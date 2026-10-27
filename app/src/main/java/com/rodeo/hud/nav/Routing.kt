@@ -68,6 +68,9 @@ object PolylineCodec {
 
 /** Turns the JSON of the free OpenStreetMap routers into a [Route]. Pure, so it is unit tested. */
 object RouteParser {
+    /** Valhalla writes "Turn left. Then Turn right."; say "then turn right". */
+    fun thenLower(s: String): String = s.replace(Regex("\\bThen ([A-Z])")) { "Then ${it.groupValues[1].lowercase()}" }
+
 
     /** Valhalla (FOSSGIS): has motorcycle costing and ready-made English instructions. */
     fun valhalla(body: String): Route {
@@ -87,7 +90,7 @@ object RouteParser {
                 maneuver = maneuver,
                 instruction = instruction,
                 alert = alert.trimEnd('.').ifBlank { instruction },
-                now = m.optString("verbal_pre_transition_instruction").trim().ifBlank { instruction },
+                now = thenLower(m.optString("verbal_pre_transition_instruction").trim().ifBlank { instruction }),
                 at = m.optInt("begin_shape_index").coerceIn(0, (points.size - 1).coerceAtLeast(0)),
                 lengthM = m.optDouble("length", 0.0) * 1000.0,
                 timeS = m.optDouble("time", 0.0),

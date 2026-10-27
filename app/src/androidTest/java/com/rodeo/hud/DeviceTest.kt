@@ -177,7 +177,9 @@ class DeviceTest {
     @Test fun d_musicCardShowsTheSong() {
         note("\n== Music card")
         var paused = false
-        val session = MediaSession(ctx, "rodeo-e2e").apply {
+        lateinit var session: MediaSession
+        // A media session needs a thread with a looper.
+        inst.runOnMainSync { session = MediaSession(ctx, "rodeo-e2e").apply {
             setMetadata(
                 MediaMetadata.Builder()
                     .putString(MediaMetadata.METADATA_KEY_TITLE, "Highway Test Track")
@@ -191,7 +193,7 @@ class DeviceTest {
                 override fun onPlay() { setPlaybackState(playing(true, 50_000)) }
             })
             isActive = true
-        }
+        } }
         try {
             launch {
                 note("access=${g.music.hasAccess()}")
@@ -216,7 +218,7 @@ class DeviceTest {
                 assertTrue(after >= before || before == audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC))
             }
         } finally {
-            session.release()
+            inst.runOnMainSync { session.release() }
         }
     }
 
@@ -288,6 +290,7 @@ class DeviceTest {
 
     private fun shot(name: String) {
         runCatching {
+            sleep(300)
             val bmp = inst.uiAutomation.takeScreenshot() ?: return
             File(out, "$name.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
         }.onFailure { note("screenshot $name failed: $it") }
@@ -300,7 +303,19 @@ class DeviceTest {
 
     private fun tileCacheKb(): Long = File(ctx.cacheDir, "osm").walkTopDown().filter { it.isFile }.sumOf { it.length() } / 1024
 
-    private fun sleep(ms: Long) = SystemClock.sleep(ms)
+    /**
+     * Waits in real time while letting the UI keep drawing: the test rule owns Compose's frame
+     * clock, so it is advanced alongside.
+     */
+    private fun sleep(ms: Long) {
+        var left = ms
+        while (left > 0) {
+            val step = minOf(100L, left)
+            SystemClock.sleep(step)
+            compose.mainClock.advanceTimeBy(step)
+            left -= step
+        }
+    }
 
     private fun resample(path: List<LatLng>, step: Double): List<LatLng> {
         val out = ArrayList<LatLng>()

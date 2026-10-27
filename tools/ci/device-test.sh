@@ -10,6 +10,8 @@ adb install -r -g app/build/outputs/apk/androidTest/debug/app-debug-androidTest.
 adb shell appops set com.rodeo.hud android:mock_location allow
 adb shell cmd notification allow_listener com.rodeo.hud/com.rodeo.hud.media.MediaListenerService
 adb shell settings put secure location_mode 3
+# Skip the one-time "Viewing full screen" tip that would cover the screenshots.
+adb shell settings put secure immersive_mode_confirmations confirmed
 adb shell media volume --stream 3 --set 7 > /dev/null 2>&1 || true
 adb logcat -c
 adb logcat -v time > $OUT/logcat.txt 2>&1 &
