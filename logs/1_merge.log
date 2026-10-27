@@ -11,13 +11,13 @@ Daemon will be stopped at the end of the build
 > Task :app:generateDebugResources
 > Task :app:packageDebugResources
 > Task :app:createDebugCompatibleScreenManifests
+> Task :app:mergeDebugResources
 > Task :app:extractDeepLinksDebug
 > Task :app:parseDebugLocalResources
-> Task :app:mergeDebugResources
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
-> Task :app:javaPreCompileDebug
 > Task :app:processDebugManifestForPackage
+> Task :app:javaPreCompileDebug
 > Task :app:mergeDebugShaders
 > Task :app:compileDebugShaders NO-SOURCE
 > Task :app:generateDebugAssets UP-TO-DATE
@@ -65,9 +65,9 @@ w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/jav
 > Task :app:packageDebug
 > Task :app:createDebugApkListingFileRedirect
 > Task :app:assembleDebug
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_6-1793123339040.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_6-1793124331110.json
 
-BUILD SUCCESSFUL in 1m 37s
+BUILD SUCCESSFUL in 1m 46s
 38 actionable tasks: 38 executed
-SIGNING Signer #1 certificate SHA-256 digest: 7a63d8c0a1c2bbe998eab78feb3906de627a3be59f8d22ee1c5c55728a4e2e7b
-SIGNING Signer #1 certificate SHA-1 digest: 338c8fb722e4e37ccbc0020f3caff9e65bd1f423
+SIGNING Signer #1 certificate SHA-256 digest: 902f7f255f839cced78c1fd415e997209d9fb38e41aef12c333576385c05f7af
+SIGNING Signer #1 certificate SHA-1 digest: 6d11a91037711f2b4e570028c141dd9f6b46274e
