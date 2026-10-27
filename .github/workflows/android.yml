@@ -37,6 +37,22 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
+      # Keep one signing key across builds so new APKs install over old ones and the
+      # Maps key SHA-1 stays valid. Prefer the SIGNING_* secrets; fall back to a cached debug key.
+      - uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: rodeo-debug-keystore-v1
+
+      - name: Signing key from secrets
+        env:
+          SIGNING_KEYSTORE_B64: ${{ secrets.SIGNING_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$SIGNING_KEYSTORE_B64" ]; then
+            echo "$SIGNING_KEYSTORE_B64" | base64 -d > $RUNNER_TEMP/rodeo.jks
+            echo "SIGNING_KEYSTORE=$RUNNER_TEMP/rodeo.jks" >> $GITHUB_ENV
+          fi
+
       - name: Build debug APK
         env:
           MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
@@ -44,10 +60,19 @@ jobs:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
           FIREBASE_DB_URL: ${{ secrets.FIREBASE_DB_URL }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
         run: |
           chmod +x gradlew
           set -o pipefail
           ./gradlew --no-daemon assembleDebug 2>&1 | tee build.log
+
+      - name: Signing fingerprint (for the Maps key restriction)
+        if: always()
+        run: |
+          KS=${SIGNING_KEYSTORE:-$HOME/.android/debug.keystore}
+          PW=${{ secrets.SIGNING_PASSWORD }}
+          [ -z "$SIGNING_KEYSTORE" ] && PW=android
+          keytool -list -v -keystore "$KS" -storepass "$PW" 2>/dev/null | grep -E "SHA1:" | sed 's/^/SIGNING /' | tee -a build.log || true
 
       # Build logs are pushed to the ci-logs branch so failures can be read without log access.
       - name: Publish build log
@@ -64,12 +89,12 @@ jobs:
           git add -f logs && git commit -qm "Build log for ${GITHUB_SHA::7} (${{ job.status }})" && git push -f origin ci-logs || true
 
       - name: Rename APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk Rodeo-${{ github.run_number }}.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk Rodeo-${{ github.ref_name }}.apk
 
       - uses: actions/upload-artifact@v4
         with:
           name: Rodeo-apk
-          path: Rodeo-${{ github.run_number }}.apk
+          path: Rodeo-${{ github.ref_name }}.apk
 
       - name: Publish rolling pre-release
         if: github.event_name == 'push'
@@ -78,4 +103,5 @@ jobs:
           tag_name: latest-${{ github.ref_name }}
           name: Rodeo ${{ github.ref_name }} (build ${{ github.run_number }})
           prerelease: true
-          files: Rodeo-${{ github.run_number }}.apk
+          files: Rodeo-${{ github.ref_name }}.apk
+          overwrite_files: true
