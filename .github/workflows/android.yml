@@ -66,6 +66,14 @@ jobs:
           set -o pipefail
           ./gradlew --no-daemon assembleDebug 2>&1 | tee build.log
 
+      - name: Signing fingerprint (for the Maps key restriction)
+        if: always()
+        run: |
+          KS=${SIGNING_KEYSTORE:-$HOME/.android/debug.keystore}
+          PW=${{ secrets.SIGNING_PASSWORD }}
+          [ -z "$SIGNING_KEYSTORE" ] && PW=android
+          keytool -list -v -keystore "$KS" -storepass "$PW" 2>/dev/null | grep -E "SHA1:" | sed 's/^/SIGNING /' | tee -a build.log || true
+
       # Build logs are pushed to the ci-logs branch so failures can be read without log access.
       - name: Publish build log
         if: always()
