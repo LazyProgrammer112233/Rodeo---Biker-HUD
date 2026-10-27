@@ -79,7 +79,11 @@ private val PERMS = listOf(
     Perm("Physical activity", "Auto-pause and crash detection.", listOf(Manifest.permission.ACTIVITY_RECOGNITION)),
     Perm("Camera", "Swipe gestures for music. Frames are read on the phone and never saved.", listOf(Manifest.permission.CAMERA)),
     Perm("Microphone", "Voice commands with gloves on.", listOf(Manifest.permission.RECORD_AUDIO)),
-    Perm("Music access", "Show and control what's playing.", emptyList(), special = "media"),
+    Perm(
+        "Music access",
+        "Song name, length and cover. If Android says \"Restricted setting\": App info, ⋮, Allow restricted settings, then try again.",
+        emptyList(), special = "media",
+    ),
 )
 
 private fun granted(ctx: Context, p: Perm): Boolean = when (p.special) {
@@ -107,7 +111,8 @@ fun PermissionsPanel(modifier: Modifier = Modifier) {
                 Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(c.glass).border(1.dp, c.glassBorder, RoundedCornerShape(16.dp))
                     .clickable(enabled = !ok) {
                         when {
-                            p.special == "media" -> ctx.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                            p.special == "media" -> runCatching { ctx.startActivity(ctx.graph.music.accessIntent()) }
+                                .onFailure { ctx.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
                             p.perms.contains(Manifest.permission.ACCESS_BACKGROUND_LOCATION) &&
                                 ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ->
                                 launcher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))

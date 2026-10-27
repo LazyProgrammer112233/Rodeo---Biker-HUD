@@ -30,6 +30,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import kotlinx.coroutines.delay
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.runtime.produceState
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.automirrored.filled.VolumeDown
 import androidx.compose.material.icons.filled.BatteryChargingFull
 import androidx.compose.material.icons.filled.BatteryFull
 import androidx.compose.material.icons.filled.Bluetooth
@@ -121,6 +126,10 @@ interface CockpitControls : HudActions {
     fun musicPrevious()
     fun musicPlayPause()
     fun musicNext()
+    fun musicVolumeUp()
+    fun musicVolumeDown()
+    /** Explain and open the notification-access switch, so song names show. */
+    fun musicAccess()
     fun bluetooth()
     fun wifi()
     fun toggleGestures()
@@ -181,6 +190,10 @@ data class MusicUi(
     val playing: Boolean = false,
     val art: ImageBitmap? = null,
     val hasAccess: Boolean = false,
+    val durationMs: Long = 0,
+    /** Where the track is now, in ms; null when unknown. Ticks from [positionMs] while playing. */
+    val position: (() -> Long)? = null,
+    val volumePct: Int? = null,
 )
 
 /**
@@ -644,35 +657,89 @@ private fun MusicStrip(m: MusicUi, actions: CockpitControls, compact: Boolean) {
     val t = LocalType.current
     val art = if (compact) 38.sdp() else 44.sdp()
     GlassCard(Modifier.fillMaxWidth(), padding = PaddingValues(horizontal = 10.sdp(), vertical = if (compact) 4.sdp() else 6.sdp())) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            val artShape = RoundedCornerShape(10.sdp())
-            if (m.art != null) {
-                Image(m.art, null, contentScale = ContentScale.Crop, modifier = Modifier.size(art).clip(artShape))
-            } else {
-                Box(Modifier.size(art).clip(artShape).background(c.surfaceHigh), contentAlignment = Alignment.Center) {
-                    Icon(Icons.Filled.MusicNote, null, tint = c.accent, modifier = Modifier.size(22.sdp()))
+        Column(verticalArrangement = Arrangement.spacedBy(if (compact) 2.sdp() else 4.sdp())) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                val artShape = RoundedCornerShape(10.sdp())
+                if (m.art != null) {
+                    Image(m.art, null, contentScale = ContentScale.Crop, modifier = Modifier.size(art).clip(artShape))
+                } else {
+                    Box(Modifier.size(art).clip(artShape).background(c.surfaceHigh), contentAlignment = Alignment.Center) {
+                        Icon(Icons.Filled.MusicNote, null, tint = c.accent, modifier = Modifier.size(22.sdp()))
+                    }
                 }
+                Spacer(Modifier.width(10.sdp()))
+                Column(Modifier.weight(1f).then(if (m.hasAccess) Modifier else Modifier.clickable(onClick = actions::musicAccess))) {
+                    Text(
+                        m.title.ifBlank { if (m.hasAccess) "Nothing playing" else "Music" }, color = c.text,
+                        style = t.headlineMd.copy(fontWeight = FontWeight.Bold), maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        if (!m.hasAccess) "Tap to show song names"
+                        else listOf(m.artist, m.app).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { "Play music in any app" },
+                        color = if (m.hasAccess) c.textMuted else c.accent, style = t.bodySm, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                val h = if (compact) 44.sdp() else 50.sdp()
+                Spacer(Modifier.width(6.sdp()))
+                MediaButton(Icons.Filled.SkipPrevious, "Previous", false, h, actions::musicPrevious)
+                Spacer(Modifier.width(6.sdp()))
+                MediaButton(if (m.playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, "Play or pause", true, h, actions::musicPlayPause)
+                Spacer(Modifier.width(6.sdp()))
+                MediaButton(Icons.Filled.SkipNext, "Next", false, h, actions::musicNext)
             }
-            Spacer(Modifier.width(10.sdp()))
-            Column(Modifier.weight(1f)) {
-                Text(
-                    m.title.ifBlank { if (m.hasAccess) "Nothing playing" else "Music" }, color = c.text,
-                    style = t.headlineMd.copy(fontWeight = FontWeight.Bold), maxLines = 1, overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    listOf(m.artist, m.app).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { "Controls any music app" },
-                    color = c.textMuted, style = t.bodySm, maxLines = 1, overflow = TextOverflow.Ellipsis,
-                )
-            }
-            val h = if (compact) 44.sdp() else 50.sdp()
-            Spacer(Modifier.width(6.sdp()))
-            MediaButton(Icons.Filled.SkipPrevious, "Previous", false, h, actions::musicPrevious)
-            Spacer(Modifier.width(6.sdp()))
-            MediaButton(if (m.playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, "Play or pause", true, h, actions::musicPlayPause)
-            Spacer(Modifier.width(6.sdp()))
-            MediaButton(Icons.Filled.SkipNext, "Next", false, h, actions::musicNext)
+            TrackRow(m, actions, compact)
         }
     }
+}
+
+/** Elapsed / progress / length, and the music volume with − and + (the + is a big target). */
+@Composable
+private fun TrackRow(m: MusicUi, actions: CockpitControls, compact: Boolean) {
+    val c = LocalHud.current
+    val t = LocalType.current
+    val pos by produceState(m.position?.invoke() ?: 0L, m) {
+        while (true) {
+            value = m.position?.invoke() ?: 0L
+            delay(500)
+        }
+    }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        val known = m.hasAccess && m.durationMs > 0
+        Text(if (known) clock(pos) else "--:--", color = c.textMuted, style = t.micro, maxLines = 1)
+        Spacer(Modifier.width(6.sdp()))
+        Box(Modifier.weight(1f).height(4.sdp()).clip(RoundedCornerShape(50)).background(c.surfaceHigh)) {
+            if (known) {
+                val f = (pos.toFloat() / m.durationMs).coerceIn(0f, 1f)
+                Box(Modifier.fillMaxHeight().fillMaxWidth(f).clip(RoundedCornerShape(50)).background(c.accent))
+            }
+        }
+        Spacer(Modifier.width(6.sdp()))
+        Text(if (known) clock(m.durationMs) else "--:--", color = c.textMuted, style = t.micro, maxLines = 1)
+        m.volumePct?.let { v ->
+            Spacer(Modifier.width(10.sdp()))
+            val size = if (compact) 26.sdp() else 30.sdp()
+            VolumeButton(Icons.AutoMirrored.Filled.VolumeDown, "Volume down", size, actions::musicVolumeDown)
+            Text(
+                "$v%", color = c.text, style = t.micro, maxLines = 1, textAlign = TextAlign.Center,
+                modifier = Modifier.width(36.sdp()),
+            )
+            VolumeButton(Icons.AutoMirrored.Filled.VolumeUp, "Volume up", size, actions::musicVolumeUp)
+        }
+    }
+}
+
+@Composable
+private fun VolumeButton(icon: ImageVector, label: String, size: Dp, onClick: () -> Unit) {
+    val c = LocalHud.current
+    Box(
+        Modifier.size(size).clip(CircleShape).background(c.surfaceHigh).clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) { Icon(icon, label, tint = c.text, modifier = Modifier.size(size * 0.62f)) }
+}
+
+private fun clock(ms: Long): String {
+    val s = (ms / 1000).coerceAtLeast(0)
+    return if (s >= 3600) "%d:%02d:%02d".format(s / 3600, s / 60 % 60, s % 60) else "%d:%02d".format(s / 60, s % 60)
 }
 
 @Composable

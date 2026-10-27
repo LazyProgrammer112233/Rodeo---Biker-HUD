@@ -82,6 +82,7 @@ fun MapPane(
     var mapView by remember { mutableStateOf<MapView?>(null) }
     val results = remember { mutableStateListOf<Place>() }
     var searching by remember { mutableStateOf(false) }
+    var searchNote by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) { MapTiles.check() }
 
@@ -97,6 +98,7 @@ fun MapPane(
         parked = parkedPlace, parkedSub = parkedPlace?.let { kmTo(it.lat, it.lng) },
         results = results.toList(),
         searching = searching,
+        searchNote = searchNote,
         bearingDeg = loc?.takeIf { it.hasBearing() }?.bearing,
         speedKmh = loc?.takeIf { it.hasSpeed() }?.let { it.speed * 3.6f } ?: 0f,
         attribution = if (tiles == MapTiles.Style.HOT) "© OpenStreetMap contributors, OSM France" else "© OpenStreetMap contributors",
@@ -106,16 +108,21 @@ fun MapPane(
             override fun search(query: String) {
                 if (query.isBlank()) return
                 searching = true
+                searchNote = null
                 results.clear()
                 scope.launch {
                     val l = g.location.location.value
                     results.addAll(Places.search(ctx, query, l?.latitude, l?.longitude))
+                    if (results.isEmpty()) {
+                        searchNote = if (Places.online(ctx)) "Nothing found for \"${query.trim()}\". Try adding the area or town." else "No internet. Search needs mobile data."
+                    }
                     searching = false
                 }
             }
-            override fun clearResults() { results.clear(); searching = false }
+            override fun clearResults() { results.clear(); searching = false; searchNote = null }
             override fun pick(place: Place, walking: Boolean) {
                 results.clear()
+                searchNote = null
                 follow = true
                 g.nav.navigateTo(place, walking)
             }

@@ -61,23 +61,6 @@ jobs:
             echo "SIGNING_KEYSTORE=$RUNNER_TEMP/rodeo.jks" >> $GITHUB_ENV
           fi
 
-      # Barlow Condensed and Inter (SIL Open Font License) are fetched at build time.
-      - name: Fonts
-        run: |
-          set -e
-          D=app/src/main/res/font
-          mkdir -p $D
-          G=https://github.com/google/fonts/raw/main/ofl/barlowcondensed
-          for p in SemiBold:semibold Bold:bold ExtraBold:extrabold Black:black BoldItalic:bold_italic ExtraBoldItalic:extrabold_italic BlackItalic:black_italic; do
-            curl -sSLf --retry 3 -o "$D/barlow_condensed_${p#*:}.ttf" "$G/BarlowCondensed-${p%%:*}.ttf"
-          done
-          curl -sSLf --retry 3 -o /tmp/inter.zip https://github.com/rsms/inter/releases/download/v4.0/Inter-4.0.zip
-          unzip -q -o /tmp/inter.zip 'extras/ttf/Inter-Regular.ttf' 'extras/ttf/Inter-Medium.ttf' 'extras/ttf/Inter-SemiBold.ttf' 'extras/ttf/Inter-Bold.ttf' -d /tmp/inter
-          for p in Regular:regular Medium:medium SemiBold:semibold Bold:bold; do
-            cp "/tmp/inter/extras/ttf/Inter-${p%%:*}.ttf" "$D/inter_${p#*:}.ttf"
-          done
-          ls -la $D
-
       # Offline speech model (Vosk, Apache 2.0) and the MediaPipe hand model, bundled into the APK.
       - uses: actions/cache@v4
         with:
@@ -86,20 +69,9 @@ jobs:
             app/src/main/assets/gesture_recognizer.task
           key: rodeo-models-v1-small-en-in-0.4
 
-      - name: Speech and hand models
-        run: |
-          set -e
-          A=app/src/main/assets
-          mkdir -p $A
-          if [ ! -f $A/vosk-model/am/final.mdl ]; then
-            curl -sSLf --retry 3 -o /tmp/vosk.zip https://alphacephei.com/vosk/models/vosk-model-small-en-in-0.4.zip
-            rm -rf /tmp/vosk && unzip -q /tmp/vosk.zip -d /tmp/vosk
-            rm -rf $A/vosk-model && mv /tmp/vosk/*/ $A/vosk-model
-          fi
-          [ -s $A/gesture_recognizer.task ] || curl -sSLf --retry 3 -o $A/gesture_recognizer.task \
-            https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/latest/gesture_recognizer.task
-          du -sh $A/*
-          find $A/vosk-model -maxdepth 2 | sort | head -40
+      # Fonts (SIL Open Font License), the offline speech model (Vosk) and the hand model.
+      - name: Fonts and models
+        run: bash tools/ci/assets.sh
 
       - name: Build debug APK
         env:
@@ -136,6 +108,11 @@ jobs:
             echo "== osrm: $(head -c 300 $F/osrm-chandigarh-sukhna.json)"
             curl -s -m 30 "https://photon.komoot.io/api/?q=nandi%20hills&limit=5&lang=en&lat=12.97&lon=77.59" -o $F/photon-nandi.json
             echo "== photon: $(head -c 300 $F/photon-nandi.json)"
+            for q in lalbagh nandi+hills hp+petrol+pump kempegowda+airport indiranagar; do
+              curl -s -m 30 "https://photon.komoot.io/api/?q=$q&limit=8&lang=en&lat=12.97&lon=77.59&location_bias_scale=0.4" -o "$F/search-photon-${q//+/-}.json"
+              curl -s -m 30 -A RodeoHUD-CI/1.0 "https://nominatim.openstreetmap.org/search?q=$q&format=jsonv2&limit=8&countrycodes=in&viewbox=76.09,14.47,79.09,11.47" -o "$F/search-nominatim-${q//+/-}.json"
+              sleep 1
+            done
             echo "== nominatim: $(curl -s -m 30 -A RodeoHUD-CI/1.0 'https://nominatim.openstreetmap.org/search?q=nandi+hills&format=jsonv2&limit=1&countrycodes=in' | head -c 300)"
             # Map tiles (2x2 around central Bengaluru, Delhi and Mumbai) from both keyless servers.
             for city in "blr 23446 15193" "del 23412 13662" "bom 23013 14616"; do
@@ -264,3 +241,77 @@ jobs:
           prerelease: true
           files: Rodeo-${{ github.ref_name }}.apk
           overwrite_files: true
+
+  # The real app on an Android emulator: search, route, ride to arrival, reroute, music card.
+  device:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Android SDK
+        run: |
+          SDKM=$(ls $ANDROID_HOME/cmdline-tools/*/bin/sdkmanager | head -1)
+          yes | $SDKM --licenses > /dev/null || true
+          $SDKM "platforms;android-35" "build-tools;35.0.0" "platform-tools" > /dev/null
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            app/src/main/assets/vosk-model
+            app/src/main/assets/gesture_recognizer.task
+          key: rodeo-models-v1-small-en-in-0.4
+
+      - name: Fonts and models
+        run: bash tools/ci/assets.sh
+
+      - name: Build for the emulator
+        run: |
+          chmod +x gradlew
+          set -o pipefail
+          ./gradlew --no-daemon -Prodeo.e2e assembleDebug assembleDebugAndroidTest 2>&1 | tee device-build.log | grep -E "^e: |FAILED|BUILD" | tail -30
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run on an emulator
+        continue-on-error: true
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          ram-size: 4096M
+          disk-size: 6000M
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot -camera-back none -camera-front none
+          disable-animations: true
+          script: bash tools/ci/device-test.sh
+
+      - name: Publish device results
+        if: always()
+        run: |
+          REF="${GITHUB_REF_NAME//\//_}"
+          mkdir -p device-out
+          [ -f device-build.log ] && cp device-build.log device-out/build.log
+          rm -rf /tmp/device && cp -r device-out /tmp/device
+          git config user.name "rodeo-ci"
+          git config user.email "ci@users.noreply.github.com"
+          for i in 1 2 3 4 5; do
+            git fetch -q origin ci-logs && git checkout -qf -B ci-logs origin/ci-logs || { git checkout -qB ci-logs; git rm -rq --cached .; }
+            rm -rf "device/$REF" && mkdir -p "device/$REF" && cp -r /tmp/device/* "device/$REF/" 2>/dev/null
+            git add -fA device && git commit -qm "Device test for ${GITHUB_SHA::7} (${{ job.status }})" || true
+            git push origin ci-logs && break
+            sleep $((RANDOM % 7 + 3))
+          done || true

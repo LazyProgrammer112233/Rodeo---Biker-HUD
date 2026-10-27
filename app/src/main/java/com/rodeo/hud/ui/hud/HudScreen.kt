@@ -11,6 +11,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -30,6 +33,7 @@ import com.rodeo.hud.graph
 import com.rodeo.hud.nav.MapPane
 import com.rodeo.hud.ride.formatDuration
 import com.rodeo.hud.ui.components.ParticleField
+import com.rodeo.hud.ui.theme.LocalHud
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -72,6 +76,8 @@ fun HudScreen(actions: HudActions, showEndSlider: Boolean, dark: Boolean) {
     val last = rides.firstOrNull()
     val top = warnings.firstOrNull()
     val art = remember(music.art) { music.art?.asImageBitmap() }
+    val position = remember(music) { { music.positionNow() } }
+    var explainMusicAccess by remember { mutableStateOf(false) }
     val state = CockpitState(
         time = SimpleDateFormat(if (is24) "HH:mm" else "h:mm", Locale.getDefault()).format(date),
         timeSuffix = if (is24) zoneShort() else SimpleDateFormat("a", Locale.ENGLISH).format(date).uppercase(),
@@ -99,7 +105,12 @@ fun HudScreen(actions: HudActions, showEndSlider: Boolean, dark: Boolean) {
         lastAvgKmh = last?.avgSpeedKmh?.toInt(),
         lastTopKmh = last?.maxSpeedKmh?.toInt(),
         warning = top?.let { WarningUi(it.title, it.detail, it.severity, warnings.size - 1) },
-        music = MusicUi(music.title, music.artist, music.app, music.playing, art, music.hasAccess),
+        music = MusicUi(
+            music.title, music.artist, music.app, music.playing, art, music.hasAccess,
+            durationMs = music.durationMs,
+            position = position,
+            volumePct = music.volume * 100 / music.maxVolume.coerceAtLeast(1),
+        ),
         btOn = route.btOn,
         btDevice = route.btDevice,
         wiredHeadset = route.wired,
@@ -130,6 +141,9 @@ fun HudScreen(actions: HudActions, showEndSlider: Boolean, dark: Boolean) {
             override fun musicPrevious() = g.music.previous()
             override fun musicPlayPause() = g.music.playPause()
             override fun musicNext() = g.music.next()
+            override fun musicVolumeUp() = g.music.volumeUp()
+            override fun musicVolumeDown() = g.music.volumeDown()
+            override fun musicAccess() { explainMusicAccess = true }
             override fun bluetooth() = openBluetooth(ctx, g.audioRoutes.route.value.btOn)
             override fun wifi() {
                 runCatching { ctx.startActivity(Intent(Settings.Panel.ACTION_WIFI).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
@@ -145,6 +159,46 @@ fun HudScreen(actions: HudActions, showEndSlider: Boolean, dark: Boolean) {
         },
         backdrop = { ParticleField(Modifier.fillMaxSize(), speed, lowPower = health.lowPower) },
         overlay = { GestureFlash(Modifier.align(Alignment.TopCenter).padding(top = 18.dp)) },
+    )
+    if (explainMusicAccess) {
+        MusicAccessDialog(
+            onOpen = {
+                explainMusicAccess = false
+                runCatching { ctx.startActivity(g.music.accessIntent()) }
+                    .onFailure { runCatching { ctx.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } }
+            },
+            onAppInfo = {
+                explainMusicAccess = false
+                runCatching { ctx.startActivity(g.music.appInfoIntent()) }
+            },
+            onDismiss = { explainMusicAccess = false },
+        )
+    }
+}
+
+/**
+ * Song names, length and art need notification access. On Android 13 and later an app installed
+ * from an APK has that switch greyed out ("Restricted setting") until it is allowed in App info.
+ */
+@Composable
+private fun MusicAccessDialog(onOpen: () -> Unit, onAppInfo: () -> Unit, onDismiss: () -> Unit) {
+    val c = LocalHud.current
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = c.surface,
+        titleContentColor = c.text,
+        textContentColor = c.textMuted,
+        title = { Text("Show what's playing") },
+        text = {
+            Text(
+                "Rodeo reads the song name, length and cover from your music app's notification. " +
+                    "Turn on Rodeo on the next screen.\n\n" +
+                    "If the switch is greyed out or says \"Restricted setting\": open App info, tap ⋮ at the top right, " +
+                    "choose \"Allow restricted settings\", then come back and tap Turn on again.",
+            )
+        },
+        confirmButton = { TextButton(onClick = onOpen) { Text("Turn on", color = c.accent) } },
+        dismissButton = { TextButton(onClick = onAppInfo) { Text("App info", color = c.text) } },
     )
 }
 

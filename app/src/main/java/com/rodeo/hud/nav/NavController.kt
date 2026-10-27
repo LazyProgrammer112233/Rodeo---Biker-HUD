@@ -17,8 +17,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-data class Place(val title: String, val subtitle: String, val lat: Double, val lng: Double)
-
 data class NavState(
     val destination: Place? = null,
     val walking: Boolean = false,

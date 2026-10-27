@@ -98,7 +98,10 @@ class HudShots {
         time = "21:45", timeSuffix = "IST", weatherTemp = "29°C", weatherLabel = "Partly cloudy", batteryPct = 84, phoneTempC = 36,
         model = "390 Duke", year = "2023", paintName = "Electronic Orange",
         lastDistanceKm = 48.2f, lastAvgKmh = 41, lastTopKmh = 112,
-        music = MusicUi("Hyper-Velocity (VIP Mix)", "Apex Drivers", "Spotify", playing = true, hasAccess = true),
+        music = MusicUi(
+            "Hyper-Velocity (VIP Mix)", "Apex Drivers", "Spotify", playing = true, hasAccess = true,
+            durationMs = 224_000, position = { 83_000L }, volumePct = 60,
+        ),
         btOn = true, btDevice = "SENA 50S", wifiOn = true, packCount = 4, packActive = true, gesturesOn = true,
     )
 
@@ -130,7 +133,7 @@ class HudShots {
 
     @Test fun searchResults() = shoot("hud-search", listOf(frames[0], frames[2]), listOf(looks[0], looks[1])) {
         CockpitLayout(
-            parked.copy(music = MusicUi(), btOn = false, btDevice = null, warning = WarningUi("Rain in 20 minutes", "70% chance", Severity.INFO)),
+            parked.copy(music = MusicUi(volumePct = 47), btOn = false, btDevice = null, warning = WarningUi("Rain in 20 minutes", "70% chance", Severity.INFO)),
             NoActions, mapOnRight = true,
             map = {
                 FakeMap(
@@ -145,6 +148,13 @@ class HudShots {
                     ),
                 )
             },
+        )
+    }
+
+    @Test fun searchNothingFound() = shoot("hud-search-none", listOf(frames[0]), listOf(looks[0], looks[1])) {
+        CockpitLayout(
+            parked, NoActions, mapOnRight = true,
+            map = { FakeMap(it, MapChromeState(home = home, homeSub = "18 km", searchNote = "Nothing found for \"qwzx\". Try adding the area or town.")) },
         )
     }
 
@@ -251,6 +261,9 @@ private object NoActions : CockpitControls {
     override fun musicPrevious() = Unit
     override fun musicPlayPause() = Unit
     override fun musicNext() = Unit
+    override fun musicVolumeUp() = Unit
+    override fun musicVolumeDown() = Unit
+    override fun musicAccess() = Unit
     override fun bluetooth() = Unit
     override fun wifi() = Unit
     override fun toggleGestures() = Unit

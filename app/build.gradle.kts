@@ -13,6 +13,10 @@ val secrets = Properties().apply {
 }
 fun secret(name: String): String = System.getenv(name) ?: secrets.getProperty(name) ?: ""
 
+// -Prodeo.e2e builds for the x86_64 emulator used by the on-device tests on CI, with a
+// mock-location permission so the tests can drive GPS. Phone builds are unaffected.
+val e2e = providers.gradleProperty("rodeo.e2e").isPresent
+
 android {
     namespace = "com.rodeo.hud"
     compileSdk = 35
@@ -25,7 +29,8 @@ android {
         versionName = "0.2.0-p2"
 
         // Phones only: the offline speech and hand models ship native code for ARM.
-        ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }
+        ndk { abiFilters += if (e2e) listOf("x86_64") else listOf("arm64-v8a", "armeabi-v7a") }
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "FIREBASE_API_KEY", "\"${secret("FIREBASE_API_KEY")}\"")
         buildConfigField("String", "FIREBASE_APP_ID", "\"${secret("FIREBASE_APP_ID")}\"")
@@ -53,6 +58,7 @@ android {
             signingConfig = signingConfigs.getByName(if (keystore != null) "rodeo" else "debug")
         }
     }
+    if (e2e) sourceSets.getByName("debug").manifest.srcFile("src/e2e/AndroidManifest.xml")
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -130,4 +136,11 @@ dependencies {
     testImplementation("io.github.takahirom.roborazzi:roborazzi-compose:1.32.2")
     testImplementation(composeBom)
     testImplementation("androidx.compose.ui:ui-test-junit4")
+
+    // On-device tests (emulator on CI): search, route, ride, reroute, music card.
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test:runner:1.6.2")
+    androidTestImplementation("androidx.test:rules:1.6.1")
+    androidTestImplementation(composeBom)
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 }

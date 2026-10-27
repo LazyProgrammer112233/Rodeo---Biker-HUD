@@ -58,6 +58,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -84,6 +85,8 @@ data class MapChromeState(
     val parkedSub: String? = null,
     val results: List<Place> = emptyList(),
     val searching: Boolean = false,
+    /** Why a search came back empty. */
+    val searchNote: String? = null,
     val bearingDeg: Float? = null,
     val speedKmh: Float = 0f,
     val attribution: String = "© OpenStreetMap contributors",
@@ -166,7 +169,7 @@ private fun SearchRow(s: MapChromeState, actions: MapChromeActions, narrow: Bool
             s.home?.let { h -> PlaceChip(Icons.Filled.Home, "Home", s.homeSub, narrow) { actions.pick(h, false) } }
             s.parked?.let { p -> PlaceChip(Icons.Filled.TwoWheeler, "Bike", s.parkedSub, narrow) { actions.pick(p, true) } }
         }
-        if (s.results.isNotEmpty() || s.searching) {
+        if (s.results.isNotEmpty() || s.searching || s.searchNote != null) {
             val shape = panelShape()
             LazyColumn(
                 Modifier.padding(top = 6.sdp()).fillMaxWidth().heightIn(max = 220.sdp()).clip(shape).background(c.surface)
@@ -174,10 +177,12 @@ private fun SearchRow(s: MapChromeState, actions: MapChromeActions, narrow: Bool
             ) {
                 if (s.searching && s.results.isEmpty()) item {
                     Text("Searching…", color = c.textMuted, style = t.body, modifier = Modifier.padding(14.sdp()))
+                } else if (s.results.isEmpty() && s.searchNote != null) item {
+                    Text(s.searchNote, color = c.textMuted, style = t.body, modifier = Modifier.padding(14.sdp()))
                 }
                 items(s.results) { p ->
                     Row(
-                        Modifier.fillMaxWidth().clickable { query = ""; actions.pick(p, false) }.padding(horizontal = 14.sdp(), vertical = 10.sdp()),
+                        Modifier.fillMaxWidth().testTag("place-result").clickable { query = ""; actions.pick(p, false) }.padding(horizontal = 14.sdp(), vertical = 10.sdp()),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(Icons.Filled.Place, null, tint = c.accent, modifier = Modifier.size(20.sdp()))

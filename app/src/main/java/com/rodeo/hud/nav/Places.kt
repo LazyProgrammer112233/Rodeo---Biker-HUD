@@ -2,6 +2,8 @@ package com.rodeo.hud.nav
 
 import android.content.Context
 import android.location.Geocoder
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import com.rodeo.hud.data.Geo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -13,31 +15,81 @@ import org.json.JSONObject
 import java.net.URLEncoder
 import java.util.Locale
 
+data class Place(
+    val title: String,
+    val subtitle: String,
+    val lat: Double,
+    val lng: Double,
+    /** A road rather than a place; search lists these after places. */
+    val road: Boolean = false,
+)
+
 /**
- * Place search without an API key: OpenStreetMap's Photon search (good at shops, petrol pumps,
- * landmarks) and the phone's own geocoder (good at street addresses) run side by side, with
- * Nominatim as the backstop. Results near the rider come first.
+ * Place search without an API key: the phone's own geocoder (strong on landmarks and addresses
+ * where the phone has one), OpenStreetMap's Photon (shops, petrol pumps) and Nominatim run side
+ * by side. Results are ordered by how well the name matches, then by distance, with roads below
+ * places unless the rider asked for a road: "Nandi Hills" is the hill, not Nandi Hills Road.
  */
 object Places {
     suspend fun search(context: Context, query: String, nearLat: Double?, nearLng: Double?): List<Place> = withContext(Dispatchers.IO) {
         val q = query.trim()
         if (q.isEmpty()) return@withContext emptyList()
-        val merged = coroutineScope {
-            val photon = async { withTimeoutOrNull(8_000) { runCatching { photon(q, nearLat, nearLng) }.getOrNull() }.orEmpty() }
+        val found = coroutineScope {
             val phone = async { withTimeoutOrNull(8_000) { runCatching { platform(context, q, nearLat, nearLng) }.getOrNull() }.orEmpty() }
-            merge(photon.await(), phone.await())
+            val photon = async { withTimeoutOrNull(8_000) { runCatching { photon(q, nearLat, nearLng) }.getOrNull() }.orEmpty() }
+            val osm = async { withTimeoutOrNull(8_000) { runCatching { nominatim(q, nearLat, nearLng) }.getOrNull() }.orEmpty() }
+            merge(merge(phone.await(), photon.await()), osm.await())
         }
-        val results = merged.ifEmpty { runCatching { nominatim(q, nearLat, nearLng) }.getOrDefault(emptyList()) }
-        rank(results, nearLat, nearLng).take(8)
+        rank(q, found, nearLat, nearLng).take(8)
     }
 
-    /** Closest to the rider first. */
-    fun rank(places: List<Place>, lat: Double?, lng: Double?): List<Place> {
-        if (lat == null || lng == null) return places
-        return places.sortedBy { Geo.distanceM(lat, lng, it.lat, it.lng) }
+    /** Whether the phone has a working internet connection, to explain an empty search. */
+    fun online(context: Context): Boolean {
+        val cm = context.getSystemService(ConnectivityManager::class.java) ?: return true
+        val caps = cm.getNetworkCapabilities(cm.activeNetwork) ?: return false
+        return caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
-    /** Drops duplicates (same name within 150 m) when both sources find the same place. */
+    /** Best name match first; among equal matches, the closest. Roads sink unless asked for. */
+    fun rank(query: String, places: List<Place>, lat: Double?, lng: Double?): List<Place> {
+        val q = words(query)
+        val wantsRoad = q.any { it in ROAD_WORDS }
+        return places.sortedWith(
+            compareBy<Place>({ match(q, it) + (if (it.road && !wantsRoad) 1.5 else 0.0) + far(it, lat, lng) }, { km(it, lat, lng) }),
+        )
+    }
+
+    /** 0 exact name, 1 the name starts with (or is the start of) the query, 1.5 all words in it, 3 other. */
+    private fun match(q: List<String>, p: Place): Double {
+        val t = words(p.title)
+        return when {
+            t == q -> 0.0
+            t.size >= q.size && t.subList(0, q.size) == q -> 1.0
+            q.size > t.size && t.isNotEmpty() && q.subList(0, t.size) == t -> 1.0
+            q.all { w -> t.any { it.startsWith(w) } } -> 1.5
+            else -> 3.0
+        }
+    }
+
+    private fun km(p: Place, lat: Double?, lng: Double?): Double =
+        if (lat == null || lng == null) 0.0 else Geo.distanceM(lat, lng, p.lat, p.lng) / 1000.0
+
+    /** A nudge for distance: a matching place in town beats one across the country. */
+    private fun far(p: Place, lat: Double?, lng: Double?): Double = km(p, lat, lng).let {
+        when {
+            it < 15 -> 0.0
+            it < 100 -> 0.3
+            it < 500 -> 0.8
+            else -> 1.6
+        }
+    }
+
+    private fun words(s: String): List<String> =
+        s.lowercase(Locale.ROOT).replace(Regex("[^\\p{L}\\p{N}]+"), " ").trim().split(' ').filter { it.isNotEmpty() }
+
+    private val ROAD_WORDS = setOf("road", "rd", "street", "st", "marg", "main", "cross", "highway", "nh", "sh", "flyover", "lane", "avenue", "salai", "path", "bypass", "expressway")
+
+    /** Drops duplicates (same name within 150 m) when two sources find the same place. */
     fun merge(a: List<Place>, b: List<Place>): List<Place> {
         val out = ArrayList<Place>(a)
         for (p in b) {
@@ -66,19 +118,23 @@ object Places {
                 .filter { it.isNotBlank() && it != name }
                 .distinct()
                 .joinToString(", ")
-            Place(name, sub, coords.getDouble(1), coords.getDouble(0))
+            val road = props.optString("osm_key") == "highway" || props.optString("type") == "street"
+            Place(name, sub, coords.getDouble(1), coords.getDouble(0), road)
         }
     }
 
     private fun nominatim(q: String, lat: Double?, lng: Double?): List<Place> {
         val box = if (lat != null && lng != null) "&viewbox=${lng - 1.5},${lat + 1.5},${lng + 1.5},${lat - 1.5}" else ""
-        val body = Router.get("https://nominatim.openstreetmap.org/search?q=${enc(q)}&format=jsonv2&limit=8&countrycodes=in$box", 8_000)
+        return parseNominatim(Router.get("https://nominatim.openstreetmap.org/search?q=${enc(q)}&format=jsonv2&limit=8&countrycodes=in$box", 8_000))
+    }
+
+    fun parseNominatim(body: String): List<Place> {
         val arr = JSONArray(body)
         return (0 until arr.length()).map { i ->
             val o = arr.getJSONObject(i)
             val display = o.optString("display_name")
             val name = o.optString("name").ifBlank { display.substringBefore(",") }
-            Place(name, display.substringAfter(", ", "").take(80), o.getString("lat").toDouble(), o.getString("lon").toDouble())
+            Place(name, display.substringAfter(", ", "").take(80), o.getString("lat").toDouble(), o.getString("lon").toDouble(), o.optString("category") == "highway")
         }
     }
 
@@ -91,7 +147,8 @@ object Places {
         } else g.getFromLocationName(q, 6)
         return results.orEmpty().map { a ->
             val title = a.featureName?.takeIf { it.isNotBlank() && !it.all { ch -> ch.isDigit() } } ?: a.getAddressLine(0) ?: q
-            Place(title, a.getAddressLine(0) ?: listOfNotNull(a.locality, a.adminArea).joinToString(", "), a.latitude, a.longitude)
+            val road = a.thoroughfare != null && a.featureName == a.thoroughfare
+            Place(title, a.getAddressLine(0) ?: listOfNotNull(a.locality, a.adminArea).joinToString(", "), a.latitude, a.longitude, road)
         }
     }
 

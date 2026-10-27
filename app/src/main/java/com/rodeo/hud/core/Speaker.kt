@@ -34,6 +34,9 @@ class Speaker(context: Context) {
     /** Rider muted the turn voice on the turn card. */
     @Volatile var navMuted = false
 
+    /** Sees every line before it is spoken (the on-device tests record them). */
+    @Volatile var onSay: ((Channel, String) -> Unit)? = null
+
     private fun ensure() {
         if (tts != null) return
         tts = TextToSpeech(app) { status ->
@@ -71,6 +74,7 @@ class Speaker(context: Context) {
      */
     fun say(text: String, channel: Channel = Channel.NAV, flush: Boolean = false, done: (() -> Unit)? = null) {
         if (channel == Channel.NAV && navMuted) { done?.invoke(); return }
+        onSay?.invoke(channel, text)
         ensure()
         val t = tts
         if (t == null || !ready) {
