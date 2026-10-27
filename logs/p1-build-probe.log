@@ -10,9 +10,9 @@
 == tile hot blr 00 200 image/png 35901
 == tile osm blr 01 200 image/png 39066
 == tile hot blr 01 200 image/png 38374
-== tile osm blr 10 200 image/png 42456
+== tile osm blr 10 200 image/png 42470
 == tile hot blr 10 200 image/png 40350
-== tile osm blr 11 200 image/png 36332
+== tile osm blr 11 200 image/png 36328
 == tile hot blr 11 200 image/png 37150
 == tile osm del 00 200 image/png 36420
 == tile hot del 00 200 image/png 35518
@@ -24,29 +24,29 @@
 == tile hot del 11 200 image/png 28543
 == tile osm bom 00 200 image/png 39360
 == tile hot bom 00 200 image/png 37203
-== tile osm bom 01 200 image/png 18372
+== tile osm bom 01 200 image/png 18214
 == tile hot bom 01 200 image/png 17494
-== tile osm bom 10 200 image/png 33914
+== tile osm bom 10 200 image/png 33733
 == tile hot bom 10 200 image/png 32538
-== tile osm bom 11 200 image/png 28920
+== tile osm bom 11 200 image/png 29357
 == tile hot bom 11 200 image/png 28852
 total 116
-drwxr-xr-x 2 runner runner  4096 Oct 27 21:21 .
-drwxr-xr-x 3 runner runner  4096 Oct 27 21:21 ..
--rw-r--r-- 1 runner runner  9141 Oct 27 21:21 osrm-chandigarh-sukhna.json
--rw-r--r-- 1 runner runner  1252 Oct 27 21:21 photon-nandi.json
--rw-r--r-- 1 runner runner  4522 Oct 27 21:21 search-nominatim-hp-petrol-pump.json
--rw-r--r-- 1 runner runner  3701 Oct 27 21:21 search-nominatim-indiranagar.json
--rw-r--r-- 1 runner runner   552 Oct 27 21:21 search-nominatim-kempegowda-airport.json
--rw-r--r-- 1 runner runner  4467 Oct 27 21:21 search-nominatim-lalbagh.json
--rw-r--r-- 1 runner runner  4201 Oct 27 21:21 search-nominatim-nandi-hills.json
--rw-r--r-- 1 runner runner  3666 Oct 27 21:21 search-photon-hp-petrol-pump.json
--rw-r--r-- 1 runner runner  3239 Oct 27 21:21 search-photon-indiranagar.json
--rw-r--r-- 1 runner runner  3395 Oct 27 21:21 search-photon-kempegowda-airport.json
--rw-r--r-- 1 runner runner  3462 Oct 27 21:21 search-photon-lalbagh.json
--rw-r--r-- 1 runner runner  1636 Oct 27 21:21 search-photon-nandi-hills.json
--rw-r--r-- 1 runner runner 12425 Oct 27 21:21 valhalla-bengaluru-nandi.json
--rw-r--r-- 1 runner runner  7076 Oct 27 21:21 valhalla-chandigarh-sukhna.json
--rw-r--r-- 1 runner runner  7289 Oct 27 21:21 valhalla-delhi-cp-indiagate.json
--rw-r--r-- 1 runner runner  3884 Oct 27 21:21 valhalla-mumbai-bandra-juhu.json
--rw-r--r-- 1 runner runner  3860 Oct 27 21:21 valhalla-walk-to-bike.json
+drwxr-xr-x 2 runner runner  4096 Oct 27 21:35 .
+drwxr-xr-x 3 runner runner  4096 Oct 27 21:35 ..
+-rw-r--r-- 1 runner runner  9141 Oct 27 21:35 osrm-chandigarh-sukhna.json
+-rw-r--r-- 1 runner runner  1252 Oct 27 21:35 photon-nandi.json
+-rw-r--r-- 1 runner runner  4531 Oct 27 21:35 search-nominatim-hp-petrol-pump.json
+-rw-r--r-- 1 runner runner  3702 Oct 27 21:35 search-nominatim-indiranagar.json
+-rw-r--r-- 1 runner runner   538 Oct 27 21:35 search-nominatim-kempegowda-airport.json
+-rw-r--r-- 1 runner runner  4440 Oct 27 21:35 search-nominatim-lalbagh.json
+-rw-r--r-- 1 runner runner  4201 Oct 27 21:35 search-nominatim-nandi-hills.json
+-rw-r--r-- 1 runner runner  3666 Oct 27 21:35 search-photon-hp-petrol-pump.json
+-rw-r--r-- 1 runner runner  3239 Oct 27 21:35 search-photon-indiranagar.json
+-rw-r--r-- 1 runner runner  3395 Oct 27 21:35 search-photon-kempegowda-airport.json
+-rw-r--r-- 1 runner runner  3462 Oct 27 21:35 search-photon-lalbagh.json
+-rw-r--r-- 1 runner runner  1636 Oct 27 21:35 search-photon-nandi-hills.json
+-rw-r--r-- 1 runner runner 12425 Oct 27 21:35 valhalla-bengaluru-nandi.json
+-rw-r--r-- 1 runner runner  7076 Oct 27 21:35 valhalla-chandigarh-sukhna.json
+-rw-r--r-- 1 runner runner  7289 Oct 27 21:35 valhalla-delhi-cp-indiagate.json
+-rw-r--r-- 1 runner runner  3884 Oct 27 21:35 valhalla-mumbai-bandra-juhu.json
+-rw-r--r-- 1 runner runner  3860 Oct 27 21:35 valhalla-walk-to-bike.json

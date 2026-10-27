@@ -25,23 +25,19 @@ Daemon will be stopped at the end of the build
 > Task :app:compileDebugShaders NO-SOURCE
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:javaPreCompileDebugUnitTest
-> Task :app:bundleDebugClassesToRuntimeJar
 > Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:bundleDebugClassesToRuntimeJar
 > Task :app:bundleDebugClassesToCompileJar
 > Task :app:packageDebugUnitTestForUnitTest
 > Task :app:processDebugJavaRes UP-TO-DATE
 > Task :app:generateDebugUnitTestConfig
-
 > Task :app:compileDebugUnitTestKotlin
-e: The daemon has terminated unexpectedly on startup attempt #1 with error code: 0. The daemon process output:
-    1. Kotlin compile daemon is ready
-
 > Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
 > Task :app:processDebugUnitTestJavaRes
 > Task :app:testDebugUnitTest
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_7-1793136110417.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_7-1793136960465.json
 
-BUILD SUCCESSFUL in 1m 6s
+BUILD SUCCESSFUL in 54s
 28 actionable tasks: 8 executed, 20 up-to-date
 testsuite name="com.rodeo.hud.logic.GestureLogicTest" tests="12" skipped="0" failures="0"
 testsuite name="com.rodeo.hud.logic.NavLogicTest" tests="9" skipped="0" failures="0"
