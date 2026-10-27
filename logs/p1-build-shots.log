@@ -25,17 +25,26 @@ Daemon will be stopped at the end of the build
 > Task :app:compileDebugShaders NO-SOURCE
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:javaPreCompileDebugUnitTest
-> Task :app:bundleDebugClassesToRuntimeJar
-> Task :app:bundleDebugClassesToCompileJar
 > Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:bundleDebugClassesToCompileJar
+> Task :app:bundleDebugClassesToRuntimeJar
 > Task :app:packageDebugUnitTestForUnitTest
 > Task :app:generateDebugUnitTestConfig
 > Task :app:processDebugJavaRes UP-TO-DATE
+
 > Task :app:compileDebugUnitTestKotlin
+w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/test/java/com/rodeo/hud/logic/NavReplayTest.kt:27:9 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'java.io.File?'.
+
 > Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
 > Task :app:processDebugUnitTestJavaRes
 > Task :app:testDebugUnitTest
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_6-1793121191378.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_8-1793123457401.json
 
-BUILD SUCCESSFUL in 54s
+BUILD SUCCESSFUL in 1m 10s
 28 actionable tasks: 8 executed, 20 up-to-date
+testsuite name="com.rodeo.hud.logic.GestureLogicTest" tests="12" skipped="0" failures="0"
+testsuite name="com.rodeo.hud.logic.NavLogicTest" tests="9" skipped="0" failures="0"
+testsuite name="com.rodeo.hud.logic.NavReplayTest" tests="1" skipped="0" failures="0"
+testsuite name="com.rodeo.hud.logic.VoiceLogicTest" tests="16" skipped="0" failures="0"
+testsuite name="com.rodeo.hud.shots.HudShots" tests="11" skipped="0" failures="0"
+testsuite name="com.rodeo.hud.shots.ScreenShots" tests="5" skipped="0" failures="0"

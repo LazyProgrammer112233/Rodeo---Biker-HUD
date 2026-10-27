@@ -1,0 +1,201 @@
+=== osrm-chandigarh-sukhna.json  (OSRM, 5.2 km, 9 min, 91 points, 12 steps)
+   step 0 DEPART at 0: Head off
+   step 1 RIGHT at 2: At the end of the road, turn right
+   step 2 STRAIGHT at 4: Continue straight
+   step 3 RIGHT at 5: Turn right
+   step 4 LEFT at 8: Turn left
+   step 5 LEFT at 12: Turn left onto Himalaya Marg
+   step 6 ROUNDABOUT_LEFT at 38: At the roundabout, take the 2nd exit onto Himalaya Marg
+   step 7 RIGHT at 48: At the end of the road, turn right onto Uttar Marg
+   step 8 LEFT at 52: Turn left
+   step 9 LEFT at 74: At the end of the road, turn left
+   step 10 RIGHT at 81: Turn right
+   step 11 ARRIVE at 90: You have arrived
+   @     0 m  "Route ready. 5.2 kilometres, about 9 minutes"
+   @     0 m  "In 60 metres, at the end of the road, turn right"
+   @    11 m  "At the end of the road, turn right"
+   @    60 m  "In 150 metres, continue straight"
+   @   144 m  "Continue straight"
+   @   199 m  "In 100 metres, turn right"
+   @   265 m  "Turn right"
+   @   310 m  "In 150 metres, turn left"
+   @   397 m  "Turn left"
+   @   431 m  "In 150 metres, turn left onto Himalaya Marg"
+   @   525 m  "Turn left onto Himalaya Marg"
+   @  2102 m  "In 500 metres, at the roundabout, take the 2nd exit onto Himalaya Marg"
+   @  2431 m  "In 150 metres, at the roundabout, take the 2nd exit onto Himalaya Marg"
+   @  2537 m  "At the roundabout, take the 2nd exit onto Himalaya Marg"
+   @  2589 m  "In 450 metres, at the end of the road, turn right onto Uttar Marg"
+   @  2902 m  "In 150 metres, at the end of the road, turn right onto Uttar Marg"
+   @  3015 m  "At the end of the road, turn right onto Uttar Marg"
+   @  3062 m  "In 350 metres, turn left"
+   @  3233 m  "In 150 metres, turn left"
+   @  3354 m  "Turn left"
+   @  4219 m  "In 500 metres, at the end of the road, turn left"
+   @  4548 m  "In 150 metres, at the end of the road, turn left"
+   @  4680 m  "At the end of the road, turn left"
+   @  4791 m  "In 150 metres, turn right"
+   @  4918 m  "Turn right"
+   @  4986 m  "In 150 metres, you have arrived"
+   @  5106 m  "You have arrived"
+   @  5122 m  "You have arrived"
+   turns=10 spokenAtTurn=10 offRoute=false arrived=true
+
+=== valhalla-bengaluru-nandi.json  (Valhalla, 61.2 km, 2 h 29 min, 1096 points, 12 steps)
+   step 0 DEPART at 0: Drive east
+   step 1 LEFT at 2: Turn left
+   step 2 LEFT at 6: Turn left onto Vittal Mallya Road
+   step 3 RIGHT at 15: Turn right onto Kasturba Road
+   step 4 LEFT at 40: Turn left onto Queen's Road
+   step 5 RIGHT at 106: Turn right onto Palace Road
+   step 6 ROUNDABOUT_RIGHT at 141: Enter the roundabout and take the 2nd exit onto Sankey Road Underpass/NH44/T Chowdiah Road
+   step 7 KEEP_RIGHT at 174: Keep right to take Ramana Maharshi Road
+   step 8 LEFT at 687: Turn left onto Nandi Hills Road/SH104. Continue on SH104
+   step 9 LEFT at 786: Turn left
+   step 10 RIGHT at 828: Turn right onto Nandi Hill Road
+   step 11 ARRIVE at 1095: Your destination is on the left
+   @     0 m  "Route ready. 61 kilometres, about 2 hours 29 minutes"
+   @     0 m  "Turn left. Then Turn left onto Vittal Mallya Road."
+   @    22 m  "Turn left onto Vittal Mallya Road."
+   @    45 m  "In 100 metres, turn right onto Kasturba Road"
+   @   115 m  "Turn right onto Kasturba Road."
+   @   434 m  "In 500 metres, turn left onto Queen's Road"
+   @   765 m  "In 150 metres, turn left onto Queen's Road"
+   @   886 m  "Turn left onto Queen's Road."
+   @  2021 m  "In 500 metres, turn right onto Palace Road"
+   @  2355 m  "In 150 metres, turn right onto Palace Road"
+   @  2457 m  "Turn right onto Palace Road."
+   @  3150 m  "In 500 metres, enter the roundabout and take the 2nd exit onto Sankey Road Underpass"
+   @  3480 m  "In 150 metres, enter the roundabout and take the 2nd exit onto Sankey Road Underpass"
+   @  3600 m  "Enter the roundabout and take the 2nd exit onto Sankey Road Underpass, NH44."
+   @  4221 m  "In 500 metres, keep right to take Ramana Maharshi Road"
+   @  4554 m  "In 150 metres, keep right to take Ramana Maharshi Road"
+   @  4675 m  "Keep right to take Ramana Maharshi Road."
+   @ 38729 m  "In 500 metres, turn left onto Nandi Hills Road"
+   @ 39057 m  "In 150 metres, turn left onto Nandi Hills Road"
+   @ 39178 m  "Turn left onto Nandi Hills Road, SH104."
+   @ 48589 m  "In 500 metres, turn left"
+   @ 48905 m  "In 150 metres, turn left"
+   @ 49025 m  "Turn left."
+   @ 52462 m  "In 500 metres, turn right onto Nandi Hill Road"
+   @ 52793 m  "In 150 metres, turn right onto Nandi Hill Road"
+   @ 52905 m  "Turn right onto Nandi Hill Road."
+   @ 60703 m  "In 500 metres, your destination will be on the left"
+   @ 61042 m  "In 150 metres, your destination will be on the left"
+   @ 61154 m  "Your destination is on the left."
+   @ 61166 m  "You have arrived"
+   turns=10 spokenAtTurn=10 offRoute=false arrived=true
+
+=== valhalla-chandigarh-sukhna.json  (Valhalla, 5.2 km, 20 min, 91 points, 12 steps)
+   step 0 DEPART at 0: Drive southeast
+   step 1 LEFT at 3: Turn left
+   step 2 UTURN_RIGHT at 5: Make a right U-turn
+   step 3 LEFT at 8: Turn left
+   step 4 SLIGHT_LEFT at 9: Bear left
+   step 5 LEFT at 12: Turn left onto Himalaya Marg
+   step 6 ROUNDABOUT_RIGHT at 38: Enter the roundabout and take the 2nd exit onto Himalaya Marg
+   step 7 RIGHT at 48: Turn right onto Uttar Marg
+   step 8 LEFT at 52: Turn left
+   step 9 LEFT at 74: Turn left
+   step 10 SLIGHT_RIGHT at 81: Bear right
+   step 11 ARRIVE at 90: You have arrived at your destination
+   @     0 m  "Route ready. 5.2 kilometres, about 20 minutes"
+   @    87 m  "In 150 metres, turn left"
+   @   199 m  "Turn left."
+   @   245 m  "In 60 metres, make a right U-turn"
+   @   265 m  "In 70 metres, turn left"
+   @   381 m  "Make a right U-turn."
+   @   397 m  "Turn left."
+   @   431 m  "In 60 metres, bear left"
+   @   443 m  "Bear left."
+   @   490 m  "In 70 metres, turn left onto Himalaya Marg"
+   @   523 m  "Turn left onto Himalaya Marg."
+   @  2102 m  "In 500 metres, enter the roundabout and take the 2nd exit onto Himalaya Marg"
+   @  2431 m  "In 150 metres, enter the roundabout and take the 2nd exit onto Himalaya Marg"
+   @  2537 m  "Enter the roundabout and take the 2nd exit onto Himalaya Marg."
+   @  2589 m  "In 450 metres, turn right onto Uttar Marg"
+   @  2895 m  "In 150 metres, turn right onto Uttar Marg"
+   @  3015 m  "Turn right onto Uttar Marg."
+   @  3062 m  "In 350 metres, turn left"
+   @  3233 m  "In 150 metres, turn left"
+   @  3354 m  "Turn left."
+   @  4219 m  "In 500 metres, turn left"
+   @  4548 m  "In 150 metres, turn left"
+   @  4680 m  "Turn left."
+   @  4791 m  "In 150 metres, bear right"
+   @  4918 m  "Bear right."
+   @  4986 m  "In 150 metres, you will arrive at your destination"
+   @  5106 m  "You have arrived at your destination."
+   @  5122 m  "You have arrived"
+   turns=10 spokenAtTurn=10 offRoute=false arrived=true
+
+=== valhalla-delhi-cp-indiagate.json  (Valhalla, 4.7 km, 16 min, 210 points, 7 steps)
+   step 0 DEPART at 0: Drive north on Outer Circle
+   step 1 ROUNDABOUT_LEFT at 1: Enter the roundabout and take the exit onto Janpath
+   step 2 ROUNDABOUT_LEFT at 122: Enter Windsor Place and take the 3rd exit onto Ashoka Road
+   step 3 ROUNDABOUT_RIGHT at 159: Enter rotary no 4 and take the 3rd exit onto Man Singh Road
+   step 4 ROUNDABOUT_LEFT at 197: Enter rotary no 15 and take the 1st exit onto Akbar Road
+   step 5 ROUNDABOUT_RIGHT at 207: Enter the roundabout and take the 1st exit
+   step 6 ARRIVE at 209: Your destination is on the right
+   @     0 m  "Route ready. 4.7 kilometres, about 16 minutes"
+   @     0 m  "Enter the roundabout and take the exit onto Janpath."
+   @  2207 m  "In 500 metres, enter Windsor Place and take the 3rd exit onto Ashoka Road"
+   @  2541 m  "In 150 metres, enter Windsor Place and take the 3rd exit onto Ashoka Road"
+   @  2661 m  "Enter Windsor Place and take the 3rd exit onto Ashoka Road."
+   @  2933 m  "In 500 metres, enter rotary no 4 and take the 3rd exit onto Man Singh Road"
+   @  3263 m  "In 150 metres, enter rotary no 4 and take the 3rd exit onto Man Singh Road"
+   @  3385 m  "Enter rotary no 4 and take the 3rd exit onto Man Singh Road."
+   @  3716 m  "In 500 metres, enter rotary no 15 and take the 1st exit onto Akbar Road"
+   @  4051 m  "In 150 metres, enter rotary no 15 and take the 1st exit onto Akbar Road"
+   @  4171 m  "Enter rotary no 15 and take the 1st exit onto Akbar Road."
+   @  4218 m  "In 350 metres, enter the roundabout and take the 1st exit"
+   @  4398 m  "In 150 metres, enter the roundabout and take the 1st exit"
+   @  4512 m  "Enter the roundabout and take the 1st exit."
+   @  4552 m  "In 150 metres, your destination will be on the right"
+   @  4658 m  "Your destination is on the right."
+   @  4674 m  "You have arrived"
+   turns=5 spokenAtTurn=5 offRoute=false arrived=true
+
+=== valhalla-mumbai-bandra-juhu.json  (Valhalla, 5.5 km, 22 min, 201 points, 5 steps)
+   step 0 DEPART at 0: Drive north on Dr. BR Ambedkar Road
+   step 1 SLIGHT_RIGHT at 37: Bear right to stay on Dr. BR Ambedkar Road
+   step 2 LEFT at 101: Turn left onto Juhu Tara Road
+   step 3 LEFT at 198: Turn left
+   step 4 ARRIVE at 200: You have arrived at your destination
+   @     0 m  "Route ready. 5.5 kilometres, about 22 minutes"
+   @   767 m  "In 500 metres, bear right to stay on Dr. BR Ambedkar Road"
+   @  1115 m  "In 150 metres, bear right to stay on Dr. BR Ambedkar Road"
+   @  1227 m  "Bear right to stay on Dr. BR Ambedkar Road."
+   @  2743 m  "In 500 metres, turn left onto Juhu Tara Road"
+   @  3072 m  "In 150 metres, turn left onto Juhu Tara Road"
+   @  3193 m  "Turn left onto Juhu Tara Road."
+   @  4901 m  "In 500 metres, turn left"
+   @  5231 m  "In 150 metres, turn left"
+   @  5351 m  "Turn left."
+   @  5396 m  "In 90 metres, you will arrive at your destination"
+   @  5443 m  "You have arrived at your destination."
+   @  5461 m  "You have arrived"
+   turns=3 spokenAtTurn=3 offRoute=false arrived=true
+
+=== valhalla-walk-to-bike.json  (Valhalla, 0.3 km, 4 min, 21 points, 7 steps)
+   step 0 DEPART at 0: Walk east
+   step 1 LEFT at 2: Turn left
+   step 2 RIGHT at 6: Turn right onto Vittal Mallya Road
+   step 3 LEFT at 8: Turn left
+   step 4 RIGHT at 13: Turn right
+   step 5 KEEP_LEFT at 14: Keep left at the fork
+   step 6 ARRIVE at 20: Your destination is on the left
+   @     0 m  "Route ready. 300 metres, about 4 minutes"
+   @     0 m  "In 30 metres, turn left"
+   @     3 m  "Turn left."
+   @    22 m  "Turn right onto Vittal Mallya Road."
+   @    29 m  "Turn left."
+   @    62 m  "In 100 metres, turn right"
+   @   169 m  "Turn right."
+   @   185 m  "Keep left at the fork."
+   @   202 m  "In 90 metres, your destination will be on the left"
+   @   261 m  "You have arrived"
+   turns=5 spokenAtTurn=5 offRoute=false arrived=true
+
+
+problems:
