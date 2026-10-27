@@ -10,35 +10,35 @@ Daemon will be stopped at the end of the build
 > Task :app:mapDebugSourceSetPaths
 > Task :app:generateDebugResources
 > Task :app:packageDebugResources
-> Task :app:mergeDebugResources
 > Task :app:createDebugCompatibleScreenManifests
+> Task :app:mergeDebugResources
 > Task :app:extractDeepLinksDebug
 > Task :app:parseDebugLocalResources
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
 > Task :app:javaPreCompileDebug
 > Task :app:mergeDebugShaders
+> Task :app:processDebugManifestForPackage
 > Task :app:compileDebugShaders NO-SOURCE
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:mergeDebugAssets
-> Task :app:processDebugManifestForPackage
-> Task :app:compressDebugAssets
 > Task :app:processDebugResources
+> Task :app:compressDebugAssets
 > Task :app:desugarDebugFileDependencies
 > Task :app:mergeDebugJniLibFolders
 > Task :app:checkDebugDuplicateClasses
 > Task :app:mergeDebugNativeLibs
 > Task :app:l8DexDesugarLibDebug
-> Task :app:compileDebugKotlin
-> Task :app:mergeExtDexDebug
 > Task :app:mergeLibDexDebug
 
 > Task :app:stripDebugDebugSymbols
 Unable to strip the following libraries, packaging them as they are: libandroidx.graphics.path.so, libimage_processing_util_jni.so, libjnidispatch.so, libmediapipe_tasks_vision_jni.so, libsurface_util_jni.so, libvosk.so.
 
+> Task :app:compileDebugKotlin
 > Task :app:validateSigningDebug
 > Task :app:writeDebugAppMetadata
 > Task :app:writeDebugSigningConfigVersions
+> Task :app:mergeExtDexDebug
 
 > Task :app:compileDebugKotlin
 w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/MainActivity.kt:254:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Please add the '@Deprecated' annotation or suppress the diagnostic.
@@ -65,9 +65,9 @@ w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/jav
 > Task :app:packageDebug
 > Task :app:createDebugApkListingFileRedirect
 > Task :app:assembleDebug
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_5-1793135004235.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_5-1793135323539.json
 
-BUILD SUCCESSFUL in 1m 51s
+BUILD SUCCESSFUL in 1m 19s
 38 actionable tasks: 38 executed
-SIGNING Signer #1 certificate SHA-256 digest: 57b63e96eefc98c1ef75c8a55f0bc88921584ad4598c4ce0d5c7691bc3e6e748
-SIGNING Signer #1 certificate SHA-1 digest: 80941423c16116f3a8c4acdb721a5a25418958dc
+SIGNING Signer #1 certificate SHA-256 digest: 40802122f92afc65fd775ea81a1d558fc5d24f6d4300b2228974f0c391a4940c
+SIGNING Signer #1 certificate SHA-1 digest: d8d15b69e752b943445af1e6ab9e31c526c433f4
