@@ -246,7 +246,7 @@ class MainActivity : ComponentActivity(), HudActions {
         } else g.gestures.stop()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 8) syncGestures()
     }

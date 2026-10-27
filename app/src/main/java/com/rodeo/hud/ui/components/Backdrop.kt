@@ -277,15 +277,15 @@ fun BrandDecal(modifier: Modifier, alpha: Float = 1f) {
 fun BrandWordmark(modifier: Modifier = Modifier, big: Boolean = true) {
     val s = LocalHudStyle.current
     val c = LocalHud.current
-    val size = if (big) 34.sp else 18.sp
+    val fontSize = if (big) 34.sp else 18.sp
     val text = s.brandName.uppercase()
     val style = when (s.gauge) {
         GaugeStyle.RACE -> TextStyle(
-            fontSize = size, fontWeight = FontWeight.Black, fontStyle = FontStyle.Italic, letterSpacing = 1.sp,
+            fontSize = fontSize, fontWeight = FontWeight.Black, fontStyle = FontStyle.Italic, letterSpacing = 1.sp,
             textGeometricTransform = TextGeometricTransform(scaleX = 1.08f, skewX = -0.18f),
         )
-        GaugeStyle.CLASSIC -> TextStyle(fontSize = size, fontWeight = FontWeight.Bold, fontFamily = s.numeralFont, letterSpacing = 3.sp)
-        GaugeStyle.MINIMAL -> TextStyle(fontSize = size, fontWeight = FontWeight.Light, letterSpacing = 6.sp)
+        GaugeStyle.CLASSIC -> TextStyle(fontSize = fontSize, fontWeight = FontWeight.Bold, fontFamily = s.numeralFont, letterSpacing = 3.sp)
+        GaugeStyle.MINIMAL -> TextStyle(fontSize = fontSize, fontWeight = FontWeight.Light, letterSpacing = 6.sp)
     }
     Column(modifier) {
         Box {
