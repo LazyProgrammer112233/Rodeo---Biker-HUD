@@ -376,36 +376,53 @@ private fun OkTarget(size: Dp, onClick: () -> Unit, title: String = "I'M OK", su
 
 /** Voice panel: what the assistant heard and what it can do. */
 @Composable
-fun VoiceOverlay(onClose: () -> Unit) {
+fun VoiceOverlay() {
     val g = LocalContext.current.graph
-    val listening by g.voice.listening.collectAsState()
-    val heard by g.voice.heard.collectAsState()
-    VoicePanel(listening, heard, onClose)
+    val ui by g.assistant.ui.collectAsState()
+    val profile by g.profile.profile.collectAsState()
+    val level by g.assistant.level.collectAsState()
+    // Shown while it waits for a command and briefly with its reply; training has its own card.
+    if (ui.training == null && (ui.awake || ui.reply.isNotBlank())) {
+        VoicePanel(ui.awake, ui.heard, ui.reply, profile.wakePhrase, level) { g.assistant.dismiss() }
+    }
 }
 
 @Composable
-fun VoicePanel(listening: Boolean, heard: String, onClose: () -> Unit) {
+fun VoicePanel(listening: Boolean, heard: String, reply: String, wakePhrase: String, level: Float, onClose: () -> Unit) {
     val c = LocalHud.current
     val t = LocalType.current
     Box(
-        Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)).clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { onClose() },
+        Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.55f)).clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { onClose() },
         contentAlignment = Alignment.Center,
     ) {
-        GlassCard(Modifier.widthIn(max = 560.sdp()).fillMaxWidth(0.7f), accentBorder = c.accent, padding = PaddingValues(18.sdp())) {
+        GlassCard(Modifier.widthIn(max = 600.sdp()).fillMaxWidth(0.72f), accentBorder = c.accent, padding = PaddingValues(18.sdp())) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 val pulse by rememberInfiniteTransition(label = "mic").animateFloat(1f, 1.18f, infiniteRepeatable(tween(700), RepeatMode.Reverse), label = "s")
-                Box(Modifier.size(72.sdp()), contentAlignment = Alignment.Center) {
-                    if (listening) Box(Modifier.size(72.sdp() * (pulse - 0.18f)).clip(CircleShape).background(c.accent.copy(alpha = 0.25f)))
+                Box(Modifier.size(76.sdp()), contentAlignment = Alignment.Center) {
+                    // The ring grows with the rider's voice so they can see they're being heard.
+                    if (listening) Box(Modifier.size(76.sdp() * (0.78f + 0.22f * maxOf(level * 2.5f, pulse - 1f).coerceIn(0f, 1f))).clip(CircleShape).background(c.accent.copy(alpha = 0.28f)))
                     Box(Modifier.size(58.sdp()).clip(CircleShape).background(if (listening) c.accent else c.surfaceHigh), contentAlignment = Alignment.Center) {
                         Icon(Icons.Filled.Mic, null, tint = if (listening) c.onAccent else c.text, modifier = Modifier.size(30.sdp()))
                     }
                 }
                 Spacer(Modifier.width(16.sdp()))
                 Column(Modifier.weight(1f)) {
-                    FitText(if (listening) "LISTENING…" else "SAY A COMMAND", t.headlineXl, c.text)
+                    FitText(
+                        when {
+                            reply.isNotBlank() -> reply.uppercase()
+                            listening -> "LISTENING…"
+                            else -> "SAY A COMMAND"
+                        },
+                        t.headlineXl, if (reply.isNotBlank() && !listening) c.accent else c.text,
+                    )
                     Text(
-                        heard.ifBlank { "\"next song\" · \"pause\" · \"navigate home\" · \"where is my bike\" · \"end ride\" · \"emergency\"" },
-                        color = if (heard.isBlank()) c.textMuted else c.accent, style = t.body, maxLines = 3, overflow = TextOverflow.Ellipsis,
+                        heard.ifBlank { "\"Next song\" · \"Pause\" · \"Navigate home\" · \"Where is my bike\" · \"Emergency\"" }.let {
+                            if (heard.isBlank()) it else "\u201C$it\u201D"
+                        },
+                        color = if (heard.isBlank()) c.textMuted else c.text, style = t.body, maxLines = 2, overflow = TextOverflow.Ellipsis,
+                    )
+                    if (heard.isBlank()) Text(
+                        "Wake phrase: \u201C$wakePhrase\u201D", color = c.textMuted, style = t.bodySm, maxLines = 1, overflow = TextOverflow.Ellipsis,
                     )
                 }
             }

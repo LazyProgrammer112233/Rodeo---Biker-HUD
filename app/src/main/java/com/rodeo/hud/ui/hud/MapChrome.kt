@@ -86,6 +86,7 @@ data class MapChromeState(
     val searching: Boolean = false,
     val bearingDeg: Float? = null,
     val speedKmh: Float = 0f,
+    val attribution: String = "© OpenStreetMap contributors",
 )
 
 interface MapChromeActions {
@@ -121,7 +122,7 @@ fun MapChrome(s: MapChromeState, actions: MapChromeActions, modifier: Modifier =
         }
         Column(Modifier.align(Alignment.BottomEnd), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(6.sdp())) {
             s.bearingDeg?.takeIf { s.speedKmh > 3f }?.let { BearingBadge(it) }
-            Attribution()
+            Attribution(s.attribution)
         }
     }
 }
@@ -325,9 +326,9 @@ private fun compass(deg: Float): String {
 }
 
 @Composable
-private fun Attribution() {
+private fun Attribution(text: String) {
     Text(
-        "© OpenStreetMap contributors", color = Color(0xFF333333), style = LocalType.current.micro.copy(letterSpacing = LocalType.current.bodySm.letterSpacing),
+        text, color = Color(0xFF333333), style = LocalType.current.micro.copy(letterSpacing = LocalType.current.bodySm.letterSpacing),
         maxLines = 1,
         modifier = Modifier.background(Color.White.copy(alpha = 0.75f), RoundedCornerShape(6.dp)).padding(horizontal = 6.dp, vertical = 2.dp),
     )
@@ -352,7 +353,8 @@ fun ManeuverGlyph(m: Maneuver, color: Color, modifier: Modifier = Modifier) {
                 drawPath(flag, color)
             }
             Maneuver.UTURN_LEFT, Maneuver.UTURN_RIGHT -> {
-                val mir = m == Maneuver.UTURN_LEFT
+                // Drawn as a left U-turn (up on the right, back down on the left); mirrored for right.
+                val mir = m == Maneuver.UTURN_RIGHT
                 val path = Path().apply {
                     val a = p(0.68f, 0.92f, mir); moveTo(a.x, a.y)
                     val b = p(0.68f, 0.4f, mir); lineTo(b.x, b.y)
@@ -383,25 +385,20 @@ fun ManeuverGlyph(m: Maneuver, color: Color, modifier: Modifier = Modifier) {
                 val rad = Math.toRadians(deg.toDouble())
                 val dx = sin(rad).toFloat()
                 val dy = -cos(rad).toFloat()
-                // Sharp turns bend high up so the return leg has room; gentle ones bend lower.
-                val sx = if (deg > 100) 0.3f else 0.34f
-                val corner = when {
-                    deg > 100 -> 0.2f
-                    deg > 60 -> 0.46f
-                    else -> 0.5f
+                if (deg > 100) {
+                    // Sharp turns: the stem rises on the far side and the leg comes back down,
+                    // with a smaller head so it stays clear of the stem.
+                    arrow(color, stroke, listOf(p(0.26f, 0.94f, mir), p(0.26f, 0.16f, mir), p(0.26f + dx * 0.66f, 0.16f + dy * 0.66f, mir)), sw, headScale = 0.8f)
+                } else {
+                    val corner = if (deg > 60) 0.46f else 0.5f
+                    arrow(color, stroke, listOf(p(0.34f, 0.94f, mir), p(0.34f, corner, mir), p(0.34f + dx * 0.46f, corner + dy * 0.46f, mir)), sw)
                 }
-                val len = if (deg > 100) 0.56f else 0.46f
-                arrow(
-                    color, stroke,
-                    listOf(p(sx, 0.94f, mir), p(sx, corner, mir), p(sx + dx * len, corner + dy * len, mir)),
-                    sw,
-                )
             }
         }
     }
 }
 
-private fun DrawScope.arrow(color: Color, stroke: Stroke, pts: List<Offset>, sw: Float) {
+private fun DrawScope.arrow(color: Color, stroke: Stroke, pts: List<Offset>, sw: Float, headScale: Float = 1f) {
     val end = pts.last()
     val prev = pts[pts.size - 2]
     val d = (end - prev).let { it / it.getDistance() }
@@ -413,7 +410,7 @@ private fun DrawScope.arrow(color: Color, stroke: Stroke, pts: List<Offset>, sw:
         lineTo(shaftEnd.x, shaftEnd.y)
     }
     drawPath(shaft, color, style = stroke)
-    head(color, end, d, sw, size.minDimension)
+    head(color, end, d, sw, size.minDimension * headScale)
 }
 
 /** Filled triangular arrow head with its tip at [tip], pointing along [dir] (unit vector). */

@@ -8,3 +8,6 @@ captures/
 *.keystore
 secrets.properties
 app/src/main/res/font/*.ttf
+app/src/main/assets/vosk-model/
+app/src/main/assets/gesture_recognizer.task
+app/src/test/resources/live/

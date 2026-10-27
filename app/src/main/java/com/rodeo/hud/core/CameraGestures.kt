@@ -2,8 +2,12 @@ package com.rodeo.hud.core
 
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
+import android.util.Log
 import android.util.Size
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -13,6 +17,12 @@ import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import com.google.mediapipe.framework.image.BitmapImageBuilder
+import com.google.mediapipe.tasks.core.BaseOptions
+import com.google.mediapipe.tasks.core.Delegate
+import com.google.mediapipe.tasks.vision.core.RunningMode
+import com.google.mediapipe.tasks.vision.gesturerecognizer.GestureRecognizer
+import com.google.mediapipe.tasks.vision.gesturerecognizer.GestureRecognizerResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,17 +30,16 @@ import java.util.concurrent.Executors
 import kotlin.math.abs
 import kotlin.math.sqrt
 
-enum class HandGesture { SWIPE_RIGHT, SWIPE_LEFT, PALM_COVER }
+/** Where a gesture came from, for the on-screen confirmation. */
+enum class GestureSource { CAMERA, WAVE }
 
 /** Last recognised gesture, for the on-screen confirmation. */
-data class GestureEvent(val gesture: HandGesture, val at: Long)
+data class GestureEvent(val gesture: HandGesture, val at: Long, val source: GestureSource = GestureSource.CAMERA, val waves: Int = 0)
 
 /**
- * Hand gestures in front of the selfie camera, read from tiny greyscale frames on the phone.
- * Nothing is recorded or uploaded.
- *
- * Swipe: a patch of motion that travels across at least 35% of the frame in under a second.
- * Palm: the frame goes dark and flat for 0.4 s, then the camera is uncovered.
+ * Hand gestures in front of the selfie camera, recognised on the phone by Google's MediaPipe hand
+ * model (free, offline). Nothing is recorded or uploaded. If the model can't run on a phone, the
+ * older brightness-based detector takes over.
  */
 class CameraGestures(private val context: Context) {
     private val main = Handler(Looper.getMainLooper())
@@ -46,6 +55,9 @@ class CameraGestures(private val context: Context) {
     /** Swap if the mount makes swipes feel reversed. */
     @Volatile var swap = false
     var onGesture: (HandGesture) -> Unit = {}
+    private var recognizer: GestureRecognizer? = null
+    private val tracker = HandTracker()
+    @Volatile private var lastFrameAt = 0L
 
     val hasPermission get() = ContextCompat.checkSelfPermission(context, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
 
@@ -55,6 +67,7 @@ class CameraGestures(private val context: Context) {
         future.addListener({
             val p = runCatching { future.get() }.getOrNull() ?: return@addListener
             if (runCatching { p.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA) }.getOrDefault(false) != true) return@addListener
+            val model = recognizer ?: createRecognizer().also { recognizer = it }
             val a = ImageAnalysis.Builder()
                 .setResolutionSelector(
                     ResolutionSelector.Builder()
@@ -62,9 +75,14 @@ class CameraGestures(private val context: Context) {
                         .build(),
                 )
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .apply { if (model != null) setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888) }
                 .build()
-            val analyzer = Analyzer()
-            a.setAnalyzer(executor) { img -> analyzer.analyze(img) }
+            if (model != null) {
+                a.setAnalyzer(executor) { img -> handFrame(model, img) }
+            } else {
+                val analyzer = Analyzer()
+                a.setAnalyzer(executor) { img -> analyzer.analyze(img) }
+            }
             runCatching {
                 p.bindToLifecycle(owner, CameraSelector.DEFAULT_FRONT_CAMERA, a)
                 provider = p
@@ -78,6 +96,59 @@ class CameraGestures(private val context: Context) {
         analysis?.let { a -> provider?.unbind(a); a.clearAnalyzer() }
         analysis = null
         _running.value = false
+    }
+
+    /** Proximity-sensor waves show the same confirmation as camera gestures. */
+    fun announce(g: HandGesture, waves: Int) {
+        _last.value = GestureEvent(g, System.currentTimeMillis(), GestureSource.WAVE, waves)
+    }
+
+    /** The hand model, or null if this phone can't run it (the fallback detector is used). */
+    private fun createRecognizer(): GestureRecognizer? = runCatching {
+        val base = BaseOptions.builder().setModelAssetPath(MODEL).setDelegate(Delegate.CPU).build()
+        val options = GestureRecognizer.GestureRecognizerOptions.builder()
+            .setBaseOptions(base)
+            .setNumHands(1)
+            .setMinHandDetectionConfidence(0.5f)
+            .setMinHandPresenceConfidence(0.5f)
+            .setMinTrackingConfidence(0.5f)
+            .setRunningMode(RunningMode.LIVE_STREAM)
+            .setResultListener { result, _ -> onResult(result) }
+            .setErrorListener { e -> Log.w(TAG, "Gesture model error", e) }
+            .build()
+        GestureRecognizer.createFromOptions(context, options)
+    }.onFailure { Log.w(TAG, "Gesture model unavailable; using the simple detector", it) }.getOrNull()
+
+    /** Camera thread: upright, mirrored like a selfie so "right" is the rider's right. */
+    private fun handFrame(model: GestureRecognizer, img: ImageProxy) {
+        try {
+            val now = SystemClock.uptimeMillis()
+            if (now - lastFrameAt < 60) return // ~15 fps is plenty and saves battery
+            lastFrameAt = now
+            val bmp = img.toBitmap()
+            val m = Matrix().apply {
+                postRotate(img.imageInfo.rotationDegrees.toFloat())
+                postScale(-1f, 1f)
+            }
+            val upright = Bitmap.createBitmap(bmp, 0, 0, bmp.width, bmp.height, m, true)
+            model.recognizeAsync(BitmapImageBuilder(upright).build(), now)
+        } catch (e: Exception) {
+            Log.w(TAG, "Gesture frame failed", e)
+        } finally {
+            img.close()
+        }
+    }
+
+    private fun onResult(r: GestureRecognizerResult) {
+        val lm = r.landmarks().firstOrNull()
+        val obs = if (lm.isNullOrEmpty()) null else {
+            // Centre of the palm: wrist and the knuckles of the index and little fingers.
+            val idx = listOf(0, 5, 17).filter { it < lm.size }
+            val x = idx.map { lm[it].x() }.average().toFloat()
+            val top = r.gestures().firstOrNull()?.firstOrNull()
+            HandObservation(x, top?.categoryName() ?: "None", top?.score() ?: 0f)
+        }
+        tracker.onFrame(SystemClock.uptimeMillis(), obs)?.let { emit(it) }
     }
 
     private fun emit(g: HandGesture) {
@@ -223,5 +294,11 @@ class CameraGestures(private val context: Context) {
             }
             return out
         }
+    }
+
+    private companion object {
+        const val TAG = "RodeoGestures"
+        /** MediaPipe's gesture recogniser, downloaded into assets at build time. */
+        const val MODEL = "gesture_recognizer.task"
     }
 }

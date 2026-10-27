@@ -28,9 +28,18 @@ class RideService : LifecycleService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         val g = graph
-        try {
+        // With the microphone type too, the wake phrase and voice SOS keep working with the
+        // screen off or another app in front.
+        val mic = ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+        val started = runCatching {
+            ServiceCompat.startForeground(
+                this, NOTIF_ID, build("Ride starting…"),
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION or (if (mic) ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE else 0),
+            )
+        }.recoverCatching {
             ServiceCompat.startForeground(this, NOTIF_ID, build("Ride starting…"), ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
-        } catch (e: Exception) {
+        }
+        if (started.isFailure) {
             stopSelf()
             return START_NOT_STICKY
         }

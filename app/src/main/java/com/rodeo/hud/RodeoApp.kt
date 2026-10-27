@@ -14,8 +14,9 @@ import com.rodeo.hud.core.DeviceGuardian
 import com.rodeo.hud.core.LocationHub
 import com.rodeo.hud.core.RideEngine
 import com.rodeo.hud.core.RideSensors
-import com.rodeo.hud.core.VoiceCommander
+import com.rodeo.hud.core.Speaker
 import com.rodeo.hud.core.WarningCenter
+import com.rodeo.hud.core.WaveSensor
 import com.rodeo.hud.core.WeatherService
 import com.rodeo.hud.data.GarageStore
 import com.rodeo.hud.data.HazardStore
@@ -23,10 +24,13 @@ import com.rodeo.hud.data.ProfileStore
 import com.rodeo.hud.data.RideRepository
 import com.rodeo.hud.garage.ReminderWorker
 import com.rodeo.hud.media.MusicController
+import com.rodeo.hud.nav.NavController
+import com.rodeo.hud.nav.RouteOptions
 import com.rodeo.hud.pack.HazardSync
 import com.rodeo.hud.pack.PackService
 import com.rodeo.hud.sos.SosManager
 import com.rodeo.hud.sos.SosSnapshot
+import com.rodeo.hud.voice.Assistant
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -48,11 +52,14 @@ class AppGraph(app: Application) {
     val ambient = AmbientController(app)
     val music = MusicController(app)
     val audioRoutes = AudioRoutes(app)
-    val voice = VoiceCommander(app)
+    val speaker = Speaker(app)
     val gestures = CameraGestures(app)
+    val waves = WaveSensor(app)
     val pack = PackService(app, scope, warnings) { profile.profile.value.riderName }
     val hazardSync = HazardSync(app, hazards)
-    val nav = com.rodeo.hud.nav.NavController(app)
+    val nav = NavController(app, scope, speaker, { location.location.value }) {
+        profile.profile.value.let { RouteOptions(avoidTolls = it.avoidTolls, avoidHighways = it.avoidHighways) }
+    }
 
     val sos: SosManager = SosManager(app, scope, { profile.profile.value }) {
         val loc = location.location.value
@@ -65,8 +72,12 @@ class AppGraph(app: Application) {
         onHazardLogged = { hazardSync.onHazard(it) },
     )
 
+    /** Created last: it listens to everything above. */
+    val assistant = Assistant(app, this)
+
     init {
         location.addListener { loc ->
+            nav.onLocation(loc)
             pack.onLocation(loc)
             hazardSync.onLocation(loc.latitude, loc.longitude)
             ambient.setLocation(loc.latitude, loc.longitude)

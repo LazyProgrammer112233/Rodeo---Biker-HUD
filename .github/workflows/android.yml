@@ -78,6 +78,29 @@ jobs:
           done
           ls -la $D
 
+      # Offline speech model (Vosk, Apache 2.0) and the MediaPipe hand model, bundled into the APK.
+      - uses: actions/cache@v4
+        with:
+          path: |
+            app/src/main/assets/vosk-model
+            app/src/main/assets/gesture_recognizer.task
+          key: rodeo-models-v1-small-en-in-0.4
+
+      - name: Speech and hand models
+        run: |
+          set -e
+          A=app/src/main/assets
+          mkdir -p $A
+          if [ ! -f $A/vosk-model/am/final.mdl ]; then
+            curl -sSLf --retry 3 -o /tmp/vosk.zip https://alphacephei.com/vosk/models/vosk-model-small-en-in-0.4.zip
+            rm -rf /tmp/vosk && unzip -q /tmp/vosk.zip -d /tmp/vosk
+            rm -rf $A/vosk-model && mv /tmp/vosk/*/ $A/vosk-model
+          fi
+          [ -s $A/gesture_recognizer.task ] || curl -sSLf --retry 3 -o $A/gesture_recognizer.task \
+            https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/latest/gesture_recognizer.task
+          du -sh $A/*
+          find $A/vosk-model -maxdepth 2 | sort | head -40
+
       - name: Build debug APK
         env:
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
@@ -90,37 +113,51 @@ jobs:
           set -o pipefail
           ./gradlew --no-daemon assembleDebug 2>&1 | tee build.log
 
-      # Render the HUD at phone and tablet sizes, day and night, for several brands, so clipped
-      # text or buttons show up without a device. The images go to the ci-logs branch.
-      - name: Screenshots
-        if: github.event_name == 'push'
-        continue-on-error: true
-        run: |
-          set -o pipefail
-          ./gradlew --no-daemon testDebugUnitTest --tests 'com.rodeo.hud.shots.*' 2>&1 | tee shots.log | grep -E "^e: |FAILED|BUILD|tests completed" | tail -60
-          for f in app/build/test-results/testDebugUnitTest/*.xml; do
-            grep -q "<failure" "$f" && sed -n '/<failure/,/<\/failure>/p' "$f" | head -60 >> shots.log
-          done; true
-
-      # Quick health check of the free, keyless map services the app relies on.
+      # Health check of the free, keyless map services, saving real answers as test fixtures
+      # (routes across Indian cities) so the turn-by-turn engine is replayed on real roads.
       - name: Probe map services
         if: github.event_name == 'push'
         continue-on-error: true
         run: |
+          F=app/src/test/resources/live
+          mkdir -p $F /tmp/probe
+          route() { # name from_lat from_lon to_lat to_lon costing
+            J="{\"locations\":[{\"lat\":$2,\"lon\":$3},{\"lat\":$4,\"lon\":$5}],\"costing\":\"$6\",\"directions_options\":{\"units\":\"kilometers\",\"language\":\"en-US\"}}"
+            curl -s -m 40 -A RodeoHUD-CI/1.0 -G --data-urlencode "json=$J" https://valhalla1.openstreetmap.de/route -o "$F/valhalla-$1.json"
+            echo "== valhalla $1: $(head -c 300 "$F/valhalla-$1.json")"
+          }
           {
-            echo "== valhalla motorcycle"
-            J='{"locations":[{"lat":12.9716,"lon":77.5946},{"lat":13.3702,"lon":77.6835}],"costing":"motorcycle","units":"kilometers","language":"en-US"}'
-            curl -s -m 30 -G --data-urlencode "json=$J" https://valhalla1.openstreetmap.de/route | head -c 1500; echo
-            echo "== osrm fossgis"
-            curl -s -m 30 "https://routing.openstreetmap.de/routed-car/route/v1/driving/77.5946,12.9716;77.6835,13.3702?steps=true&overview=false" | head -c 600; echo
-            echo "== photon"
-            curl -s -m 30 "https://photon.komoot.io/api/?q=nandi%20hills&limit=2&lat=12.97&lon=77.59" | head -c 600; echo
-            echo "== nominatim"
-            curl -s -m 30 -A "RodeoHUD-CI/1.0" "https://nominatim.openstreetmap.org/search?q=nandi+hills&format=jsonv2&limit=1&countrycodes=in" | head -c 400; echo
-            for u in https://a.basemaps.cartocdn.com/rastertiles/voyager/12/2930/1898@2x.png https://a.basemaps.cartocdn.com/dark_all/12/2930/1898@2x.png https://tile.openstreetmap.org/12/2930/1898.png; do
-              echo "== $u $(curl -s -m 20 -A RodeoHUD-CI/1.0 -o /dev/null -w '%{http_code} %{content_type} %{size_download}' $u)"
+            route bengaluru-nandi 12.9716 77.5946 13.3702 77.6835 motorcycle
+            route chandigarh-sukhna 30.7398 76.7827 30.7421 76.8188 motorcycle
+            route mumbai-bandra-juhu 19.0596 72.8295 19.0988 72.8267 motorcycle
+            route delhi-cp-indiagate 28.6315 77.2167 28.6129 77.2295 motorcycle
+            route walk-to-bike 12.9716 77.5946 12.9731 77.5961 pedestrian
+            curl -s -m 30 "https://routing.openstreetmap.de/routed-car/route/v1/driving/76.7827,30.7398;76.8188,30.7421?overview=full&geometries=polyline6&steps=true" -o $F/osrm-chandigarh-sukhna.json
+            echo "== osrm: $(head -c 300 $F/osrm-chandigarh-sukhna.json)"
+            curl -s -m 30 "https://photon.komoot.io/api/?q=nandi%20hills&limit=5&lang=en&lat=12.97&lon=77.59" -o $F/photon-nandi.json
+            echo "== photon: $(head -c 300 $F/photon-nandi.json)"
+            echo "== nominatim: $(curl -s -m 30 -A RodeoHUD-CI/1.0 'https://nominatim.openstreetmap.org/search?q=nandi+hills&format=jsonv2&limit=1&countrycodes=in' | head -c 300)"
+            C=https://a.basemaps.cartocdn.com
+            for t in "voyager $C/rastertiles/voyager/15/23443/15186@2x.png" "dark $C/dark_all/15/23443/15186@2x.png" "osm https://tile.openstreetmap.org/15/23443/15186.png"; do
+              set -- $t
+              echo "== tile $1 $(curl -s -m 20 -A RodeoHUD-CI/1.0 -o /tmp/probe/tile-$1.png -w '%{http_code} %{content_type} %{size_download}' $2)"
             done
-          } > probe.log 2>&1; cat probe.log | head -80
+          } > probe.log 2>&1
+          ls -la $F >> probe.log; cat probe.log | head -60
+
+      # Unit tests (routing, voice, gestures) and screenshots of every screen at phone and tablet
+      # sizes, day and night. Images and logs go to the ci-logs branch.
+      - name: Tests and screenshots
+        if: github.event_name == 'push'
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          ./gradlew --no-daemon testDebugUnitTest --tests 'com.rodeo.hud.shots.*' --tests 'com.rodeo.hud.logic.*' 2>&1 | tee shots.log | grep -E "^e: |FAILED|BUILD|tests completed" | tail -60
+          for f in app/build/test-results/testDebugUnitTest/*.xml; do
+            grep -q "<failure" "$f" && sed -n '/<failure/,/<\/failure>/p' "$f" | head -60 >> shots.log
+          done
+          grep -h -o 'testsuite name="[^"]*" tests="[0-9]*" skipped="[0-9]*" failures="[0-9]*"' app/build/test-results/testDebugUnitTest/*.xml >> shots.log || true
+          true
 
       # Read the certificate from the APK itself, so the SHA-1 is the one Maps will see.
       - name: Signing fingerprint (for the Maps key restriction)
@@ -139,6 +176,10 @@ jobs:
           rm -rf /tmp/shots && mkdir -p /tmp/shots
           [ -f shots.log ] && cp shots.log /tmp/shots.log
           [ -f probe.log ] && cp probe.log /tmp/probe.log
+          rm -rf /tmp/probe-out && mkdir -p /tmp/probe-out
+          cp app/src/test/resources/live/*.json /tmp/probe-out/ 2>/dev/null || true
+          cp /tmp/probe/*.png /tmp/probe-out/ 2>/dev/null || true
+          cp app/build/reports-rodeo/*.txt /tmp/probe-out/ 2>/dev/null || true
           ls app/build/shots/*.png >/dev/null 2>&1 && cp app/build/shots/*.png /tmp/shots/
           git config user.name "rodeo-ci"
           git config user.email "ci@users.noreply.github.com"
@@ -148,6 +189,9 @@ jobs:
             mkdir -p logs && cp /tmp/build.log "logs/$REF.log"
             [ -f /tmp/shots.log ] && cp /tmp/shots.log "logs/$REF-shots.log"
             [ -f /tmp/probe.log ] && cp /tmp/probe.log "logs/$REF-probe.log"
+            if ls /tmp/probe-out/* >/dev/null 2>&1; then
+              rm -rf "probe/$REF" && mkdir -p "probe/$REF" && cp /tmp/probe-out/* "probe/$REF/" && git add -fA probe
+            fi
             if ls /tmp/shots/*.png >/dev/null 2>&1; then
               rm -rf "shots/$REF" && mkdir -p "shots/$REF" && cp /tmp/shots/*.png "shots/$REF/" && git add -fA shots
             fi

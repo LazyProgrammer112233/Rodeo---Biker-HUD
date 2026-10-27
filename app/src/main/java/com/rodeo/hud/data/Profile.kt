@@ -10,6 +10,9 @@ import org.json.JSONObject
 
 enum class ThemeMode { AUTO, LIGHT, DARK }
 
+/** When the assistant listens for the wake phrase. */
+enum class ListenMode { OFF, RIDING, ALWAYS }
+
 data class SosContact(val name: String, val phone: String)
 
 data class Profile(
@@ -35,6 +38,19 @@ data class Profile(
     val homeLabel: String = "",
     val homeLat: Double? = null,
     val homeLng: Double? = null,
+    /** The rider's own wake phrase, e.g. "Hey Doku". */
+    val wakePhrase: String = "Hey Rodeo",
+    /** What the recogniser heard when the rider trained the wake phrase. */
+    val wakeAliases: List<String> = emptyList(),
+    val listenMode: ListenMode = ListenMode.RIDING,
+    /** Take commands through the helmet intercom's microphone after waking. */
+    val helmetMic: Boolean = false,
+    /** "Emergency emergency" starts SOS even without the wake phrase. */
+    val sosWithoutWake: Boolean = true,
+    /** Wave a hand over the top of the phone to play / pause. */
+    val waveControl: Boolean = true,
+    val avoidTolls: Boolean = false,
+    val avoidHighways: Boolean = false,
 ) {
     val bikeLabel: String
         get() = listOfNotNull(Catalog.brand(brandId)?.name, model, year?.toString()).joinToString(" ")
@@ -80,6 +96,14 @@ class ProfileStore(context: Context) {
         put("homeLabel", p.homeLabel)
         p.homeLat?.let { put("homeLat", it) }
         p.homeLng?.let { put("homeLng", it) }
+        put("wakePhrase", p.wakePhrase)
+        put("wakeAliases", JSONArray().apply { p.wakeAliases.forEach { put(it) } })
+        put("listenMode", p.listenMode.name)
+        put("helmetMic", p.helmetMic)
+        put("sosWithoutWake", p.sosWithoutWake)
+        put("waveControl", p.waveControl)
+        put("avoidTolls", p.avoidTolls)
+        put("avoidHighways", p.avoidHighways)
     }
 
     private fun fromJson(o: JSONObject): Profile {
@@ -110,6 +134,14 @@ class ProfileStore(context: Context) {
             homeLabel = o.optString("homeLabel"),
             homeLat = if (o.has("homeLat")) o.getDouble("homeLat") else null,
             homeLng = if (o.has("homeLng")) o.getDouble("homeLng") else null,
+            wakePhrase = o.optString("wakePhrase").ifBlank { "Hey Rodeo" },
+            wakeAliases = o.optJSONArray("wakeAliases")?.let { a -> (0 until a.length()).map { a.getString(it) } } ?: emptyList(),
+            listenMode = runCatching { ListenMode.valueOf(o.optString("listenMode")) }.getOrDefault(ListenMode.RIDING),
+            helmetMic = o.optBoolean("helmetMic", false),
+            sosWithoutWake = o.optBoolean("sosWithoutWake", true),
+            waveControl = o.optBoolean("waveControl", true),
+            avoidTolls = o.optBoolean("avoidTolls", false),
+            avoidHighways = o.optBoolean("avoidHighways", false),
         )
     }
 

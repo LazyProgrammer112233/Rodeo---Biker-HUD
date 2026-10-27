@@ -163,6 +163,8 @@ data class CockpitState(
     val packCount: Int = 0,
     val packActive: Boolean = false,
     val listening: Boolean = false,
+    /** The wake phrase is armed (the assistant is listening in the background). */
+    val wakeArmed: Boolean = false,
     val gesturesOn: Boolean = false,
     val showEndSlider: Boolean = false,
     val lockInput: Boolean = false,
@@ -716,7 +718,7 @@ private fun TileRow(s: CockpitState, actions: CockpitControls, narrow: Boolean) 
             ) { actions.wifi() }
         }
         HudTile(Icons.Filled.Groups, if (s.packActive) "Pack ${s.packCount}" else "Pack", tile.weight(1f), active = s.packActive) { actions.openPack() }
-        HudTile(Icons.Filled.Mic, "Voice", tile.weight(1f), active = s.listening, jewel = if (s.listening) c.ok else null) { actions.voice() }
+        HudTile(Icons.Filled.Mic, "Voice", tile.weight(1f), active = s.listening, jewel = if (s.listening || s.wakeArmed) c.ok else null) { actions.voice() }
         if (!s.riding) {
             HudTile(
                 Icons.Filled.PanTool, "Gestures", tile.weight(1f), active = s.gesturesOn,

@@ -195,7 +195,11 @@ class HudShots {
     }
 
     @Test fun voice() = shoot("voice", listOf(frames[0], frames[2]), listOf(looks[0], looks[1])) {
-        VoicePanel(listening = true, heard = "navigate home", onClose = {})
+        VoicePanel(listening = true, heard = "hey doku navigate home", reply = "", wakePhrase = "Hey Doku", level = 0.4f, onClose = {})
+    }
+
+    @Test fun voiceReply() = shoot("voice-reply", listOf(frames[0], frames[2]), listOf(looks[0])) {
+        VoicePanel(listening = false, heard = "hey doku emergency", reply = "Emergency. Sending SOS in 10 seconds.", wakePhrase = "Hey Doku", level = 0f, onClose = {})
     }
 
     @Test fun summary() = shoot("ride-summary", listOf(frames[0], frames[2], frames[3]), listOf(looks[0], looks[1])) {

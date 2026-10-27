@@ -21,8 +21,11 @@ android {
         applicationId = "com.rodeo.hud"
         minSdk = 29
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0-p1"
+        versionCode = 2
+        versionName = "0.2.0-p2"
+
+        // Phones only: the offline speech and hand models ship native code for ARM.
+        ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }
 
         buildConfigField("String", "FIREBASE_API_KEY", "\"${secret("FIREBASE_API_KEY")}\"")
         buildConfigField("String", "FIREBASE_APP_ID", "\"${secret("FIREBASE_APP_ID")}\"")
@@ -65,6 +68,10 @@ android {
     packaging {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
+    // The hand model is memory-mapped straight from the APK.
+    androidResources {
+        noCompress += "task"
+    }
     // Screenshot tests (Robolectric + Roborazzi) render the HUD at several screen sizes on CI.
     testOptions {
         unitTests {
@@ -96,8 +103,13 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
 
     implementation("com.google.android.gms:play-services-location:21.3.0")
-    // Keyless map: OpenStreetMap tiles. Turn-by-turn hands off to the Google Maps app.
+    // Keyless map: OpenStreetMap / CARTO tiles; routing from the free OpenStreetMap servers.
     implementation("org.osmdroid:osmdroid-android:6.1.20")
+
+    // Offline speech for the wake phrase and commands (model downloaded into assets on CI).
+    implementation("com.alphacephei:vosk-android:0.3.75")
+    // Google's on-device hand model for camera gestures (model downloaded into assets on CI).
+    implementation("com.google.mediapipe:tasks-vision:0.10.14")
 
     // Camera hand gestures, analysed on the phone.
     implementation("androidx.camera:camera-camera2:1.4.1")
@@ -112,6 +124,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     testImplementation("junit:junit:4.13.2")
+    testImplementation("org.json:json:20240303")
     testImplementation("org.robolectric:robolectric:4.14.1")
     testImplementation("io.github.takahirom.roborazzi:roborazzi:1.32.2")
     testImplementation("io.github.takahirom.roborazzi:roborazzi-compose:1.32.2")

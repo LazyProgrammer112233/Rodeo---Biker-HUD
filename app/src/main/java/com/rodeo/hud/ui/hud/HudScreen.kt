@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.rodeo.hud.core.GestureSource
 import com.rodeo.hud.core.HandGesture
 import com.rodeo.hud.graph
 import com.rodeo.hud.nav.MapPane
@@ -52,7 +53,7 @@ fun HudScreen(actions: HudActions, showEndSlider: Boolean, dark: Boolean) {
     val music by g.music.now.collectAsState()
     val vib by g.sensors.vibration.collectAsState()
     val rides by g.rides.rides.collectAsState()
-    val listening by g.voice.listening.collectAsState()
+    val voice by g.assistant.ui.collectAsState()
     val route by g.audioRoutes.route.collectAsState()
     val lastFix by g.location.lastFixAt.collectAsState()
 
@@ -105,7 +106,8 @@ fun HudScreen(actions: HudActions, showEndSlider: Boolean, dark: Boolean) {
         wifiOn = wifi,
         packCount = pack.members.size,
         packActive = pack.active,
-        listening = listening,
+        listening = voice.awake,
+        wakeArmed = voice.listening,
         gesturesOn = profile.gestureControl,
         showEndSlider = showEndSlider,
         lockInput = speed > 10f,
@@ -163,7 +165,13 @@ private fun GestureFlash(modifier: Modifier) {
         HandGesture.PALM_COVER -> Icons.Filled.PlayArrow to "Play / pause"
         null -> null to ""
     }
-    ActionToast(visible, icon, label, modifier)
+    val ev = last
+    val how = when {
+        ev == null || ev.source != GestureSource.WAVE -> ""
+        ev.waves == 1 -> "Wave · "
+        else -> "${ev.waves} waves · "
+    }
+    ActionToast(visible, icon, how + label, modifier)
 }
 
 /** "IST" rather than "GMT+05:30" where the phone has a short name for the zone. */
