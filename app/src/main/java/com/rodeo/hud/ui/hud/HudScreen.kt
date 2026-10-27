@@ -103,6 +103,7 @@ fun HudScreen(actions: HudActions, showEndSlider: Boolean, dark: Boolean) {
         btOn = route.btOn,
         btDevice = route.btDevice,
         wiredHeadset = route.wired,
+        musicOnPhone = route.musicOnPhone,
         wifiOn = wifi,
         packCount = pack.members.size,
         packActive = pack.active,

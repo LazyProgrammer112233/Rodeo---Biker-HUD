@@ -99,7 +99,7 @@ fun MapPane(
         searching = searching,
         bearingDeg = loc?.takeIf { it.hasBearing() }?.bearing,
         speedKmh = loc?.takeIf { it.hasSpeed() }?.let { it.speed * 3.6f } ?: 0f,
-        attribution = if (tiles == MapTiles.Style.CARTO) "© OpenStreetMap contributors © CARTO" else "© OpenStreetMap contributors",
+        attribution = if (tiles == MapTiles.Style.HOT) "© OpenStreetMap contributors, OSM France" else "© OpenStreetMap contributors",
     )
     val actions = remember {
         object : MapChromeActions {
@@ -154,60 +154,55 @@ fun MapPane(
     }
 }
 
-/**
- * Map tiles without a key. CARTO's OpenStreetMap styles look right in day and night; if their
- * server can't be reached the map falls back to the standard OpenStreetMap tiles with a filter.
- */
+/** Map tiles without a key; night mode is a colour filter over the same tiles. */
 object MapTiles {
-    enum class Style { CARTO, OSM }
+    /**
+     * Both are free OpenStreetMap raster tiles with no key. CARTO's basemaps were dropped: their
+     * servers now answer keyless requests with an "API key required" picture.
+     */
+    enum class Style { OSM, HOT }
 
-    private val _style = MutableStateFlow(Style.CARTO)
+    private val _style = MutableStateFlow(Style.OSM)
     val style: StateFlow<Style> = _style
     private var checked = false
 
-    private fun carto(name: String, path: String) = XYTileSource(
-        name, 1, 20, 256, "@2x.png",
-        arrayOf("a", "b", "c", "d").map { "https://$it.basemaps.cartocdn.com/$path/" }.toTypedArray(),
-        "© OpenStreetMap contributors © CARTO",
+    /** OpenStreetMap France's Humanitarian style, used if the main OSM servers refuse us. */
+    val HOT = XYTileSource(
+        "OsmHot", 1, 19, 256, ".png",
+        arrayOf("https://a.tile.openstreetmap.fr/hot/", "https://b.tile.openstreetmap.fr/hot/"),
+        "© OpenStreetMap contributors, OSM France",
     )
-
-    val DAY = carto("CartoVoyager", "rastertiles/voyager")
-    val NIGHT = carto("CartoDarkMatter", "dark_all")
 
     /** One small request per app start; tiles already cached keep working offline either way. */
     suspend fun check() {
         if (checked) return
         checked = true
-        val ok = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        val code = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
             runCatching {
-                val c = java.net.URL("https://a.basemaps.cartocdn.com/rastertiles/voyager/3/5/3.png").openConnection() as java.net.HttpURLConnection
+                val c = java.net.URL("https://tile.openstreetmap.org/3/5/3.png").openConnection() as java.net.HttpURLConnection
                 c.connectTimeout = 6_000
                 c.readTimeout = 6_000
-                c.setRequestProperty("User-Agent", Router.userAgent)
-                try { c.responseCode in 200..299 } finally { c.disconnect() }
-            }
+                c.setRequestProperty("User-Agent", org.osmdroid.config.Configuration.getInstance().userAgentValue)
+                try { c.responseCode } finally { c.disconnect() }
+            }.getOrNull()
         }
-        // Offline (no answer at all) keeps CARTO so its cached tiles still show.
-        if (ok.getOrNull() == false) _style.value = Style.OSM
+        // Offline (no answer at all) keeps OSM so its cached tiles still show; a refusal
+        // (blocked, rate limited) moves to the second server.
+        if (code != null && code !in 200..299) _style.value = Style.HOT
     }
 }
 
-/** Dark map: invert the light OSM style and pull the saturation down so it reads as night mode. */
+/**
+ * Night map: invert the light style, then turn the hues back round so water stays blue, parks
+ * green and highways amber, with the brightness pulled down a little to avoid glare.
+ */
 private val NIGHT = ColorMatrixColorFilter(
-    ColorMatrix().apply {
-        set(floatArrayOf(-1f, 0f, 0f, 0f, 255f, 0f, -1f, 0f, 0f, 255f, 0f, 0f, -1f, 0f, 255f, 0f, 0f, 0f, 1f, 0f))
-        postConcat(ColorMatrix().apply { setSaturation(0.35f) })
-        postConcat(ColorMatrix(floatArrayOf(0.9f, 0f, 0f, 0f, -12f, 0f, 0.9f, 0f, 0f, -12f, 0f, 0f, 0.95f, 0f, -6f, 0f, 0f, 0f, 1f, 0f)))
-    },
-)
-
-/** CARTO dark: a little brighter and crisper so roads read at night without glare. */
-private val CARTO_NIGHT_BOOST = ColorMatrixColorFilter(
-    ColorMatrix().apply {
-        val k = 1.3f
-        val t = -(k - 1f) * 40f + 10f
-        set(floatArrayOf(k, 0f, 0f, 0f, t, 0f, k, 0f, 0f, t, 0f, 0f, k, 0f, t, 0f, 0f, 0f, 1f, 0f))
-    },
+    floatArrayOf(
+        0.332f, -1.1011f, -0.1109f, 0f, 230.4f,
+        -0.328f, -0.4411f, -0.1109f, 0f, 230.4f,
+        -0.328f, -1.1011f, 0.5491f, 0f, 230.4f,
+        0f, 0f, 0f, 1f, 0f,
+    ),
 )
 
 /** Daylight map: a touch more contrast and colour so roads stand out in sun glare. */
@@ -243,7 +238,7 @@ private fun OsmMap(
     val pan by rememberUpdatedState(onUserPan)
     val view = remember {
         MapView(ctx).apply {
-            setTileSource(if (tiles == MapTiles.Style.CARTO) MapTiles.DAY else TileSourceFactory.MAPNIK)
+            setTileSource(if (tiles == MapTiles.Style.HOT) MapTiles.HOT else TileSourceFactory.MAPNIK)
             setMultiTouchControls(true)
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
             isTilesScaledToDpi = true
@@ -277,11 +272,8 @@ private fun OsmMap(
     }
 
     LaunchedEffect(dark, tiles) {
-        val carto = tiles == MapTiles.Style.CARTO
-        view.setTileSource(if (carto) (if (dark) MapTiles.NIGHT else MapTiles.DAY) else TileSourceFactory.MAPNIK)
-        // CARTO's night style is drawn dark already; only lift its roads a little. The plain
-        // OpenStreetMap fallback is inverted at night.
-        view.overlayManager.tilesOverlay.setColorFilter(if (carto) (if (dark) CARTO_NIGHT_BOOST else null) else if (dark) NIGHT else DAY)
+        view.setTileSource(if (tiles == MapTiles.Style.HOT) MapTiles.HOT else TileSourceFactory.MAPNIK)
+        view.overlayManager.tilesOverlay.setColorFilter(if (dark) NIGHT else DAY)
         view.overlayManager.tilesOverlay.setLoadingBackgroundColor(if (dark) 0xFF111214.toInt() else 0xFFE9EAEC.toInt())
         view.overlayManager.tilesOverlay.setLoadingLineColor(if (dark) 0xFF1B1D21.toInt() else 0xFFDDDEE1.toInt())
         view.invalidate()

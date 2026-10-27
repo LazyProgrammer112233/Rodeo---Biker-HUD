@@ -24,7 +24,7 @@ class NavReplayTest {
         val files = dir.listFiles { f -> f.name.endsWith(".json") && (f.name.startsWith("valhalla-") || f.name.startsWith("osrm-")) }
             ?.filter { it.length() > 200 }.orEmpty().sortedBy { it.name }
         assumeTrue("no live fixtures (CI saves them)", files.isNotEmpty())
-        report.parentFile.mkdirs()
+        report.parentFile?.mkdirs()
         val out = StringBuilder()
         val problems = ArrayList<String>()
         for (f in files) {
@@ -46,20 +46,35 @@ class NavReplayTest {
             var t = 0L
             var rerouted = false
             var arrived = false
-            for ((i, p) in resample(route.points, speed).withIndex()) {
+            val ride = resample(route.points, speed)
+            for ((i, p) in ride.withIndex()) {
                 val j = jitter(p, 6.0, i)
-                val pr = nav.update(j.lat, j.lng, speed.toFloat(), null, 8f, t)
+                // Like a phone's GPS: a heading once moving, with a few degrees of noise.
+                val next = ride.getOrNull(i + 1) ?: p
+                val heading = if (next == p) null else (bearing(p, next) + 6 * sin(i * 0.9)).toFloat()
+                val pr = nav.update(j.lat, j.lng, speed.toFloat(), heading, 8f, t)
                 along = nav.totalM - pr.remainingM
                 if (pr.offRoute) rerouted = true
                 if (pr.arrived) arrived = true
                 t += 1_000
             }
             heard.forEach { (m, s) -> out.append("   @%6.0f m  \"%s\"\n".format(m, s)) }
-            val turns = route.steps.drop(1).filter { it.maneuver != Maneuver.ARRIVE }
-            val missing = turns.filter { st -> heard.none { it.second == st.now } }
-            out.append("   turns=${turns.size} spokenAtTurn=${turns.size - missing.size} offRoute=$rerouted arrived=$arrived\n\n")
+            // The at-the-turn prompts, in the order heard, must follow the route's turns in order,
+            // each at most once: a turn out of order means the matcher jumped ahead.
+            val expected = route.steps.drop(1).map { it.now }
+            val actual = heard.map { it.second }.filter { !it.startsWith("In ") && !it.startsWith("Route ready") && it != "You have arrived" }
+            var k = 0
+            var inOrder = true
+            for (h in actual) {
+                while (k < expected.size && expected[k] != h) k++
+                if (k == expected.size) { inOrder = false; break }
+                k++
+            }
+            val missing = if (inOrder) expected.size - actual.size else 0
+            out.append("   turns=${expected.size} spokenAtTurn=${actual.size} inOrder=$inOrder offRoute=$rerouted arrived=$arrived\n\n")
+            if (!inOrder) problems += "${f.name}: turns announced out of order or twice"
             // Steps closer together than the "now" distance can merge; allow a few on long routes.
-            if (missing.size > maxOf(1, turns.size / 10)) problems += "${f.name}: ${missing.size} of ${turns.size} turns never announced: ${missing.take(3).map { it.instruction }}"
+            if (missing > maxOf(1, expected.size / 10)) problems += "${f.name}: $missing of ${expected.size} turns never announced"
             if (rerouted) problems += "${f.name}: went off route while following it"
             if (!arrived) problems += "${f.name}: never arrived"
         }
@@ -86,6 +101,12 @@ class NavReplayTest {
         }
         out += path.last()
         return out
+    }
+
+    private fun bearing(a: LatLng, b: LatLng): Double {
+        val dx = (b.lng - a.lng) * cos(Math.toRadians(a.lat))
+        val dy = b.lat - a.lat
+        return (Math.toDegrees(kotlin.math.atan2(dx, dy)) + 360.0) % 360.0
     }
 
     private fun jitter(p: LatLng, m: Double, i: Int): LatLng {

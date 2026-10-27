@@ -136,8 +136,10 @@ object RouteParser {
             val s = legSteps.getJSONObject(i)
             val man = s.getJSONObject("maneuver")
             val type = man.optString("type")
-            if (type == "exit roundabout" || type == "exit rotary") continue
             val modifier = man.optString("modifier")
+            if (type == "exit roundabout" || type == "exit rotary" || type == "notification") continue
+            // A road changing its name is not something to say out loud.
+            if ((type == "new name" || type == "continue") && modifier in setOf("straight", "")) continue
             val loc = man.optJSONArray("location")
             val at = if (loc != null) nearestIndex(points, LatLng(loc.getDouble(1), loc.getDouble(0)), searchFrom) else searchFrom
             searchFrom = at
@@ -145,7 +147,8 @@ object RouteParser {
             val exit = man.optInt("exit", 0)
             val maneuver = osrmManeuver(type, modifier)
             val sentence = osrmSentence(type, modifier, name, exit)
-            steps += RouteStep(maneuver, sentence, sentence, sentence, at, s.optDouble("distance", 0.0), s.optDouble("duration", 0.0))
+            val alert = if (type == "arrive") "You will arrive at your destination" else sentence
+            steps += RouteStep(maneuver, sentence, alert, sentence, at, s.optDouble("distance", 0.0), s.optDouble("duration", 0.0))
         }
         return Route(points, steps, route.optDouble("distance", 0.0), route.optDouble("duration", 0.0), "OSRM")
     }

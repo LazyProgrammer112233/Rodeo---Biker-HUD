@@ -159,6 +159,8 @@ data class CockpitState(
     /** Name of the connected headset or intercom, if any. */
     val btDevice: String? = null,
     val wiredHeadset: Boolean = false,
+    /** A headset is connected but music is playing from the phone speaker. */
+    val musicOnPhone: Boolean = false,
     val wifiOn: Boolean = false,
     val packCount: Int = 0,
     val packActive: Boolean = false,
@@ -708,8 +710,8 @@ private fun TileRow(s: CockpitState, actions: CockpitControls, narrow: Boolean) 
                 s.btDevice != null -> Icons.Filled.BluetoothConnected
                 else -> Icons.Filled.Bluetooth
             },
-            s.btDevice ?: if (s.wiredHeadset) "Wired" else if (s.btOn) "Bluetooth" else "BT off",
-            tile.weight(1.15f), active = connected, jewel = if (connected) c.ok else null,
+            if (s.musicOnPhone) "Phone speaker" else s.btDevice ?: if (s.wiredHeadset) "Wired" else if (s.btOn) "Bluetooth" else "BT off",
+            tile.weight(1.15f), active = connected, jewel = if (s.musicOnPhone) c.warning else if (connected) c.ok else null,
         ) { actions.bluetooth() }
         if (!s.riding && !narrow) {
             HudTile(

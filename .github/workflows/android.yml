@@ -137,10 +137,16 @@ jobs:
             curl -s -m 30 "https://photon.komoot.io/api/?q=nandi%20hills&limit=5&lang=en&lat=12.97&lon=77.59" -o $F/photon-nandi.json
             echo "== photon: $(head -c 300 $F/photon-nandi.json)"
             echo "== nominatim: $(curl -s -m 30 -A RodeoHUD-CI/1.0 'https://nominatim.openstreetmap.org/search?q=nandi+hills&format=jsonv2&limit=1&countrycodes=in' | head -c 300)"
-            C=https://a.basemaps.cartocdn.com
-            for t in "voyager $C/rastertiles/voyager/15/23443/15186@2x.png" "dark $C/dark_all/15/23443/15186@2x.png" "osm https://tile.openstreetmap.org/15/23443/15186.png"; do
-              set -- $t
-              echo "== tile $1 $(curl -s -m 20 -A RodeoHUD-CI/1.0 -o /tmp/probe/tile-$1.png -w '%{http_code} %{content_type} %{size_download}' $2)"
+            # Map tiles (2x2 around central Bengaluru, Delhi and Mumbai) from both keyless servers.
+            for city in "blr 23446 15193" "del 23412 13662" "bom 23013 14616"; do
+              read -r name x0 y0 <<< "$city"
+              for d in 00 01 10 11; do
+                x=$((x0 + ${d:0:1})); y=$((y0 + ${d:1:1}))
+                for src in osm hot; do
+                  if [ $src = osm ]; then base=https://tile.openstreetmap.org; else base=https://a.tile.openstreetmap.fr/hot; fi
+                  echo "== tile $src $name $d $(curl -s -m 20 -A RodeoHUD-CI/1.0 -o /tmp/probe/tile-$src-$name-$d.png -w '%{http_code} %{content_type} %{size_download}' $base/15/$x/$y.png)"
+                done
+              done
             done
           } > probe.log 2>&1
           ls -la $F >> probe.log; cat probe.log | head -60
@@ -158,6 +164,41 @@ jobs:
           done
           grep -h -o 'testsuite name="[^"]*" tests="[0-9]*" skipped="[0-9]*" failures="[0-9]*"' app/build/test-results/testDebugUnitTest/*.xml >> shots.log || true
           true
+
+      # Voice accuracy: synthetic riders (Indian-accented voices first) saying the wake phrase,
+      # commands, SOS and everyday chatter over engine and wind noise, played through the real
+      # offline recogniser and the app's own wake-phrase and command logic.
+      - uses: actions/setup-python@v5
+        if: github.event_name == 'push'
+        with:
+          python-version: '3.11'
+
+      - uses: actions/cache@v4
+        if: github.event_name == 'push'
+        with:
+          path: ~/.cache/piper
+          key: piper-voices-v1
+
+      - name: Voice evaluation
+        if: github.event_name == 'push'
+        continue-on-error: true
+        timeout-minutes: 30
+        run: |
+          set -e
+          sudo apt-get install -y -qq espeak-ng > /dev/null 2>&1 || true
+          pip install -q "piper-tts==1.2.0" numpy || pip install -q numpy
+          mkdir -p ~/.cache/piper
+          H=https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en
+          for v in en_GB/vctk/medium/en_GB-vctk-medium en_US/lessac/medium/en_US-lessac-medium en_GB/alan/medium/en_GB-alan-medium; do
+            n=$(basename $v)
+            [ -s ~/.cache/piper/$n.onnx ] || curl -sfL -o ~/.cache/piper/$n.onnx $H/$v.onnx || true
+            [ -s ~/.cache/piper/$n.onnx.json ] || curl -sfL -o ~/.cache/piper/$n.onnx.json $H/$v.onnx.json || true
+          done
+          python3 tools/voice-eval/gen.py /tmp/clips ~/.cache/piper 2>&1 | tail -20
+          ./gradlew -q --no-daemon -p tools/voice-eval installDist
+          mkdir -p app/build/reports-rodeo
+          tools/voice-eval/build/install/voice-eval/bin/voice-eval app/src/main/assets/vosk-model /tmp/clips \
+            app/build/reports-rodeo/voice-eval.txt app/build/reports-rodeo/voice-eval.json 2>&1 | grep -v "^LOG" | head -80
 
       # Read the certificate from the APK itself, so the SHA-1 is the one Maps will see.
       - name: Signing fingerprint (for the Maps key restriction)
@@ -179,7 +220,7 @@ jobs:
           rm -rf /tmp/probe-out && mkdir -p /tmp/probe-out
           cp app/src/test/resources/live/*.json /tmp/probe-out/ 2>/dev/null || true
           cp /tmp/probe/*.png /tmp/probe-out/ 2>/dev/null || true
-          cp app/build/reports-rodeo/*.txt /tmp/probe-out/ 2>/dev/null || true
+          cp app/build/reports-rodeo/*.txt app/build/reports-rodeo/*.json /tmp/probe-out/ 2>/dev/null || true
           ls app/build/shots/*.png >/dev/null 2>&1 && cp app/build/shots/*.png /tmp/shots/
           git config user.name "rodeo-ci"
           git config user.email "ci@users.noreply.github.com"

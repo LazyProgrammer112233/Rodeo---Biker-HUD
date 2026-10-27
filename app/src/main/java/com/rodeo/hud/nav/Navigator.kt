@@ -129,7 +129,11 @@ class Navigator(val route: Route, private val speak: (String) -> Unit) {
         if (stage <= done || stage == 0) return
         spoken[k] = stage
         when (stage) {
-            3 -> speak(step.now)
+            3 -> {
+                speak(step.now)
+                // The arrival sentence ("Your destination is on the left") already said it.
+                if (step.maneuver == Maneuver.ARRIVE) arrivedSaid = true
+            }
             // A long way out only if there was room for a separate warning before the near one.
             1 -> if (d > near + 150) speak("In ${spokenDistance(d)}, ${lowerFirst(step.alert)}")
             else -> speak("In ${spokenDistance(d)}, ${lowerFirst(step.alert)}")
@@ -139,7 +143,7 @@ class Navigator(val route: Route, private val speak: (String) -> Unit) {
     /** Closest route segment to [p], searched near the last match first so loops don't confuse it. */
     private fun match(p: LatLng, bearing: Float?, speed: Float?): Triple<Int, Double, Double> {
         if (pts.size < 2) return Triple(0, 0.0, if (pts.isEmpty()) 0.0 else metres(p, pts[0]))
-        val local = search(p, (seg - 3).coerceAtLeast(0), aheadEnd(seg), bearing, speed)
+        val local = search(p, (seg - 3).coerceAtLeast(0), aheadEnd(seg), bearing, speed, cum[seg])
         if (local.third <= 60.0) return local
         val global = search(p, 0, pts.size - 2, bearing, speed)
         return if (global.third + 20.0 < local.third) global else local
@@ -151,7 +155,12 @@ class Navigator(val route: Route, private val speak: (String) -> Unit) {
         return j
     }
 
-    private fun search(p: LatLng, from: Int, to: Int, bearing: Float?, speed: Float?): Triple<Int, Double, Double> {
+    /**
+     * Best segment for [p] between [from] and [to]. With [origin] (where the rider was along the
+     * route) a jump far ahead costs a little, so on a road ridden out and back the matcher keeps
+     * the leg the rider is on instead of skipping to the return leg lying on top of it.
+     */
+    private fun search(p: LatLng, from: Int, to: Int, bearing: Float?, speed: Float?, origin: Double? = null): Triple<Int, Double, Double> {
         val cosLat = cos(p.lat * PI / 180.0)
         var best = Triple(from, 0.0, Double.MAX_VALUE)
         var bestScore = Double.MAX_VALUE
@@ -176,6 +185,7 @@ class Navigator(val route: Route, private val speak: (String) -> Unit) {
                 val diff = abs(RouteParser.signedTurn(segBearing, bearing!!.toDouble()))
                 if (diff > 100) score += 30.0 // the other carriageway, or the road coming back
             }
+            if (origin != null) score += max(0.0, cum[i] - origin - 80.0) / 25.0
             if (score < bestScore) {
                 bestScore = score
                 best = Triple(i, t, d)

@@ -75,7 +75,8 @@ class NavLogicTest {
         assertTrue("got $said", turn.size >= 2)
         assertTrue(turn.any { it.startsWith("In ") })
         assertTrue(turn.last() == "Turn right onto Brigade Road.")
-        assertEquals("You have arrived", said.last())
+        assertEquals("You have arrived.", said.last())
+        assertEquals("arrival said once", 1, said.count { it.startsWith("You have arrived") })
         assertTrue(last.arrived)
         assertFalse(said.any { it == "Rerouting" })
     }

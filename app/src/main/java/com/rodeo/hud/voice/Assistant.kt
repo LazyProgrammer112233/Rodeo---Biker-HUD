@@ -200,6 +200,7 @@ class Assistant(private val context: Context, private val g: AppGraph) : VoiceBr
     }
 
     fun cancelTraining() {
+        if (_ui.value.training == null) return
         _ui.update { it.copy(training = null) }
         releaseFocus(resume = true)
         sync()
@@ -209,7 +210,9 @@ class Assistant(private val context: Context, private val g: AppGraph) : VoiceBr
         val t = _ui.value.training ?: return
         val text = alternatives.firstOrNull()?.takeIf { it.isNotBlank() } ?: return
         val p = g.profile.profile.value
-        val plain = WakeMatcher(p.wakePhrase).find(text) != null || alternatives.any { WakeMatcher(p.wakePhrase).find(it) != null }
+        // Training measures the bare phrase; a test measures what will be used on the road.
+        val matcher = WakeMatcher(p.wakePhrase, if (t.testOnly) p.wakeAliases else emptyList())
+        val plain = alternatives.any { matcher.find(it) != null }
         val next = t.copy(heard = t.heard + text, matched = t.matched + if (plain) 1 else 0)
         _ui.update { it.copy(training = next, heard = text) }
         if (next.heard.size >= 3) finishTraining()
