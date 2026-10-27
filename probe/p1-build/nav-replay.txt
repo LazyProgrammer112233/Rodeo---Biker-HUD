@@ -51,7 +51,7 @@
    step 10 RIGHT at 828: Turn right onto Nandi Hill Road
    step 11 ARRIVE at 1095: Your destination is on the left
    @     0 m  "Route ready. 61 kilometres, about 2 hours 29 minutes"
-   @     0 m  "Turn left. Then Turn left onto Vittal Mallya Road."
+   @     0 m  "Turn left. Then turn left onto Vittal Mallya Road."
    @    22 m  "Turn left onto Vittal Mallya Road."
    @    45 m  "In 100 metres, turn right onto Kasturba Road"
    @   115 m  "Turn right onto Kasturba Road."
