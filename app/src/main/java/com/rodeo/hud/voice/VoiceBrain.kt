@@ -17,7 +17,7 @@ class VoiceBrain(
     private val out: Output,
     var repeatedSosEnabled: Boolean = true,
     /** How sure the keyword spotter must be of a word. */
-    var keywordConf: Double = 0.75,
+    var keywordConf: Double = 0.5,
 ) {
     interface Output {
         fun onWake()

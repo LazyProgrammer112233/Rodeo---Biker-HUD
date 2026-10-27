@@ -208,8 +208,8 @@ class VoiceLogicTest {
 
     @Test fun keywordSpotterIgnoresUnsureWords() {
         val (b, r) = trained()
-        b.keywords(kw("hey" to 0.9, "doug" to 0.4), 900)
-        b.keywords(kw("emergency" to 0.5, "emergency" to 0.6), 1_900)
+        b.keywords(kw("hey" to 0.9, "doug" to 0.3), 900)
+        b.keywords(kw("emergency" to 0.35, "emergency" to 0.45), 1_900)
         assertEquals(emptyList<String>(), r.events)
         b.keywords(kw("emergency" to 0.9, "emergency" to 0.95), 2_900)
         assertEquals(listOf("SOS"), r.events)

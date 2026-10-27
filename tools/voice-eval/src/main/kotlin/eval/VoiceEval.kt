@@ -94,7 +94,7 @@ fun main(args: Array<String>) {
     }
 
     val phrases = clips.map { it.phrase }.filter { it.isNotEmpty() }.distinct()
-    val configs = (System.getenv("EVAL_CONFIGS") ?: "hp,hp+kws50,hp+kws75,hp+kws95").split(",").mapNotNull { CONFIGS[it.trim()] }
+    val configs = (System.getenv("EVAL_CONFIGS") ?: "base,hp+kws50").split(",").mapNotNull { CONFIGS[it.trim()] }
     val jobs = ArrayList<java.util.concurrent.Future<Outcome>>()
     for (cfg in configs) for (c in clips) {
         if (c.kind == "train") continue

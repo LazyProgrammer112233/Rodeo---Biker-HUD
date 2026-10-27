@@ -58,6 +58,8 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
@@ -135,6 +137,8 @@ private fun SearchRow(s: MapChromeState, actions: MapChromeActions, narrow: Bool
     val c = LocalHud.current
     val t = LocalType.current
     var query by remember { mutableStateOf("") }
+    val keyboard = LocalSoftwareKeyboardController.current
+    val focus = LocalFocusManager.current
     Column {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.sdp())) {
             val pill = RoundedCornerShape(50)
@@ -157,7 +161,8 @@ private fun SearchRow(s: MapChromeState, actions: MapChromeActions, narrow: Bool
                         textStyle = t.headlineMd.copy(color = c.text, fontWeight = FontWeight.Bold),
                         cursorBrush = SolidColor(c.accent),
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                        keyboardActions = KeyboardActions(onSearch = { actions.search(query) }),
+                        // Put the keyboard away so the results (and the map) are visible in landscape.
+                        keyboardActions = KeyboardActions(onSearch = { keyboard?.hide(); focus.clearFocus(); actions.search(query) }),
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
