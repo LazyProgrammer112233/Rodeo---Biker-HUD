@@ -32,10 +32,24 @@ android {
         buildConfigField("String", "FIREBASE_DB_URL", "\"${secret("FIREBASE_DB_URL")}\"")
     }
 
+    // Optional fixed signing key (CI secrets SIGNING_KEYSTORE_B64 / SIGNING_PASSWORD).
+    val keystore = System.getenv("SIGNING_KEYSTORE")?.let { file(it) }?.takeIf { it.exists() }
+    if (keystore != null) {
+        signingConfigs.create("rodeo") {
+            storeFile = keystore
+            storePassword = secret("SIGNING_PASSWORD")
+            keyAlias = "rodeo"
+            keyPassword = secret("SIGNING_PASSWORD")
+        }
+    }
+
     buildTypes {
+        debug {
+            if (keystore != null) signingConfig = signingConfigs.getByName("rodeo")
+        }
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName(if (keystore != null) "rodeo" else "debug")
         }
     }
     compileOptions {
