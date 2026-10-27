@@ -197,8 +197,13 @@ jobs:
           python3 tools/voice-eval/gen.py /tmp/clips ~/.cache/piper 2>&1 | tail -20
           ./gradlew -q --no-daemon -p tools/voice-eval installDist
           mkdir -p app/build/reports-rodeo
-          tools/voice-eval/build/install/voice-eval/bin/voice-eval app/src/main/assets/vosk-model /tmp/clips \
-            app/build/reports-rodeo/voice-eval.txt app/build/reports-rodeo/voice-eval.json 2>&1 | grep -v "^LOG" | head -80
+          # The recogniser's maths library keeps its own thread pool, which breaks when several
+          # recognisers run side by side unless it is limited to one thread each.
+          export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
+          ev() { tools/voice-eval/build/install/voice-eval/bin/voice-eval app/src/main/assets/vosk-model /tmp/clips \
+            app/build/reports-rodeo/voice-eval.txt app/build/reports-rodeo/voice-eval.json > /tmp/eval.log 2>&1; }
+          ev || { grep -v WARNING /tmp/eval.log | tail -5; echo "retrying on one thread"; EVAL_THREADS=1 ev; } || true
+          grep -v "WARNING\|^LOG" /tmp/eval.log | head -120
 
       # Read the certificate from the APK itself, so the SHA-1 is the one Maps will see.
       - name: Signing fingerprint (for the Maps key restriction)
