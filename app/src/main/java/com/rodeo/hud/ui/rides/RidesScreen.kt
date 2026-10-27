@@ -151,7 +151,7 @@ fun RouteTrace(ride: Ride, modifier: Modifier) {
             Text("Not enough GPS points to draw this ride", color = c.textMuted, modifier = Modifier.align(Alignment.Center))
             return@Box
         }
-        Canvas(Modifier.fillMaxSize().padding(24.dp)) {
+        Canvas(Modifier.fillMaxSize().padding(start = 24.dp, end = 24.dp, top = 24.dp, bottom = 44.dp)) {
             val minLat = pts.minOf { it.lat }; val maxLat = pts.maxOf { it.lat }
             val minLng = pts.minOf { it.lng }; val maxLng = pts.maxOf { it.lng }
             val midLat = Math.toRadians((minLat + maxLat) / 2)

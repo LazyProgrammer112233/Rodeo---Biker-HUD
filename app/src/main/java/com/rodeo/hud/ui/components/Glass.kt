@@ -89,7 +89,8 @@ fun FitText(
         style = style.copy(fontSize = size, lineHeight = if (style.lineHeight.isSpecified()) style.lineHeight * factor else style.lineHeight),
         maxLines = maxLines,
         softWrap = maxLines > 1,
-        overflow = TextOverflow.Clip,
+        // Last resort once it is as small as it may go: an ellipsis rather than a hard cut.
+        overflow = if (factor <= minScale) TextOverflow.Ellipsis else TextOverflow.Clip,
         textAlign = textAlign,
         modifier = modifier.drawWithContent { if (ready) drawContent() },
         onTextLayout = { r ->
@@ -261,7 +262,16 @@ fun StatusChip(text: String, color: Color, modifier: Modifier = Modifier) {
 
 /** Small boxed metric: micro label over a big Barlow figure and unit. */
 @Composable
-fun StatBox(label: String, value: String, unit: String = "", modifier: Modifier = Modifier, valueColor: Color? = null, boxed: Boolean = true) {
+fun StatBox(
+    label: String,
+    value: String,
+    unit: String = "",
+    modifier: Modifier = Modifier,
+    valueColor: Color? = null,
+    boxed: Boolean = true,
+    /** Narrow boxes: put the unit beside the label so the figure keeps its full size. */
+    unitInLabel: Boolean = false,
+) {
     val c = LocalHud.current
     val t = LocalType.current
     val shape = RoundedCornerShape(12.sdp())
@@ -274,10 +284,10 @@ fun StatBox(label: String, value: String, unit: String = "", modifier: Modifier 
                 else Modifier,
             ),
     ) {
-        FitText(label.uppercase(), t.micro, c.textMuted)
+        FitText((if (unitInLabel && unit.isNotEmpty()) "$label · $unit" else label).uppercase(), t.micro, c.textMuted)
         Row(verticalAlignment = Alignment.Bottom) {
             FitText(value, t.headlineLg, valueColor ?: c.text, modifier = Modifier.weight(1f, fill = false))
-            if (unit.isNotEmpty()) {
+            if (unit.isNotEmpty() && !unitInLabel) {
                 Spacer(Modifier.width(3.sdp()))
                 Text(unit.uppercase(), color = c.accent, style = t.label, maxLines = 1, modifier = Modifier.padding(bottom = 2.sdp()))
             }

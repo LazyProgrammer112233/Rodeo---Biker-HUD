@@ -102,6 +102,26 @@ jobs:
             grep -q "<failure" "$f" && sed -n '/<failure/,/<\/failure>/p' "$f" | head -60 >> shots.log
           done; true
 
+      # Quick health check of the free, keyless map services the app relies on.
+      - name: Probe map services
+        if: github.event_name == 'push'
+        continue-on-error: true
+        run: |
+          {
+            echo "== valhalla motorcycle"
+            J='{"locations":[{"lat":12.9716,"lon":77.5946},{"lat":13.3702,"lon":77.6835}],"costing":"motorcycle","units":"kilometers","language":"en-US"}'
+            curl -s -m 30 -G --data-urlencode "json=$J" https://valhalla1.openstreetmap.de/route | head -c 1500; echo
+            echo "== osrm fossgis"
+            curl -s -m 30 "https://routing.openstreetmap.de/routed-car/route/v1/driving/77.5946,12.9716;77.6835,13.3702?steps=true&overview=false" | head -c 600; echo
+            echo "== photon"
+            curl -s -m 30 "https://photon.komoot.io/api/?q=nandi%20hills&limit=2&lat=12.97&lon=77.59" | head -c 600; echo
+            echo "== nominatim"
+            curl -s -m 30 -A "RodeoHUD-CI/1.0" "https://nominatim.openstreetmap.org/search?q=nandi+hills&format=jsonv2&limit=1&countrycodes=in" | head -c 400; echo
+            for u in https://a.basemaps.cartocdn.com/rastertiles/voyager/12/2930/1898@2x.png https://a.basemaps.cartocdn.com/dark_all/12/2930/1898@2x.png https://tile.openstreetmap.org/12/2930/1898.png; do
+              echo "== $u $(curl -s -m 20 -A RodeoHUD-CI/1.0 -o /dev/null -w '%{http_code} %{content_type} %{size_download}' $u)"
+            done
+          } > probe.log 2>&1; cat probe.log | head -80
+
       # Read the certificate from the APK itself, so the SHA-1 is the one Maps will see.
       - name: Signing fingerprint (for the Maps key restriction)
         if: always()
@@ -118,6 +138,7 @@ jobs:
           REF="${GITHUB_REF_NAME//\//_}"
           rm -rf /tmp/shots && mkdir -p /tmp/shots
           [ -f shots.log ] && cp shots.log /tmp/shots.log
+          [ -f probe.log ] && cp probe.log /tmp/probe.log
           ls app/build/shots/*.png >/dev/null 2>&1 && cp app/build/shots/*.png /tmp/shots/
           git config user.name "rodeo-ci"
           git config user.email "ci@users.noreply.github.com"
@@ -126,6 +147,7 @@ jobs:
             git fetch -q origin ci-logs && git checkout -qf -B ci-logs origin/ci-logs || { git checkout -qB ci-logs; git rm -rq --cached .; }
             mkdir -p logs && cp /tmp/build.log "logs/$REF.log"
             [ -f /tmp/shots.log ] && cp /tmp/shots.log "logs/$REF-shots.log"
+            [ -f /tmp/probe.log ] && cp /tmp/probe.log "logs/$REF-probe.log"
             if ls /tmp/shots/*.png >/dev/null 2>&1; then
               rm -rf "shots/$REF" && mkdir -p "shots/$REF" && cp /tmp/shots/*.png "shots/$REF/" && git add -fA shots
             fi

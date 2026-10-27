@@ -75,7 +75,7 @@ fun HudScreen(actions: HudActions, showEndSlider: Boolean, dark: Boolean) {
         time = SimpleDateFormat(if (is24) "HH:mm" else "h:mm", Locale.getDefault()).format(date),
         timeSuffix = if (is24) zoneShort() else SimpleDateFormat("a", Locale.ENGLISH).format(date).uppercase(),
         weatherTemp = weather?.let { "${it.tempC.toInt()}°C" },
-        weatherLabel = weather?.label,
+        weatherLabel = weather?.shortLabel,
         sunny = weather?.code?.let { it <= 2 } ?: true,
         batteryPct = health.batteryPct,
         charging = health.charging,

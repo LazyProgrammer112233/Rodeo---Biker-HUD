@@ -229,7 +229,7 @@ fun CockpitPanel(s: CockpitState, actions: CockpitControls, modifier: Modifier =
 @Composable
 private fun EndRideSheet(actions: CockpitControls, modifier: Modifier) {
     val c = LocalHud.current
-    GlassCard(modifier.fillMaxWidth(), accentBorder = c.accent, padding = PaddingValues(8.sdp())) {
+    GlassCard(modifier.fillMaxWidth().clip(panelShape()).background(c.surface), accentBorder = c.accent, padding = PaddingValues(8.sdp())) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             FitText("END THIS RIDE?", LocalType.current.headlineLg, c.text, Modifier.weight(1f).padding(start = 8.sdp()))
             Box(Modifier.size(48.sdp()).clip(CircleShape).clickable { actions.cancelEndRide() }, contentAlignment = Alignment.Center) {
@@ -249,19 +249,29 @@ private fun StatusBar(s: CockpitState, actions: CockpitControls, narrow: Boolean
     GlassCard(Modifier.fillMaxWidth(), padding = PaddingValues(horizontal = 12.sdp(), vertical = 6.sdp())) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.sdp())) {
             Clock(s, t.headlineXl.copy(fontWeight = FontWeight.ExtraBold))
-            // Badges shrink first so the buttons never get pushed off.
-            Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(6.sdp()), verticalAlignment = Alignment.CenterVertically) {
-                Badge(
-                    if (s.sunny) Icons.Filled.WbSunny else Icons.Filled.Cloud, c.warning,
-                    s.weatherTemp ?: "--°", if (narrow) null else (s.weatherLabel ?: "Weather"), Modifier.weight(1f, fill = false),
-                )
-                Badge(
-                    if (s.charging) Icons.Filled.BatteryChargingFull else Icons.Filled.BatteryFull,
-                    if (s.batteryPct <= 20) c.danger else c.ok,
-                    "${s.batteryPct}%",
-                    if (narrow) null else "${s.phoneTempC}°C" + if (s.lowPower) " · saver" else "",
-                    Modifier.weight(1f, fill = false),
-                )
+            // Badges give way first so the buttons never get pushed off; on narrow phones they stack.
+            if (narrow) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.sdp())) {
+                    MiniStat(if (s.sunny) Icons.Filled.WbSunny else Icons.Filled.Cloud, c.warning, s.weatherTemp ?: "--°")
+                    MiniStat(
+                        if (s.charging) Icons.Filled.BatteryChargingFull else Icons.Filled.BatteryFull,
+                        if (s.batteryPct <= 20) c.danger else c.ok, "${s.batteryPct}%",
+                    )
+                }
+            } else {
+                Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(6.sdp()), verticalAlignment = Alignment.CenterVertically) {
+                    Badge(
+                        if (s.sunny) Icons.Filled.WbSunny else Icons.Filled.Cloud, c.warning,
+                        s.weatherTemp ?: "--°", s.weatherLabel ?: "Weather", Modifier.weight(1f, fill = false),
+                    )
+                    Badge(
+                        if (s.charging) Icons.Filled.BatteryChargingFull else Icons.Filled.BatteryFull,
+                        if (s.batteryPct <= 20) c.danger else c.ok,
+                        "${s.batteryPct}%",
+                        "${s.phoneTempC}°C" + if (s.lowPower) " · saver" else "",
+                        Modifier.weight(1f, fill = false),
+                    )
+                }
             }
             SquareButton(Icons.Filled.Timeline, "Rides", !s.lockInput) { actions.openRides() }
             SquareButton(Icons.Filled.TwoWheeler, "Garage", !s.lockInput) { actions.openGarage() }
@@ -325,6 +335,15 @@ private fun Badge(icon: ImageVector, iconTint: Color, value: String, sub: String
             FitText(value, t.headlineSm, c.text)
             if (sub != null) FitText(sub.uppercase(), t.micro, c.textMuted)
         }
+    }
+}
+
+@Composable
+private fun MiniStat(icon: ImageVector, tint: Color, value: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(icon, null, tint = tint, modifier = Modifier.size(15.sdp()))
+        Spacer(Modifier.width(4.sdp()))
+        FitText(value, LocalType.current.headlineSm, LocalHud.current.text)
     }
 }
 
@@ -423,9 +442,9 @@ private fun HeroIdle(s: CockpitState, actions: CockpitControls, modifier: Modifi
                                 }
                             }
                             if (showStats) Row(horizontalArrangement = Arrangement.spacedBy(6.sdp())) {
-                                StatBox("Last trip", s.lastDistanceKm?.let { "%.1f".format(it) } ?: "--", "km", Modifier.weight(1f))
-                                StatBox("Avg", s.lastAvgKmh?.toString() ?: "--", "km/h", Modifier.weight(1f))
-                                StatBox("Top", s.lastTopKmh?.toString() ?: "--", "km/h", Modifier.weight(1f), valueColor = c.ok)
+                                StatBox("Last trip", s.lastDistanceKm?.let { "%.1f".format(it) } ?: "--", "km", Modifier.weight(1f), unitInLabel = !roomy)
+                                StatBox("Avg", s.lastAvgKmh?.toString() ?: "--", "km/h", Modifier.weight(1f), unitInLabel = !roomy)
+                                StatBox("Top", s.lastTopKmh?.toString() ?: "--", "km/h", Modifier.weight(1f), valueColor = c.ok, unitInLabel = !roomy)
                             }
                         }
                     }
@@ -531,59 +550,85 @@ private fun SpeedCluster(s: CockpitState, modifier: Modifier) {
                 RevBar(anim / 160f, Modifier.fillMaxWidth().height(12.sdp()))
                 BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
                     val gap = 8.sdp()
-                    val statsW = maxWidth * 0.42f
-                    val speedW = maxWidth - statsW - gap
-                    val unitW = 62.sdp()
-                    // Condensed italic digits run about half an em wide; three of them plus the unit must fit.
-                    val byWidth = (speedW - unitW) / 1.65f
-                    val fontDp = minOf(maxHeight * 0.95f, byWidth).coerceAtLeast(16.dp)
-                    val speedSp = with(LocalDensity.current) { fontDp.toSp() }
-                    val fullGrid = maxHeight >= 96.sdp()
-                    Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
-                        Row(Modifier.width(speedW), verticalAlignment = Alignment.Bottom) {
-                            Text(
-                                "${anim.toInt()}",
-                                color = c.text,
-                                style = t.speed.copy(fontSize = speedSp, lineHeight = speedSp),
-                                maxLines = 1,
-                                softWrap = false,
-                            )
-                            Column(Modifier.padding(start = 4.sdp(), bottom = 4.sdp())) {
-                                Text(
-                                    "KM/H", color = c.accent, style = t.headlineLg.copy(fontStyle = FontStyle.Italic, fontWeight = FontWeight.Black),
-                                    maxLines = 1, softWrap = false,
-                                )
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Box(Modifier.size(6.sdp()).clip(CircleShape).background(if (s.paused) c.warning else c.ok))
-                                    Spacer(Modifier.width(4.sdp()))
-                                    Text(
-                                        if (s.paused) "PAUSED" else if (anim > 3f) "CRUISE" else "STOPPED",
-                                        color = c.textMuted, style = t.micro, maxLines = 1, softWrap = false,
-                                    )
-                                }
+                    if (maxHeight > maxWidth * 0.5f) {
+                        // Tall cards (tablets): the speed spans the width and the stats sit in one row below.
+                        Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(gap)) {
+                            BoxWithConstraints(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
+                                SpeedReadout(anim, s.paused, minOf(maxHeight * 0.95f, (maxWidth - 70.sdp()) / 1.65f))
                             }
+                            StatsWell(s, Modifier.fillMaxWidth(), columns = 4)
                         }
-                        Spacer(Modifier.width(gap))
-                        val wellShape = RoundedCornerShape(12.sdp())
-                        Column(
-                            Modifier.width(statsW).clip(wellShape).background(if (c.dark) c.surfaceLowest.copy(alpha = 0.7f) else c.surfaceHigh)
-                                .then(if (c.dark) Modifier else Modifier.border(c.borderWidth, c.glassBorder, wellShape))
-                                .padding(horizontal = 8.sdp(), vertical = 6.sdp()),
-                            verticalArrangement = Arrangement.spacedBy(6.sdp()),
-                        ) {
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.sdp())) {
-                                StatBox("Trip", "%.1f".format(s.distanceKm), "km", Modifier.weight(1f), boxed = false)
-                                StatBox("Time", s.elapsed, "", Modifier.weight(1f), boxed = false)
-                            }
-                            if (fullGrid) Row(horizontalArrangement = Arrangement.spacedBy(8.sdp())) {
-                                StatBox("Avg", "${s.avgKmh}", "km/h", Modifier.weight(1f), boxed = false)
-                                StatBox("Top", "${s.topKmh}", "km/h", Modifier.weight(1f), boxed = false, valueColor = c.accent)
-                            }
+                    } else {
+                        val statsW = maxWidth * 0.42f
+                        val speedW = maxWidth - statsW - gap
+                        // Condensed italic digits run about half an em wide; three of them plus the unit must fit.
+                        val font = minOf(maxHeight * 0.95f, (speedW - 62.sdp()) / 1.65f)
+                        Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+                            Box(Modifier.width(speedW)) { SpeedReadout(anim, s.paused, font) }
+                            Spacer(Modifier.width(gap))
+                            StatsWell(s, Modifier.width(statsW), columns = if (maxHeight >= 96.sdp()) 2 else 1)
                         }
                     }
                 }
             }
         }
+    }
+}
+
+/** The big number, its unit and the riding state. */
+@Composable
+private fun SpeedReadout(speed: Float, paused: Boolean, fontSize: Dp) {
+    val c = LocalHud.current
+    val t = LocalType.current
+    val sp = with(LocalDensity.current) { fontSize.coerceAtLeast(16.dp).toSp() }
+    Row(verticalAlignment = Alignment.Bottom) {
+        Text("${speed.toInt()}", color = c.text, style = t.speed.copy(fontSize = sp, lineHeight = sp), maxLines = 1, softWrap = false)
+        Column(Modifier.padding(start = 4.sdp(), bottom = 4.sdp())) {
+            Text("KM/H", color = c.accent, style = t.headlineLg.copy(fontStyle = FontStyle.Italic, fontWeight = FontWeight.Black), maxLines = 1, softWrap = false)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(6.sdp()).clip(CircleShape).background(if (paused) c.warning else c.ok))
+                Spacer(Modifier.width(4.sdp()))
+                Text(
+                    if (paused) "PAUSED" else if (speed > 3f) "CRUISE" else "STOPPED",
+                    color = c.textMuted, style = t.micro, maxLines = 1, softWrap = false,
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Trip figures in an inset well. [columns] 4 puts all four in a row (tablets), 2 makes a 2 x 2 grid,
+ * and 1 keeps only distance and time when the card is very short.
+ */
+@Composable
+private fun StatsWell(s: CockpitState, modifier: Modifier, columns: Int) {
+    val c = LocalHud.current
+    val shape = RoundedCornerShape(12.sdp())
+    Column(
+        modifier.clip(shape).background(if (c.dark) c.surfaceLowest.copy(alpha = 0.7f) else c.surfaceHigh)
+            .then(if (c.dark) Modifier else Modifier.border(c.borderWidth, c.glassBorder, shape))
+            .padding(horizontal = 8.sdp(), vertical = 6.sdp()),
+        verticalArrangement = Arrangement.spacedBy(6.sdp()),
+    ) {
+        val rows = when (columns) {
+            4 -> listOf(listOf(0, 1, 2, 3))
+            2 -> listOf(listOf(0, 1), listOf(2, 3))
+            else -> listOf(listOf(0, 1))
+        }
+        rows.forEach { row ->
+            Row(horizontalArrangement = Arrangement.spacedBy(8.sdp())) { row.forEach { TripStat(it, s, Modifier.weight(1f)) } }
+        }
+    }
+}
+
+@Composable
+private fun TripStat(index: Int, s: CockpitState, modifier: Modifier) {
+    when (index) {
+        0 -> StatBox("Trip", "%.1f".format(s.distanceKm), "km", modifier, boxed = false)
+        1 -> StatBox("Time", s.elapsed, "", modifier, boxed = false)
+        2 -> StatBox("Avg", "${s.avgKmh}", "km/h", modifier, boxed = false)
+        else -> StatBox("Top", "${s.topKmh}", "km/h", modifier, boxed = false, valueColor = LocalHud.current.accent)
     }
 }
 

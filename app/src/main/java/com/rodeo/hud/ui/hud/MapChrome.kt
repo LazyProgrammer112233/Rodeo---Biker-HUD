@@ -364,10 +364,12 @@ fun ManeuverGlyph(m: Maneuver, color: Color, modifier: Modifier = Modifier) {
                 head(color, p(0.3f, 0.66f, mir), Offset(0f, 1f), sw, s)
             }
             Maneuver.ROUNDABOUT_LEFT, Maneuver.ROUNDABOUT_RIGHT -> {
+                // Ring with the approach from below and the exit leaving at the top corner.
                 val mir = m == Maneuver.ROUNDABOUT_LEFT
-                drawCircle(color, s * 0.18f, p(0.5f, 0.45f, false), style = Stroke(sw * 0.8f))
-                drawLine(color, p(0.5f, 0.92f, false), p(0.5f, 0.64f, false), sw, StrokeCap.Round)
-                arrow(color, stroke, listOf(p(0.64f, 0.33f, mir), p(0.86f, 0.12f, mir)), sw)
+                val ring = p(0.5f, 0.5f, false)
+                drawCircle(color, s * 0.2f, ring, style = Stroke(sw * 0.75f))
+                drawLine(color, p(0.5f, 0.95f, false), p(0.5f, 0.71f, false), sw, StrokeCap.Round)
+                arrow(color, stroke, listOf(p(0.63f, 0.36f, mir), p(0.9f, 0.08f, mir)), sw)
             }
             else -> {
                 val (deg, mir) = when (m) {
@@ -381,12 +383,17 @@ fun ManeuverGlyph(m: Maneuver, color: Color, modifier: Modifier = Modifier) {
                 val rad = Math.toRadians(deg.toDouble())
                 val dx = sin(rad).toFloat()
                 val dy = -cos(rad).toFloat()
-                val sx = 0.36f
-                val corner = 0.48f
-                val len = if (deg > 100) 0.4f else 0.44f
+                // Sharp turns bend high up so the return leg has room; gentle ones bend lower.
+                val sx = if (deg > 100) 0.3f else 0.34f
+                val corner = when {
+                    deg > 100 -> 0.2f
+                    deg > 60 -> 0.46f
+                    else -> 0.5f
+                }
+                val len = if (deg > 100) 0.56f else 0.46f
                 arrow(
                     color, stroke,
-                    listOf(p(sx, 0.92f, mir), p(sx, corner, mir), p(sx + dx * len, corner + dy * len, mir)),
+                    listOf(p(sx, 0.94f, mir), p(sx, corner, mir), p(sx + dx * len, corner + dy * len, mir)),
                     sw,
                 )
             }
@@ -411,8 +418,8 @@ private fun DrawScope.arrow(color: Color, stroke: Stroke, pts: List<Offset>, sw:
 
 /** Filled triangular arrow head with its tip at [tip], pointing along [dir] (unit vector). */
 private fun DrawScope.head(color: Color, tip: Offset, dir: Offset, sw: Float, s: Float) {
-    val len = s * 0.3f
-    val half = s * 0.2f
+    val len = s * 0.26f
+    val half = s * 0.17f
     val base = tip - dir * len
     val n = Offset(-dir.y, dir.x)
     val p = Path().apply {

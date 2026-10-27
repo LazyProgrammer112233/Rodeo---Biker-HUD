@@ -85,7 +85,7 @@ class RodeoApp : Application() {
         initMap()
         graph = AppGraph(this)
         channels()
-        ReminderWorker.schedule(this)
+        runCatching { ReminderWorker.schedule(this) }
     }
 
     /** Firebase is optional: only pack mode and pothole sharing use it. */

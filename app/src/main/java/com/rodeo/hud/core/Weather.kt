@@ -20,6 +20,19 @@ data class WeatherNow(
     val lng: Double,
 ) {
     val label: String get() = describe(code)
+    /** One or two words, for tight spots on the HUD. */
+    val shortLabel: String get() = when (code) {
+        0 -> "Clear"
+        1, 2 -> "Cloudy"
+        3 -> "Overcast"
+        45, 48 -> "Fog"
+        51, 53, 55, 56, 57 -> "Drizzle"
+        61, 63, 80, 81 -> "Rain"
+        65, 82, 66, 67 -> "Heavy rain"
+        71, 73, 75, 77, 85, 86 -> "Snow"
+        95, 96, 99 -> "Storm"
+        else -> ""
+    }
 
     companion object {
         fun describe(code: Int) = when (code) {
