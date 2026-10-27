@@ -16,20 +16,24 @@ Daemon will be stopped at the end of the build
 > Task :app:parseDebugLocalResources
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
-> Task :app:processDebugManifestForPackage
 > Task :app:javaPreCompileDebug
 > Task :app:mergeDebugShaders
 > Task :app:compileDebugShaders NO-SOURCE
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:mergeDebugAssets
-> Task :app:processDebugResources
 > Task :app:compressDebugAssets
+> Task :app:processDebugManifestForPackage
+> Task :app:processDebugResources
 > Task :app:desugarDebugFileDependencies
 > Task :app:mergeDebugJniLibFolders
+> Task :app:l8DexDesugarLibDebug
 > Task :app:checkDebugDuplicateClasses
 > Task :app:mergeDebugNativeLibs
-> Task :app:l8DexDesugarLibDebug
+
 > Task :app:compileDebugKotlin
+e: The daemon has terminated unexpectedly on startup attempt #1 with error code: 0. The daemon process output:
+    1. Kotlin compile daemon is ready
+
 > Task :app:mergeExtDexDebug
 > Task :app:mergeLibDexDebug
 
@@ -65,9 +69,9 @@ w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/jav
 > Task :app:packageDebug
 > Task :app:createDebugApkListingFileRedirect
 > Task :app:assembleDebug
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_6-1793124331110.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_6-1793124789525.json
 
-BUILD SUCCESSFUL in 1m 46s
+BUILD SUCCESSFUL in 1m 47s
 38 actionable tasks: 38 executed
-SIGNING Signer #1 certificate SHA-256 digest: 902f7f255f839cced78c1fd415e997209d9fb38e41aef12c333576385c05f7af
-SIGNING Signer #1 certificate SHA-1 digest: 6d11a91037711f2b4e570028c141dd9f6b46274e
+SIGNING Signer #1 certificate SHA-256 digest: 14520173b3379569718055b47aff38775c701ef0a34de2babc198a293379987a
+SIGNING Signer #1 certificate SHA-1 digest: 50141b63ff32cc5def0e8e81c3f90c56c9e2b904
