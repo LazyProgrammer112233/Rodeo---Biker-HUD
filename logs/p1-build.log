@@ -10,35 +10,35 @@ Daemon will be stopped at the end of the build
 > Task :app:mapDebugSourceSetPaths
 > Task :app:generateDebugResources
 > Task :app:packageDebugResources
+> Task :app:mergeDebugResources
 > Task :app:createDebugCompatibleScreenManifests
 > Task :app:extractDeepLinksDebug
 > Task :app:parseDebugLocalResources
-> Task :app:mergeDebugResources
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
 > Task :app:javaPreCompileDebug
 > Task :app:mergeDebugShaders
+> Task :app:processDebugManifestForPackage
 > Task :app:compileDebugShaders NO-SOURCE
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:mergeDebugAssets
-> Task :app:processDebugManifestForPackage
-> Task :app:compressDebugAssets
 > Task :app:processDebugResources
+> Task :app:compressDebugAssets
 > Task :app:desugarDebugFileDependencies
 > Task :app:mergeDebugJniLibFolders
 > Task :app:checkDebugDuplicateClasses
-> Task :app:mergeDebugNativeLibs
 > Task :app:l8DexDesugarLibDebug
+> Task :app:mergeDebugNativeLibs
+> Task :app:compileDebugKotlin
 > Task :app:mergeLibDexDebug
 
 > Task :app:stripDebugDebugSymbols
 Unable to strip the following libraries, packaging them as they are: libandroidx.graphics.path.so, libimage_processing_util_jni.so, libjnidispatch.so, libmediapipe_tasks_vision_jni.so, libsurface_util_jni.so, libvosk.so.
 
+> Task :app:mergeExtDexDebug
 > Task :app:validateSigningDebug
 > Task :app:writeDebugAppMetadata
 > Task :app:writeDebugSigningConfigVersions
-> Task :app:compileDebugKotlin
-> Task :app:mergeExtDexDebug
 
 > Task :app:compileDebugKotlin
 w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/MainActivity.kt:254:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Please add the '@Deprecated' annotation or suppress the diagnostic.
@@ -51,8 +51,8 @@ w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/jav
       {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)} passing
       in a {@link RequestMultiplePermissions} object for the {@link ActivityResultContract} and
       handling the result in the {@link ActivityResultCallback#onActivityResult(Object) callback}.
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/hud/MapChrome.kt:268:53 'val Icons.Filled.VolumeUp: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.VolumeUp.
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/hud/MapChrome.kt:268:80 'val Icons.Filled.VolumeOff: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.VolumeOff.
+w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/hud/MapChrome.kt:273:53 'val Icons.Filled.VolumeUp: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.VolumeUp.
+w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/hud/MapChrome.kt:273:80 'val Icons.Filled.VolumeOff: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.VolumeOff.
 w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/hud/Overlays.kt:315:27 'val Icons.Filled.VolumeUp: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.VolumeUp.
 w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/setup/SetupParts.kt:100:21 'val LocalLifecycleOwner: ProvidableCompositionLocal<LifecycleOwner>' is deprecated. Moved to lifecycle-runtime-compose library in androidx.lifecycle.compose package.
 
@@ -65,9 +65,9 @@ w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/jav
 > Task :app:packageDebug
 > Task :app:createDebugApkListingFileRedirect
 > Task :app:assembleDebug
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_5-1793136869285.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_5-1793138746784.json
 
-BUILD SUCCESSFUL in 1m 9s
+BUILD SUCCESSFUL in 1m 34s
 38 actionable tasks: 38 executed
-SIGNING Signer #1 certificate SHA-256 digest: ab3375f94e057b4eb4ea9ca4031336da1ef529e9ba800776364cfa80f6f70178
-SIGNING Signer #1 certificate SHA-1 digest: fb9728ae60b96d3e487e270edcb64c83f39c7fc6
+SIGNING Signer #1 certificate SHA-256 digest: a33320bcf3e91641376611d98f343874e6e266b4e9c68882a33ad477b67cf89b
+SIGNING Signer #1 certificate SHA-1 digest: b5dccb9bfe009d43a9411cda91b583e34fcdac7e
