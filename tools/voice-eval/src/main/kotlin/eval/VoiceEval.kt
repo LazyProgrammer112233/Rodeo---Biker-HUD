@@ -160,17 +160,10 @@ private fun samples(f: File): ShortArray {
     }
 }
 
-private fun newOpen(model: Model): Recognizer = Recognizer(model, RATE.toFloat()).apply {
-    setMaxAlternatives(3)
-    shortEndpointer(this)
-}
-
-/** The phone build sets the short end-of-speech timeout; the desktop build may not have it. */
-private fun shortEndpointer(r: Recognizer) {
-    runCatching {
-        com.sun.jna.NativeLibrary.getInstance("vosk").getFunction("vosk_recognizer_set_endpointer_mode").invokeVoid(arrayOf(r.pointer, 1))
-    }
-}
+// The phone build also shortens the end-of-speech timeout; the desktop library has no call for it,
+// so finals come a little later here than on the phone. Partial results, which SOS acts on, are
+// the same.
+private fun newOpen(model: Model): Recognizer = Recognizer(model, RATE.toFloat()).apply { setMaxAlternatives(3) }
 
 private fun alternatives(json: String): List<String> = runCatching {
     val o = JSONObject(json)
@@ -249,7 +242,7 @@ private fun run(model: Model, f: File, c: Clip, phrase: String, trained: Boolean
             if (commandsOn) {
                 if (commandsReset || cmd == null) {
                     commandsReset = false
-                    if (cmd == null) cmd = Recognizer(model, RATE.toFloat(), grammar).also { shortEndpointer(it) } else cmd.reset()
+                    if (cmd == null) cmd = Recognizer(model, RATE.toFloat(), grammar) else cmd.reset()
                     lastCmdPartial = ""
                 }
                 val r = cmd!!
