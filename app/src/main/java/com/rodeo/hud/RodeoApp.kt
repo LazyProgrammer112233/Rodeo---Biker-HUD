@@ -7,6 +7,8 @@ import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.rodeo.hud.core.AmbientController
+import com.rodeo.hud.core.CameraGestures
+import com.rodeo.hud.core.CrashDetector
 import com.rodeo.hud.core.DeviceGuardian
 import com.rodeo.hud.core.LocationHub
 import com.rodeo.hud.core.RideEngine
@@ -39,14 +41,16 @@ class AppGraph(app: Application) {
     val warnings = WarningCenter()
     val location = LocationHub(app)
     val sensors = RideSensors(app)
+    val crash = CrashDetector(app)
     val guardian = DeviceGuardian(app, warnings)
     val weather = WeatherService(warnings)
     val ambient = AmbientController(app)
     val music = MusicController(app)
     val voice = VoiceCommander(app)
+    val gestures = CameraGestures(app)
     val pack = PackService(app, scope, warnings) { profile.profile.value.riderName }
     val hazardSync = HazardSync(app, hazards)
-    val nav = com.rodeo.hud.nav.NavController(warnings)
+    val nav = com.rodeo.hud.nav.NavController(app)
 
     val sos: SosManager = SosManager(app, scope, { profile.profile.value }) {
         val loc = location.location.value
@@ -54,7 +58,7 @@ class AppGraph(app: Application) {
     }
 
     val ride: RideEngine = RideEngine(
-        scope, location, sensors, rides, hazards, warnings, sos,
+        scope, location, sensors, crash, rides, hazards, warnings, sos,
         crashEnabled = { profile.profile.value.crashDetection },
         onHazardLogged = { hazardSync.onHazard(it) },
     )
@@ -76,6 +80,7 @@ class RodeoApp : Application() {
     override fun onCreate() {
         super.onCreate()
         initFirebase()
+        initMap()
         graph = AppGraph(this)
         channels()
         ReminderWorker.schedule(this)
@@ -96,6 +101,16 @@ class RodeoApp : Application() {
                         .build(),
                 )
             }
+        }
+    }
+
+    /** OpenStreetMap tiles: identify the app and keep the tile cache inside app storage. */
+    private fun initMap() {
+        org.osmdroid.config.Configuration.getInstance().apply {
+            load(this@RodeoApp, getSharedPreferences("osmdroid", MODE_PRIVATE))
+            userAgentValue = "$packageName/${BuildConfig.VERSION_NAME}"
+            osmdroidBasePath = java.io.File(cacheDir, "osm")
+            osmdroidTileCache = java.io.File(cacheDir, "osm/tiles")
         }
     }
 

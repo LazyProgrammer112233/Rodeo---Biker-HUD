@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.Icon
@@ -43,6 +42,7 @@ import com.rodeo.hud.ui.components.GhostButton
 import com.rodeo.hud.ui.components.GlassCard
 import com.rodeo.hud.ui.components.PrimaryButton
 import com.rodeo.hud.ui.rides.RouteTrace
+import com.rodeo.hud.ui.setup.SmsStatusList
 import com.rodeo.hud.ui.theme.LocalHud
 
 /** Full-screen SOS countdown and the "help is on the way" screen. */
@@ -86,20 +86,14 @@ fun SosOverlay() {
                 Column(Modifier.weight(1f).fillMaxHeight(), verticalArrangement = Arrangement.Center) {
                     Text(if (s.dryRun) "SOS test complete" else "SOS sent", color = c.danger, fontSize = 34.sp, fontWeight = FontWeight.Black)
                     Spacer(Modifier.height(8.dp))
-                    if (s.smsSentTo.isNotEmpty()) Text("SMS: " + s.smsSentTo.joinToString(), color = c.text, fontSize = 16.sp)
-                    if (s.smsFailed.isNotEmpty()) Text("SMS failed: " + s.smsFailed.joinToString(), color = c.warning, fontSize = 14.sp)
-                    if (s.smsSentTo.isEmpty() && s.smsFailed.isEmpty()) Text("No SOS contacts set. Add them in Settings.", color = c.warning)
+                    val contacts = g.profile.profile.collectAsState().value.sosContacts
+                    if (contacts.isEmpty()) Text("No SOS contacts set. Add them in Settings.", color = c.warning)
+                    else SmsStatusList()
                     if (!s.dryRun) Text("Location updates every 2 minutes · ${s.updates} sent", color = c.textMuted, fontSize = 13.sp)
                     Spacer(Modifier.height(12.dp))
                     GlassCard { Text(s.message, color = c.textMuted, fontSize = 13.sp) }
                 }
                 Column(Modifier.width(300.dp).fillMaxHeight(), verticalArrangement = Arrangement.Center) {
-                    val next = s.whatsAppPending.firstOrNull()
-                    if (next != null) {
-                        PrimaryButton("WhatsApp ${next.name}", Modifier.fillMaxWidth(), icon = Icons.AutoMirrored.Filled.Send) { g.sos.openNextWhatsApp() }
-                        Text("${s.whatsAppPending.size} contact(s) left on WhatsApp", color = c.textMuted, fontSize = 12.sp, modifier = Modifier.padding(top = 6.dp))
-                        Spacer(Modifier.height(16.dp))
-                    }
                     GhostButton(if (s.dryRun) "Close" else "I'm safe · stop SOS", Modifier.fillMaxWidth(), icon = Icons.Filled.Check) { g.sos.cancel() }
                 }
             }

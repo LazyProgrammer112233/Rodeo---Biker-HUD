@@ -286,10 +286,14 @@ private fun ThemePreview(modifier: Modifier) {
     val c = LocalHud.current
     val style = LocalHudStyle.current
     val profile by g.profile.profile.collectAsState()
-    GlassCard(modifier, accentBorder = c.accent.copy(alpha = 0.4f), padding = androidx.compose.foundation.layout.PaddingValues(18.dp)) {
+    GlassCard(modifier, accentBorder = c.accent.copy(alpha = 0.6f), padding = androidx.compose.foundation.layout.PaddingValues(0.dp)) {
+      Box(Modifier.fillMaxSize()) {
+        com.rodeo.hud.ui.components.ParticleField(Modifier.matchParentSize(), 70f)
+        com.rodeo.hud.ui.components.BrandDecal(Modifier.matchParentSize(), alpha = 0.5f)
+      Column(Modifier.fillMaxSize().padding(18.dp)) {
         SectionLabel("Live preview")
         Spacer(Modifier.height(6.dp))
-        Text(style.brandName.uppercase(), color = c.accent, fontWeight = FontWeight.Black, fontSize = 20.sp, letterSpacing = 3.sp)
+        com.rodeo.hud.ui.components.BrandWordmark(big = false)
         Text(listOfNotNull(profile.model, profile.year?.toString(), profile.paintName).joinToString(" · ").ifBlank { "Choose your bike" }, color = c.text, fontSize = 15.sp)
         Spacer(Modifier.weight(1f))
         SpeedGauge(62f, Modifier.fillMaxWidth(), height = 130.dp)
@@ -302,6 +306,8 @@ private fun ThemePreview(modifier: Modifier) {
         Spacer(Modifier.height(10.dp))
         Box(Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(c.accent))
         if (style.tagline.isNotBlank()) Text(style.tagline, color = c.textMuted, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp))
+      }
+      }
     }
 }
 

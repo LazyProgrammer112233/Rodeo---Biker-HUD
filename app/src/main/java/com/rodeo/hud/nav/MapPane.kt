@@ -1,6 +1,29 @@
 package com.rodeo.hud.nav
 
-import android.os.Bundle
+import android.annotation.SuppressLint
+import android.graphics.Bitmap
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.DashPathEffect
+import android.graphics.drawable.BitmapDrawable
+import android.view.MotionEvent
+import androidx.compose.foundation.Canvas
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Navigation
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.rodeo.hud.data.Geo
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.CustomZoomButtonsController
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polygon
+import org.osmdroid.views.overlay.Polyline
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -44,7 +67,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -54,22 +76,16 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.Circle
-import com.google.android.gms.maps.model.CircleOptions
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.libraries.navigation.NavigationView
 import com.rodeo.hud.data.Hazard
 import com.rodeo.hud.graph
 import com.rodeo.hud.pack.PackMember
-import com.rodeo.hud.ui.components.Radar
 import com.rodeo.hud.ui.theme.LocalHud
 import kotlinx.coroutines.launch
 
-/** The map half of the HUD: embedded Google navigation, or the radar when no Maps key is set. */
+/**
+ * The map half of the HUD: OpenStreetMap inside Rodeo (no API key), heading-up while riding.
+ * Turn-by-turn voice guidance hands off to the Google Maps app in two-wheeler mode.
+ */
 @Composable
 fun MapPane(
     modifier: Modifier,
@@ -81,31 +97,48 @@ fun MapPane(
 ) {
     val ctx = LocalContext.current
     val g = ctx.graph
+    val c = LocalHud.current
     val nav by g.nav.state.collectAsState()
     val loc by g.location.location.collectAsState()
     val parked = g.rides.rides.collectAsState().value.firstOrNull { it.parkLat != null }
     val profile by g.profile.profile.collectAsState()
+    var follow by remember { mutableStateOf(true) }
 
     Box(modifier) {
-        if (g.nav.enabled && nav.ready) {
-            NavMap(Modifier.fillMaxSize(), dark, lowPower, members, hazards)
-        } else {
-            Radar(
-                Modifier.fillMaxSize(), loc?.latitude, loc?.longitude, loc?.bearing ?: 0f,
-                members, hazards, parked?.parkLat, parked?.parkLng,
-            )
-            val msg = when {
-                !g.nav.enabled -> "Radar view · add a Google Maps key to enable turn-by-turn"
-                nav.error != null -> nav.error!!
-                else -> "Starting navigation…"
+        OsmMap(
+            Modifier.fillMaxSize(), dark, lowPower, follow, loc, members, hazards,
+            parked?.parkLat?.let { lat -> parked.parkLng?.let { lng -> GeoPoint(lat, lng) } },
+            nav.destination,
+            onUserPan = { follow = false },
+        )
+        if (follow && loc != null) {
+            // Rider arrow sits at the centre of the heading-up map.
+            Canvas(Modifier.align(Alignment.Center).size(34.dp)) {
+                val w = size.width
+                val path = Path().apply {
+                    moveTo(w / 2f, 0f); lineTo(w, w); lineTo(w / 2f, w * 0.74f); lineTo(0f, w); close()
+                }
+                drawPath(path, Color.White, style = Stroke(5.dp.toPx(), join = StrokeJoin.Round))
+                drawPath(path, c.accent)
             }
-            Text(msg, color = LocalHud.current.textMuted, fontSize = 12.sp, modifier = Modifier.align(Alignment.BottomCenter).padding(10.dp))
+        }
+        Text(
+            "© OpenStreetMap contributors", color = Color(0xFF333333), fontSize = 10.sp,
+            modifier = Modifier.align(Alignment.BottomEnd).padding(6.dp).background(Color.White.copy(alpha = 0.7f), RoundedCornerShape(6.dp)).padding(horizontal = 6.dp, vertical = 2.dp),
+        )
+        if (!follow) {
+            Box(
+                Modifier.align(Alignment.BottomStart).padding(10.dp).size(56.dp).clip16().background(c.accent).clickable { follow = true },
+                contentAlignment = Alignment.Center,
+            ) { Icon(Icons.Filled.MyLocation, "Recenter", tint = c.onAccent) }
         }
 
         Column(Modifier.align(Alignment.TopStart).padding(10.dp).fillMaxWidth()) {
-            if (nav.guiding) {
-                GuidanceChip(nav) { g.nav.stop() }
-            } else if (g.nav.enabled && nav.ready) {
+            val dest = nav.destination
+            if (dest != null) {
+                val km = loc?.let { Geo.distanceM(it.latitude, it.longitude, dest.lat, dest.lng) / 1000.0 }
+                GuidanceChip(dest, km, onOpen = { g.nav.openGuidance() }, onStop = { g.nav.stop() })
+            } else {
                 SearchBox(
                     enabled = !lockInput,
                     nearLat = loc?.latitude, nearLng = loc?.longitude,
@@ -119,21 +152,23 @@ fun MapPane(
 }
 
 @Composable
-private fun GuidanceChip(nav: NavState, onStop: () -> Unit) {
+private fun GuidanceChip(dest: Place, km: Double?, onOpen: () -> Unit, onStop: () -> Unit) {
     val c = LocalHud.current
     Row(
-        Modifier.clip16().background(c.glass).border(1.dp, c.glassBorder, RoundedCornerShape(16.dp)).padding(horizontal = 14.dp, vertical = 8.dp),
+        Modifier.clip16().background(c.surface).border(1.5.dp, c.accent, RoundedCornerShape(16.dp)).padding(start = 14.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f, fill = false)) {
-            Text(nav.destination?.title ?: "Navigating", color = c.text, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            val km = nav.remainingMeters?.let { "%.1f km".format(it / 1000f) } ?: ""
-            val min = nav.remainingSeconds?.let { " · ${it / 60} min" } ?: ""
-            Text("$km$min", color = c.textMuted, fontSize = 13.sp)
+            Text(dest.title, color = c.text, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(km?.let { "%.1f km away (straight line)".format(it) } ?: "Destination set", color = c.textMuted, fontSize = 13.sp)
         }
-        Spacer(Modifier.width(12.dp))
-        Box(Modifier.size(44.dp).clip16().background(c.danger.copy(alpha = 0.15f)).clickable(onClick = onStop), contentAlignment = Alignment.Center) {
-            Icon(Icons.Filled.Close, "Stop navigation", tint = c.danger)
+        Spacer(Modifier.width(10.dp))
+        Box(Modifier.size(48.dp).clip16().background(c.accent).clickable(onClick = onOpen), contentAlignment = Alignment.Center) {
+            Icon(Icons.Filled.Navigation, "Voice guidance in Google Maps", tint = c.onAccent)
+        }
+        Spacer(Modifier.width(6.dp))
+        Box(Modifier.size(48.dp).clip16().background(c.danger.copy(alpha = 0.15f)).clickable(onClick = onStop), contentAlignment = Alignment.Center) {
+            Icon(Icons.Filled.Close, "Clear destination", tint = c.danger)
         }
     }
 }
@@ -205,21 +240,56 @@ private fun QuickChip(icon: androidx.compose.ui.graphics.vector.ImageVector, lab
 
 private fun Modifier.clip16() = this.clip(RoundedCornerShape(16.dp))
 
-/** NavigationView hosted in Compose, with pack members and hazards drawn on the map. */
+/** Dark map: invert the light OSM style and pull the saturation down so it reads as night mode. */
+private val NIGHT = ColorMatrixColorFilter(
+    ColorMatrix().apply {
+        set(floatArrayOf(-1f, 0f, 0f, 0f, 255f, 0f, -1f, 0f, 0f, 255f, 0f, 0f, -1f, 0f, 255f, 0f, 0f, 0f, 1f, 0f))
+        postConcat(ColorMatrix().apply { setSaturation(0.35f) })
+        postConcat(ColorMatrix(floatArrayOf(0.9f, 0f, 0f, 0f, -12f, 0f, 0.9f, 0f, 0f, -12f, 0f, 0f, 0.95f, 0f, -6f, 0f, 0f, 0f, 1f, 0f)))
+    },
+)
+
+/** Daylight map: a touch more contrast and colour so roads stand out in sun glare. */
+private val DAY = ColorMatrixColorFilter(
+    ColorMatrix().apply {
+        setSaturation(1.25f)
+        val k = 1.18f
+        val t = -(k - 1f) * 128f
+        postConcat(ColorMatrix(floatArrayOf(k, 0f, 0f, 0f, t, 0f, k, 0f, 0f, t, 0f, 0f, k, 0f, t, 0f, 0f, 0f, 1f, 0f)))
+    },
+)
+
+@SuppressLint("ClickableViewAccessibility")
 @Composable
-private fun NavMap(modifier: Modifier, dark: Boolean, lowPower: Boolean, members: List<PackMember>, hazards: List<Hazard>) {
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    val c = LocalHud.current
-    var map by remember { mutableStateOf<GoogleMap?>(null) }
-    val markers = remember { mutableMapOf<String, Marker>() }
-    val circles = remember { mutableMapOf<String, Circle>() }
+private fun OsmMap(
+    modifier: Modifier,
+    dark: Boolean,
+    lowPower: Boolean,
+    follow: Boolean,
+    loc: android.location.Location?,
+    members: List<PackMember>,
+    hazards: List<Hazard>,
+    parked: GeoPoint?,
+    destination: Place?,
+    onUserPan: () -> Unit,
+) {
     val ctx = LocalContext.current
+    val c = LocalHud.current
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    val pan by rememberUpdatedState(onUserPan)
     val view = remember {
-        NavigationView(ctx).apply {
-            onCreate(Bundle())
-            getMapAsync { m ->
-                m.isTrafficEnabled = true
-                map = m
+        MapView(ctx).apply {
+            setTileSource(TileSourceFactory.MAPNIK)
+            setMultiTouchControls(true)
+            zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+            isTilesScaledToDpi = true
+            minZoomLevel = 4.0
+            maxZoomLevel = 19.0
+            controller.setZoom(16.5)
+            controller.setCenter(GeoPoint(20.59, 78.96))
+            setOnTouchListener { _, e ->
+                if (e.actionMasked == MotionEvent.ACTION_MOVE) pan()
+                false
             }
         }
     }
@@ -227,60 +297,106 @@ private fun NavMap(modifier: Modifier, dark: Boolean, lowPower: Boolean, members
     DisposableEffect(lifecycle) {
         val obs = LifecycleEventObserver { _, e ->
             when (e) {
-                Lifecycle.Event.ON_START -> view.onStart()
                 Lifecycle.Event.ON_RESUME -> view.onResume()
                 Lifecycle.Event.ON_PAUSE -> view.onPause()
-                Lifecycle.Event.ON_STOP -> view.onStop()
                 else -> Unit
             }
         }
         lifecycle.addObserver(obs)
-        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) view.onStart()
         if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) view.onResume()
         onDispose {
             lifecycle.removeObserver(obs)
-            view.onPause(); view.onStop(); view.onDestroy()
+            view.onPause()
+            view.onDetach()
         }
     }
 
     LaunchedEffect(dark) {
-        view.setForceNightMode(
-            if (dark) com.google.android.libraries.navigation.ForceNightMode.FORCE_NIGHT
-            else com.google.android.libraries.navigation.ForceNightMode.FORCE_DAY,
-        )
-    }
-    LaunchedEffect(lowPower, map) {
-        // Low-power HUD: flat map and no traffic layer to cut GPU work and heat.
-        map?.isBuildingsEnabled = !lowPower
-        map?.isTrafficEnabled = !lowPower
+        view.overlayManager.tilesOverlay.setColorFilter(if (dark) NIGHT else DAY)
+        view.overlayManager.tilesOverlay.setLoadingBackgroundColor(if (dark) 0xFF111214.toInt() else 0xFFE9EAEC.toInt())
+        view.invalidate()
     }
 
-    LaunchedEffect(members, map) {
-        val m = map ?: return@LaunchedEffect
-        val ids = members.filter { !it.isMe }.map { it.id }.toSet()
-        markers.keys.filter { it !in ids }.forEach { markers.remove(it)?.remove() }
+    // Follow the rider; turn the map heading-up once moving so the road ahead points up.
+    LaunchedEffect(loc, follow) {
+        val l = loc ?: return@LaunchedEffect
+        if (!follow) return@LaunchedEffect
+        val p = GeoPoint(l.latitude, l.longitude)
+        val moving = l.hasSpeed() && l.speed * 3.6f > 8f && l.hasBearing()
+        view.mapOrientation = if (moving) -l.bearing else 0f
+        if (view.zoomLevelDouble < 13.0) view.controller.setZoom(16.5)
+        if (lowPower) view.controller.setCenter(p) else view.controller.animateTo(p, null, 800L)
+    }
+
+    LaunchedEffect(members, hazards, parked, destination, loc?.latitude, loc?.longitude, follow, dark) {
+        view.overlays.clear()
+        val accent = c.accent.toArgb()
+        val warn = c.warning.toArgb()
+        hazards.forEach { h ->
+            view.overlays += Polygon(view).apply {
+                points = Polygon.pointsAsCircle(GeoPoint(h.lat, h.lng), 12.0 + h.hits * 3)
+                fillPaint.color = (warn and 0x00FFFFFF) or (0x66 shl 24)
+                outlinePaint.color = warn
+                outlinePaint.strokeWidth = 3f
+                setOnClickListener { _, _, _ -> true }
+            }
+        }
+        val here = loc?.let { GeoPoint(it.latitude, it.longitude) }
+        if (destination != null) {
+            val d = GeoPoint(destination.lat, destination.lng)
+            if (here != null) {
+                view.overlays += Polyline(view).apply {
+                    setPoints(listOf(here, d))
+                    outlinePaint.color = accent
+                    outlinePaint.strokeWidth = 8f
+                    outlinePaint.pathEffect = DashPathEffect(floatArrayOf(24f, 18f), 0f)
+                    setOnClickListener { _, _, _ -> true }
+                }
+            }
+            view.overlays += pin(view, d, destination.title, dot(ctx, accent, ring = true))
+        }
+        parked?.let { view.overlays += pin(view, it, "Parked bike", dot(ctx, 0xFF2D7FF9.toInt(), letter = "P")) }
         members.filter { !it.isMe }.forEach { r ->
-            val pos = LatLng(r.lat, r.lng)
-            val existing = markers[r.id]
-            if (existing != null) existing.position = pos
-            else markers[r.id] = m.addMarker(
-                MarkerOptions().position(pos).title(r.name)
-                    .icon(BitmapDescriptorFactory.defaultMarker(if (r.isLead) BitmapDescriptorFactory.HUE_ORANGE else BitmapDescriptorFactory.HUE_AZURE)),
-            ) ?: return@forEach
+            view.overlays += pin(view, GeoPoint(r.lat, r.lng), r.name, dot(ctx, if (r.isLead) accent else 0xFF19A7CE.toInt(), letter = r.name.take(1).uppercase()))
         }
-    }
-
-    LaunchedEffect(hazards, map) {
-        val m = map ?: return@LaunchedEffect
-        val ids = hazards.map { it.id }.toSet()
-        circles.keys.filter { it !in ids }.forEach { circles.remove(it)?.remove() }
-        hazards.filter { it.id !in circles }.forEach { h ->
-            circles[h.id] = m.addCircle(
-                CircleOptions().center(LatLng(h.lat, h.lng)).radius(12.0 + h.hits * 3)
-                    .fillColor(c.warning.copy(alpha = 0.35f).toArgb()).strokeColor(c.warning.toArgb()).strokeWidth(2f),
-            )
-        }
+        // When the rider pans away, show their position as a dot instead of the centre arrow.
+        if (!follow && here != null) view.overlays += pin(view, here, "You", dot(ctx, accent, ring = true))
+        view.invalidate()
     }
 
     AndroidView(factory = { view }, modifier = modifier)
+}
+
+private fun pin(map: MapView, at: GeoPoint, title: String, icon: android.graphics.drawable.Drawable) = Marker(map).apply {
+    position = at
+    this.title = title
+    this.icon = icon
+    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+    setOnMarkerClickListener { _, _ -> true }
+}
+
+/** Round map marker drawn in code: brand colour, white rim for contrast on any map. */
+private fun dot(ctx: android.content.Context, color: Int, ring: Boolean = false, letter: String? = null): android.graphics.drawable.Drawable {
+    val d = ctx.resources.displayMetrics.density
+    val size = (if (letter != null) 30 else 22) * d
+    val bmp = Bitmap.createBitmap(size.toInt(), size.toInt(), Bitmap.Config.ARGB_8888)
+    val cv = android.graphics.Canvas(bmp)
+    val p = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
+    val r = size / 2f
+    p.color = android.graphics.Color.WHITE
+    cv.drawCircle(r, r, r, p)
+    p.color = color
+    cv.drawCircle(r, r, r - 3 * d, p)
+    if (ring) {
+        p.color = android.graphics.Color.WHITE
+        cv.drawCircle(r, r, r * 0.3f, p)
+    }
+    if (letter != null) {
+        p.color = android.graphics.Color.WHITE
+        p.textSize = 14 * d
+        p.typeface = android.graphics.Typeface.DEFAULT_BOLD
+        p.textAlign = android.graphics.Paint.Align.CENTER
+        cv.drawText(letter, r, r - (p.descent() + p.ascent()) / 2f, p)
+    }
+    return BitmapDrawable(ctx.resources, bmp)
 }

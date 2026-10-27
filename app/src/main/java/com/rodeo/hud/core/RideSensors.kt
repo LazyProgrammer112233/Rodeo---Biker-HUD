@@ -21,22 +21,19 @@ data class VibrationState(
 )
 
 /**
- * Motion sensing during a ride: mount vibration, pothole jolts and crash impacts.
+ * Motion sensing during a ride: mount vibration and pothole jolts (crashes live in CrashDetector).
  * Thresholds are starting points to tune on test rides (see acceptance AC-26..AC-35).
  */
 class RideSensors(context: Context) : SensorEventListener {
     private val sm = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     private val linear = sm.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
     private val gravitySensor = sm.getDefaultSensor(Sensor.TYPE_GRAVITY)
-    private val accel = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
     private val _vibration = MutableStateFlow(VibrationState())
     val vibration: StateFlow<VibrationState> = _vibration.asStateFlow()
 
     /** Called with severity (in g) when a vertical jolt looks like a pothole. */
     var onJolt: ((Float) -> Unit)? = null
-    /** Called with peak g when a crash-level impact happens. */
-    var onImpact: ((Float) -> Unit)? = null
     /** Current speed, supplied by the ride engine; jolts below 15 km/h are ignored. */
     var speedKmh: () -> Float = { 0f }
 
@@ -46,7 +43,6 @@ class RideSensors(context: Context) : SensorEventListener {
     private var windowStart = 0L
     private var highStreak = 0
     private var lastJoltAt = 0L
-    private var lastImpactAt = 0L
 
     // Ride statistics for the summary.
     var vibSum = 0.0; private set
@@ -58,7 +54,6 @@ class RideSensors(context: Context) : SensorEventListener {
         reset()
         linear?.let { sm.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
         gravitySensor?.let { sm.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
-        accel?.let { sm.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
     }
 
     fun stop() {
@@ -74,15 +69,6 @@ class RideSensors(context: Context) : SensorEventListener {
     override fun onSensorChanged(e: SensorEvent) {
         when (e.sensor.type) {
             Sensor.TYPE_GRAVITY -> System.arraycopy(e.values, 0, gravity, 0, 3)
-            Sensor.TYPE_ACCELEROMETER -> {
-                // Raw magnitude including gravity, in g: a crash shows as a large spike.
-                val g = sqrt(e.values[0] * e.values[0] + e.values[1] * e.values[1] + e.values[2] * e.values[2]) / SensorManager.GRAVITY_EARTH
-                val now = System.currentTimeMillis()
-                if (g > CRASH_G && now - lastImpactAt > 5_000) {
-                    lastImpactAt = now
-                    onImpact?.invoke(g)
-                }
-            }
             Sensor.TYPE_LINEAR_ACCELERATION -> onLinear(e.values[0], e.values[1], e.values[2])
         }
     }
@@ -123,6 +109,5 @@ class RideSensors(context: Context) : SensorEventListener {
         const val MEDIUM_G = 0.25f
         const val HIGH_G = 0.6f
         const val JOLT_G = 0.9f
-        const val CRASH_G = 4.0f
     }
 }

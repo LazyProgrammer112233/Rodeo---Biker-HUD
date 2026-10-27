@@ -24,7 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.DirectionsWalk
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -116,11 +116,9 @@ fun RidesScreen(onBack: () -> Unit, onNavigated: () -> Unit) {
                 Spacer(Modifier.height(10.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     if (r.parkLat != null && r.parkLng != null) {
-                        PrimaryButton("Find my bike", icon = Icons.Filled.DirectionsWalk) {
-                            if (g.nav.enabled && g.nav.state.value.ready) {
-                                g.nav.navigateTo(Place("Parked bike", "", r.parkLat, r.parkLng), walking = true)
-                                onNavigated()
-                            } else walkTo(ctx, r.parkLat, r.parkLng)
+                        PrimaryButton("Find my bike", icon = Icons.AutoMirrored.Filled.DirectionsWalk) {
+                            g.nav.navigateTo(Place("Parked bike", "", r.parkLat, r.parkLng), walking = true)
+                            onNavigated()
                         }
                     }
                     GhostButton("Share", icon = Icons.Filled.Share) { share(ctx, r) }
@@ -190,14 +188,6 @@ private fun Legend(color: androidx.compose.ui.graphics.Color, text: String) {
         Box(Modifier.size(10.dp).clip(RoundedCornerShape(5.dp)).background(color))
         Spacer(Modifier.width(6.dp))
         Text(text, color = LocalHud.current.textMuted, fontSize = 12.sp)
-    }
-}
-
-private fun walkTo(ctx: Context, lat: Double, lng: Double) {
-    val uri = Uri.parse("google.navigation:q=$lat,$lng&mode=w")
-    val intent = Intent(Intent.ACTION_VIEW, uri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    runCatching { ctx.startActivity(intent) }.onFailure {
-        runCatching { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Geo.mapsLink(lat, lng))).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
     }
 }
 

@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -65,7 +66,7 @@ private fun guard(accent: Color, base: Color, min: Double = 3.0): Color {
     var c = accent
     var i = 0
     val toward = if (base.luminance() < 0.5) Color.White else Color.Black
-    while (contrast(c, base) < min && i < 12) {
+    while (contrast(c, base) < min && i < 16) {
         c = lerp(c, toward, 0.12f)
         i++
     }
@@ -79,44 +80,59 @@ private fun lerp(a: Color, b: Color, t: Float) = Color(
     alpha = 1f,
 )
 
+/** Push the brand colour toward full saturation so it pops in sun and at night. */
+private fun vivid(c: Color, amount: Float = 0.25f): Color {
+    val hsv = FloatArray(3)
+    android.graphics.Color.colorToHSV(c.toArgb(), hsv)
+    hsv[1] = (hsv[1] + (1f - hsv[1]) * amount).coerceIn(0f, 1f)
+    hsv[2] = (hsv[2] * 1.08f).coerceAtMost(1f)
+    return Color(android.graphics.Color.HSVToColor(hsv))
+}
+
+/**
+ * High-contrast palettes for a phone on a handlebar.
+ * Dark: true black with bright text, readable at night without glare.
+ * Light: white cards and near-black text for direct sun; the accent is darkened only as far as
+ * needed to hit 4.5:1 on white.
+ */
 fun hudColors(brand: Brand?, paintHex: Long?, dark: Boolean, heritage: Boolean = false): HudColors {
-    val rawAccent = Color(((if (heritage) brand?.heritageAccent else null) ?: brand?.accent ?: 0xFFFF6A13))
+    val rawAccent = vivid(Color(((if (heritage) brand?.heritageAccent else null) ?: brand?.accent ?: 0xFFFF6A13)))
     val paint = Color(paintHex ?: 0xFF6E7176)
     return if (dark) {
-        val base = Color(0xFF0B0C0E)
-        val accent = guard(rawAccent, base)
+        val base = Color(0xFF000000)
+        val accent = guard(rawAccent, base, 4.5)
         HudColors(
             dark = true,
             background = base,
-            surface = Color(0xFF15171A),
-            glass = lerp(Color(0xFF1B1D21), paint, 0.10f).copy(alpha = 0.72f),
-            glassBorder = Color.White.copy(alpha = 0.09f),
-            text = Color(0xFFF2F3F5),
-            textMuted = Color(0xFF8E939A),
+            surface = Color(0xFF111214),
+            glass = lerp(Color(0xFF15171A), paint, 0.10f).copy(alpha = 0.88f),
+            glassBorder = Color.White.copy(alpha = 0.16f),
+            text = Color(0xFFFFFFFF),
+            textMuted = Color(0xFFB4B9C0),
             accent = accent,
-            onAccent = if (accent.luminance() > 0.45f) Color(0xFF0B0C0E) else Color.White,
+            onAccent = if (accent.luminance() > 0.45f) Color(0xFF000000) else Color.White,
             tint = paint,
-            warning = Color(0xFFF2B33D),
-            danger = Color(0xFFFF4D4D),
-            ok = Color(0xFF4CD08A),
+            warning = Color(0xFFFFC233),
+            danger = Color(0xFFFF4545),
+            ok = Color(0xFF3DDC84),
         )
     } else {
-        val base = Color(0xFFF3F4F6)
-        val accent = guard(rawAccent, Color.White)
+        val base = Color(0xFFF4F5F7)
+        val accent = guard(rawAccent, Color.White, 4.5)
         HudColors(
             dark = false,
             background = base,
             surface = Color.White,
-            glass = lerp(Color.White, paint, 0.06f).copy(alpha = 0.86f),
-            glassBorder = Color.Black.copy(alpha = 0.08f),
-            text = Color(0xFF0E0F11),
-            textMuted = Color(0xFF5D6168),
+            glass = lerp(Color.White, paint, 0.05f).copy(alpha = 0.97f),
+            glassBorder = Color.Black.copy(alpha = 0.22f),
+            text = Color(0xFF000000),
+            textMuted = Color(0xFF34373C),
             accent = accent,
-            onAccent = if (accent.luminance() > 0.45f) Color(0xFF0E0F11) else Color.White,
+            onAccent = if (accent.luminance() > 0.45f) Color(0xFF000000) else Color.White,
             tint = paint,
-            warning = Color(0xFFB7791F),
-            danger = Color(0xFFD32F2F),
-            ok = Color(0xFF1E8E57),
+            warning = Color(0xFF9A5B00),
+            danger = Color(0xFFC40000),
+            ok = Color(0xFF00703C),
         )
     }
 }

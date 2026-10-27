@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Sensors
 import androidx.compose.material.icons.filled.TwoWheeler
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rodeo.hud.BuildConfig
+import com.rodeo.hud.core.HandGesture
 import com.rodeo.hud.data.ThemeMode
 import com.rodeo.hud.graph
 import com.rodeo.hud.ui.components.GhostButton
@@ -45,13 +47,16 @@ import com.rodeo.hud.ui.setup.ToggleRow
 import com.rodeo.hud.ui.theme.LocalHud
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onSimulateCrash: () -> Unit) {
+fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onSimulateCrash: () -> Unit, onDropTest: () -> Unit) {
     val ctx = LocalContext.current
     val g = ctx.graph
     val c = LocalHud.current
     val profile by g.profile.profile.collectAsState()
     val loc by g.location.location.collectAsState()
     val lux by g.ambient.lux.collectAsState()
+    val crashTest by g.crash.status.collectAsState()
+    val camOn by g.gestures.running.collectAsState()
+    val lastGesture by g.gestures.last.collectAsState()
 
     Row(Modifier.fillMaxSize().background(c.background).padding(16.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
         Column(Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -86,16 +91,43 @@ fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onSimulateCrash
             }
             GlassCard(Modifier.fillMaxWidth()) {
                 SectionLabel("Safety")
-                ToggleRow("Crash detection", profile.crashDetection, sub = "Impact + stillness starts a 30 s countdown, then SOS") { v -> g.profile.update { it.copy(crashDetection = v) } }
-                GhostButton("Simulate crash (test, sends nothing)", icon = Icons.Filled.Warning) { onSimulateCrash() }
+                ToggleRow("Crash detection", profile.crashDetection, sub = "Hard impact, then the bike stops and tips over: 30 s alarm countdown, then SOS by SMS") { v ->
+                    g.profile.update { it.copy(crashDetection = v) }
+                    g.ride.setCrashDetection(v)
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    GhostButton("Drop test", icon = Icons.Filled.Sensors) { onDropTest() }
+                    GhostButton("Simulate crash", icon = Icons.Filled.Warning) { onSimulateCrash() }
+                }
+                Text(
+                    crashTest.text.ifBlank { "Drop test runs the real sensor check: drop the phone onto a bed and leave it still. Both tests send nothing." },
+                    color = if (crashTest.text.isBlank()) c.textMuted else c.text, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp),
+                )
                 Spacer(Modifier.height(8.dp))
                 SectionLabel("SOS contacts")
                 Spacer(Modifier.height(6.dp))
-                SosContactsEditor()
+                SosContactsEditor(showTest = true)
             }
             GlassCard(Modifier.fillMaxWidth()) {
                 SectionLabel("Controls")
-                ToggleRow("Wave control", profile.waveControl, sub = "Wave = next song · two waves = dismiss warning · hold = voice") { v -> g.profile.update { it.copy(waveControl = v) } }
+                ToggleRow("Camera gestures", profile.gestureControl, sub = "Swipe right = next song · swipe left = previous · cover the selfie camera with your palm = pause / play") { v ->
+                    g.profile.update { it.copy(gestureControl = v) }
+                }
+                ToggleRow("Swap left and right", profile.swapSwipe, sub = "Use this if swipes feel reversed on your mount") { v -> g.profile.update { it.copy(swapSwipe = v) } }
+                Text(
+                    when {
+                        !profile.gestureControl -> "Gestures are off"
+                        !g.gestures.hasPermission -> "Needs camera permission (see Permissions)"
+                        !camOn -> "Camera starting…"
+                        lastGesture != null -> "Watching · last: " + when (lastGesture!!.gesture) {
+                            HandGesture.SWIPE_RIGHT -> "next song"
+                            HandGesture.SWIPE_LEFT -> "previous song"
+                            HandGesture.PALM_COVER -> "pause / play"
+                        }
+                        else -> "Watching for gestures. Swipe about 10 to 20 cm from the camera."
+                    },
+                    color = c.textMuted, fontSize = 12.sp,
+                )
                 Text("Bluetooth remotes: media keys control music; arrow keys and Enter move between HUD buttons.", color = c.textMuted, fontSize = 12.sp)
             }
             GlassCard(Modifier.fillMaxWidth()) {
@@ -111,7 +143,8 @@ fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onSimulateCrash
             PermissionsPanel()
             GlassCard(Modifier.fillMaxWidth()) {
                 SectionLabel("Services")
-                Text("Navigation: " + if (BuildConfig.MAPS_API_KEY.isBlank()) "off (no Maps key in this build)" else "Google Navigation SDK, two-wheeler mode", color = c.text, fontSize = 14.sp)
+                Text("Map: OpenStreetMap (no key) · voice guidance: Google Maps app, two-wheeler mode", color = c.text, fontSize = 14.sp)
+                Text("SOS: SMS from the default SIM" + if (g.sos.canSendSms) "" else " · SMS permission off", color = c.text, fontSize = 14.sp)
                 Text("Pack mode and pothole sharing: " + if (g.pack.online) "online (Firebase)" else "demo / on-device only", color = c.text, fontSize = 14.sp)
                 Text("Weather: Open-Meteo", color = c.text, fontSize = 14.sp)
                 Text("Version ${BuildConfig.VERSION_NAME}", color = c.textMuted, fontSize = 12.sp)

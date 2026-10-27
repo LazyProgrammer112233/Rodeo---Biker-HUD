@@ -2,88 +2,13 @@ package com.rodeo.hud.core
 
 import android.content.Context
 import android.content.Intent
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-
-enum class Gesture { WAVE, DOUBLE_WAVE, HOLD }
-
-/**
- * Glove-free control with the proximity sensor at the top of the phone:
- * one wave = next track, two waves = dismiss warning, hold a hand over it = voice command.
- */
-class WaveDetector(context: Context, private val onGesture: (Gesture) -> Unit) : SensorEventListener {
-    private val sm = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-    private val prox = sm.getDefaultSensor(Sensor.TYPE_PROXIMITY)
-    private val handler = Handler(Looper.getMainLooper())
-    private var nearAt = 0L
-    private var near = false
-    private var waves = 0
-    private var holdFired = false
-
-    val available get() = prox != null
-
-    private val flush = Runnable {
-        when (waves) {
-            0 -> Unit
-            1 -> onGesture(Gesture.WAVE)
-            else -> onGesture(Gesture.DOUBLE_WAVE)
-        }
-        waves = 0
-    }
-    private val hold = Runnable {
-        if (near) {
-            holdFired = true
-            waves = 0
-            handler.removeCallbacks(flush)
-            onGesture(Gesture.HOLD)
-        }
-    }
-
-    fun start() { prox?.let { sm.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) } }
-
-    fun stop() {
-        sm.unregisterListener(this)
-        handler.removeCallbacksAndMessages(null)
-    }
-
-    override fun onSensorChanged(e: SensorEvent) {
-        val isNear = e.values[0] < (prox?.maximumRange ?: 5f).coerceAtMost(5f)
-        val now = System.currentTimeMillis()
-        if (isNear && !near) {
-            near = true
-            nearAt = now
-            holdFired = false
-            handler.postDelayed(hold, HOLD_MS)
-        } else if (!isNear && near) {
-            near = false
-            handler.removeCallbacks(hold)
-            if (!holdFired && now - nearAt < WAVE_MAX_MS) {
-                waves++
-                handler.removeCallbacks(flush)
-                handler.postDelayed(flush, MULTI_WINDOW_MS)
-            }
-        }
-    }
-
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
-
-    companion object {
-        const val WAVE_MAX_MS = 900L
-        const val HOLD_MS = 1500L
-        const val MULTI_WINDOW_MS = 700L
-    }
-}
 
 enum class VoiceCommand { NEXT, PREVIOUS, PAUSE, PLAY, FIND_BIKE, START_RIDE, END_RIDE, SOS, NAVIGATE_HOME, DISMISS, UNKNOWN }
 

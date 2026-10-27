@@ -63,7 +63,6 @@ jobs:
 
       - name: Build debug APK
         env:
-          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}

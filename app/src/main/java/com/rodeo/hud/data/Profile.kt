@@ -24,10 +24,11 @@ data class Profile(
     val themeMode: ThemeMode = ThemeMode.AUTO,
     val mapOnRight: Boolean = true,
     val sosContacts: List<SosContact> = emptyList(),
-    val sosSms: Boolean = true,
-    val sosWhatsApp: Boolean = true,
     val crashDetection: Boolean = true,
-    val waveControl: Boolean = true,
+    /** Camera swipe gestures for music (front camera, on-device only). */
+    val gestureControl: Boolean = true,
+    /** Flip left and right if swipes feel reversed on a particular mount. */
+    val swapSwipe: Boolean = false,
     val regNumber: String = "",
     val bloodGroup: String = "",
     val allergies: String = "",
@@ -70,10 +71,9 @@ class ProfileStore(context: Context) {
         put("sosContacts", JSONArray().apply {
             p.sosContacts.forEach { put(JSONObject().put("name", it.name).put("phone", it.phone)) }
         })
-        put("sosSms", p.sosSms)
-        put("sosWhatsApp", p.sosWhatsApp)
         put("crashDetection", p.crashDetection)
-        put("waveControl", p.waveControl)
+        put("gestureControl", p.gestureControl)
+        put("swapSwipe", p.swapSwipe)
         put("regNumber", p.regNumber)
         put("bloodGroup", p.bloodGroup)
         put("allergies", p.allergies)
@@ -101,10 +101,9 @@ class ProfileStore(context: Context) {
             themeMode = runCatching { ThemeMode.valueOf(o.optString("themeMode")) }.getOrDefault(ThemeMode.AUTO),
             mapOnRight = o.optBoolean("mapOnRight", true),
             sosContacts = contacts,
-            sosSms = o.optBoolean("sosSms", true),
-            sosWhatsApp = o.optBoolean("sosWhatsApp", true),
             crashDetection = o.optBoolean("crashDetection", true),
-            waveControl = o.optBoolean("waveControl", true),
+            gestureControl = o.optBoolean("gestureControl", true),
+            swapSwipe = o.optBoolean("swapSwipe", false),
             regNumber = o.optString("regNumber"),
             bloodGroup = o.optString("bloodGroup"),
             allergies = o.optString("allergies"),

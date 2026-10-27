@@ -69,6 +69,11 @@ import com.rodeo.hud.core.Severity
 import com.rodeo.hud.core.VibrationLevel
 import com.rodeo.hud.graph
 import com.rodeo.hud.nav.MapPane
+import com.rodeo.hud.core.HandGesture
+import com.rodeo.hud.ui.components.BrandDecal
+import com.rodeo.hud.ui.components.BrandWordmark
+import com.rodeo.hud.ui.components.ParticleField
+import com.rodeo.hud.ui.components.PulseRing
 import com.rodeo.hud.ride.formatDuration
 import com.rodeo.hud.ui.components.GlassCard
 import com.rodeo.hud.ui.components.HoldToTrigger
@@ -114,8 +119,9 @@ fun HudScreen(actions: HudActions, showEndSlider: Boolean, dark: Boolean) {
         Modifier
             .fillMaxSize()
             .background(c.background)
-            .background(Brush.horizontalGradient(listOf(c.tint.copy(alpha = if (c.dark) 0.10f else 0.07f), Color.Transparent, Color.Transparent))),
+            .background(Brush.horizontalGradient(listOf(c.tint.copy(alpha = if (c.dark) 0.14f else 0.08f), Color.Transparent, Color.Transparent))),
     ) {
+        ParticleField(Modifier.fillMaxSize(), speed, lowPower = health.lowPower)
         Row(Modifier.fillMaxSize()) {
             val panel: @Composable RowScope.() -> Unit = {
                 ControlPanel(
@@ -133,6 +139,38 @@ fun HudScreen(actions: HudActions, showEndSlider: Boolean, dark: Boolean) {
                 )
             }
             if (profile.mapOnRight) { panel(); map() } else { map(); panel() }
+        }
+        GestureFlash(Modifier.align(Alignment.TopCenter).padding(top = 18.dp))
+    }
+}
+
+/** Big, brief confirmation when a camera gesture is recognised. */
+@Composable
+private fun GestureFlash(modifier: Modifier) {
+    val g = LocalContext.current.graph
+    val c = LocalHud.current
+    val last by g.gestures.last.collectAsState()
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(last) {
+        if (last == null) return@LaunchedEffect
+        visible = true
+        delay(1_200)
+        visible = false
+    }
+    AnimatedVisibility(visible, modifier) {
+        val e = last ?: return@AnimatedVisibility
+        val (icon, label) = when (e.gesture) {
+            HandGesture.SWIPE_RIGHT -> Icons.Filled.SkipNext to "Next song"
+            HandGesture.SWIPE_LEFT -> Icons.Filled.SkipPrevious to "Previous song"
+            HandGesture.PALM_COVER -> Icons.Filled.PlayArrow to "Play / pause"
+        }
+        Row(
+            Modifier.clip(RoundedCornerShape(28.dp)).background(c.accent).padding(horizontal = 22.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(icon, null, tint = c.onAccent, modifier = Modifier.size(30.dp))
+            Spacer(Modifier.width(10.dp))
+            Text(label, color = c.onAccent, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -252,8 +290,10 @@ private fun RideCard(modifier: Modifier, speed: Float) {
     val c = LocalHud.current
     val live by g.ride.live.collectAsState()
     val vib by g.sensors.vibration.collectAsState()
-    GlassCard(modifier, accentBorder = c.accent.copy(alpha = 0.5f)) {
-        Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+    GlassCard(modifier, accentBorder = c.accent.copy(alpha = 0.7f), padding = androidx.compose.foundation.layout.PaddingValues(0.dp)) {
+      Box(Modifier.fillMaxSize()) {
+        BrandDecal(Modifier.fillMaxSize(), alpha = 0.35f)
+        Row(Modifier.fillMaxSize().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
             SpeedGauge(speed, Modifier.weight(1.2f))
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -270,6 +310,7 @@ private fun RideCard(modifier: Modifier, speed: Float) {
                 }
             }
         }
+      }
     }
 }
 
@@ -277,8 +318,8 @@ private fun RideCard(modifier: Modifier, speed: Float) {
 private fun Stat(label: String, value: String) {
     val c = LocalHud.current
     Row(verticalAlignment = Alignment.Bottom) {
-        Text(label, color = c.textMuted, fontSize = 12.sp, modifier = Modifier.width(64.dp))
-        Text(value, color = c.text, fontSize = 17.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+        Text(label, color = c.textMuted, fontSize = 13.sp, fontWeight = FontWeight.Medium, modifier = Modifier.width(68.dp))
+        Text(value, color = c.text, fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1)
     }
 }
 
@@ -297,10 +338,12 @@ private fun IdleCard(modifier: Modifier, actions: HudActions) {
     val style = LocalHudStyle.current
     val profile by g.profile.profile.collectAsState()
     val rides by g.rides.rides.collectAsState()
-    GlassCard(modifier) {
-        Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+    GlassCard(modifier, padding = androidx.compose.foundation.layout.PaddingValues(0.dp)) {
+      Box(Modifier.fillMaxSize()) {
+        BrandDecal(Modifier.fillMaxSize())
+        Row(Modifier.fillMaxSize().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text(style.brandName.uppercase(), color = c.accent, fontSize = 13.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold)
+                BrandWordmark()
                 Text(listOfNotNull(profile.model, profile.year?.toString()).joinToString(" · "), color = c.text, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(profile.paintName.orEmpty(), color = c.textMuted, fontSize = 13.sp)
                 Spacer(Modifier.height(8.dp))
@@ -311,17 +354,23 @@ private fun IdleCard(modifier: Modifier, actions: HudActions) {
                 )
                 if (style.tagline.isNotBlank()) Text(style.tagline, color = c.textMuted.copy(alpha = 0.7f), fontSize = 11.sp)
             }
-            Box(
-                Modifier.size(132.dp).clip(CircleShape).background(c.accent).clickable { actions.startRide() },
-                contentAlignment = Alignment.Center,
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Filled.TwoWheeler, null, tint = c.onAccent, modifier = Modifier.size(40.dp))
-                    Text("START", color = c.onAccent, fontWeight = FontWeight.Black, fontSize = 18.sp, letterSpacing = 2.sp)
-                    Text("RIDE", color = c.onAccent.copy(alpha = 0.8f), fontSize = 12.sp, letterSpacing = 2.sp)
+            Box(Modifier.size(160.dp), contentAlignment = Alignment.Center) {
+                PulseRing(Modifier.fillMaxSize(), c.accent)
+                Box(
+                    Modifier.size(128.dp).clip(CircleShape)
+                        .background(Brush.radialGradient(listOf(c.accent, c.accent.copy(alpha = 0.85f))))
+                        .clickable { actions.startRide() },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.Filled.TwoWheeler, null, tint = c.onAccent, modifier = Modifier.size(40.dp))
+                        Text("START", color = c.onAccent, fontWeight = FontWeight.Black, fontSize = 20.sp, letterSpacing = 2.sp)
+                        Text("RIDE", color = c.onAccent.copy(alpha = 0.85f), fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+                    }
                 }
             }
         }
+      }
     }
 }
 

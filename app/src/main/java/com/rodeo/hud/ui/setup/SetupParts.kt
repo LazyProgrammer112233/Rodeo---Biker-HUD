@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -31,6 +32,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
+import androidx.compose.material.icons.filled.Sms
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -58,6 +60,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.rodeo.hud.data.SosContact
+import com.rodeo.hud.sos.SmsStatus
 import com.rodeo.hud.graph
 import com.rodeo.hud.ui.components.GhostButton
 import com.rodeo.hud.ui.components.GlassCard
@@ -70,9 +73,10 @@ private val PERMS = listOf(
     Perm("Location all the time", "Keeps tracking when the screen is off mid-ride.", listOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION)),
     Perm("Notifications", "Ride-in-progress card and garage reminders.", listOf(Manifest.permission.POST_NOTIFICATIONS)),
     Perm("Bluetooth", "Shows your headset and handlebar remote.", listOf(Manifest.permission.BLUETOOTH_CONNECT)),
-    Perm("SMS", "Sends SOS texts automatically, even with no data.", listOf(Manifest.permission.SEND_SMS)),
+    Perm("SMS", "Sends SOS texts from your default SIM automatically, even with no data.", listOf(Manifest.permission.SEND_SMS)),
     Perm("Contacts", "Pick SOS contacts.", listOf(Manifest.permission.READ_CONTACTS)),
     Perm("Physical activity", "Auto-pause and crash detection.", listOf(Manifest.permission.ACTIVITY_RECOGNITION)),
+    Perm("Camera", "Swipe gestures for music. Frames are read on the phone and never saved.", listOf(Manifest.permission.CAMERA)),
     Perm("Microphone", "Voice commands with gloves on.", listOf(Manifest.permission.RECORD_AUDIO)),
     Perm("Music access", "Show and control what's playing.", emptyList(), special = "media"),
 )
@@ -126,7 +130,7 @@ fun PermissionsPanel(modifier: Modifier = Modifier) {
 
 /** SOS contacts: pick from the phone book or type a number; up to five. */
 @Composable
-fun SosContactsEditor(modifier: Modifier = Modifier) {
+fun SosContactsEditor(modifier: Modifier = Modifier, showTest: Boolean = false) {
     val ctx = LocalContext.current
     val g = ctx.graph
     val c = LocalHud.current
@@ -167,8 +171,36 @@ fun SosContactsEditor(modifier: Modifier = Modifier) {
                 )
             }
         }
-        ToggleRow("Send SMS automatically", profile.sosSms) { v -> g.profile.update { it.copy(sosSms = v) } }
-        ToggleRow("Also open WhatsApp for each contact", profile.sosWhatsApp) { v -> g.profile.update { it.copy(sosWhatsApp = v) } }
+        Text("SOS goes out as SMS from your default SIM, in the background. No internet or WhatsApp needed.", color = c.textMuted, fontSize = 12.sp)
+        if (showTest && profile.sosContacts.isNotEmpty()) {
+            GhostButton("Send a test SMS to my contacts", Modifier.fillMaxWidth(), icon = Icons.Filled.Sms) { g.sos.sendTest() }
+            SmsStatusList()
+        }
+    }
+}
+
+/** One line per contact: sending, sent, or why it failed. */
+@Composable
+fun SmsStatusList(modifier: Modifier = Modifier) {
+    val g = LocalContext.current.graph
+    val c = LocalHud.current
+    val list by g.sos.sms.collectAsState()
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        list.forEach { s ->
+            val (label, color) = when (s.state) {
+                SmsStatus.State.SENDING -> "sending…" to c.textMuted
+                SmsStatus.State.SENT -> "sent" to c.ok
+                SmsStatus.State.FAILED -> "failed: ${s.detail}" to c.danger
+                SmsStatus.State.TEST -> s.detail to c.warning
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(10.dp).clip(CircleShape).background(color))
+                Spacer(Modifier.width(8.dp))
+                Text(s.contact.name, color = c.text, fontWeight = FontWeight.Medium, fontSize = 15.sp)
+                Spacer(Modifier.width(8.dp))
+                Text(label, color = color, fontSize = 14.sp)
+            }
+        }
     }
 }
 

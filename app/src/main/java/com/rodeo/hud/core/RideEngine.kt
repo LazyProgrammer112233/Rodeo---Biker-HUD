@@ -41,6 +41,7 @@ class RideEngine(
     private val scope: CoroutineScope,
     private val location: LocationHub,
     private val sensors: RideSensors,
+    private val crash: CrashDetector,
     private val rides: RideRepository,
     private val hazards: HazardStore,
     private val warnings: WarningCenter,
@@ -59,7 +60,6 @@ class RideEngine(
     private var last: Location? = null
     private var stillSince = 0L
     private var ticker: Job? = null
-    private var crashWatch: Job? = null
 
     private val onLocation: (Location) -> Unit = { loc -> handle(loc) }
 
@@ -67,7 +67,10 @@ class RideEngine(
         location.addListener { loc -> if (loc.hasSpeed()) _speed.value = loc.speed * 3.6f }
         sensors.speedKmh = { _speed.value }
         sensors.onJolt = { g -> onJolt(g) }
-        sensors.onImpact = { g -> onImpact(g) }
+        crash.speedKmh = { _speed.value }
+        crash.onCrash = { dryRun, _ ->
+            if (dryRun || (_live.value.active && crashEnabled())) sos.startCountdown(SosReason.CRASH, dryRun)
+        }
     }
 
     fun start() {
@@ -86,6 +89,7 @@ class RideEngine(
         here?.let { points += TrackPoint(it.latitude, it.longitude, System.currentTimeMillis(), 0f) }
         location.addListener(onLocation)
         sensors.start()
+        if (crashEnabled()) crash.armForRide()
         ticker = scope.launch {
             while (true) {
                 delay(1000)
@@ -110,9 +114,9 @@ class RideEngine(
         val l = _live.value
         if (!l.active) return null
         ticker?.cancel()
-        crashWatch?.cancel()
         location.removeListener(onLocation)
         sensors.stop()
+        crash.disarmRide()
         val park = location.location.value ?: last
         val ride = Ride(
             id = l.id,
@@ -202,20 +206,17 @@ class RideEngine(
         }
     }
 
-    /** Crash rule: big impact, then 10 s later the bike is still (under 5 km/h). */
-    private fun onImpact(g: Float) {
-        if (!_live.value.active || !crashEnabled()) return
-        val speedBefore = _speed.value
-        crashWatch?.cancel()
-        crashWatch = scope.launch {
-            delay(10_000)
-            val still = _speed.value < 5f
-            if (still && (speedBefore > 8f || g > 6f)) sos.startCountdown(SosReason.CRASH)
-        }
+    /** Turning crash detection on or off mid-ride takes effect straight away. */
+    fun setCrashDetection(on: Boolean) {
+        if (!_live.value.active) return
+        if (on) crash.armForRide() else crash.disarmRide()
     }
 
-    /** Settings "Simulate crash": full flow, no messages sent. */
+    /** Settings "Simulate crash": the countdown and alarm, no messages sent. */
     fun simulateCrash() = sos.startCountdown(SosReason.CRASH, dryRun = true)
+
+    /** Settings "Drop test": the real detector, ending in a test countdown. */
+    fun startDropTest() = crash.startTest()
 
     companion object {
         const val KEY_VIB = "vibration"

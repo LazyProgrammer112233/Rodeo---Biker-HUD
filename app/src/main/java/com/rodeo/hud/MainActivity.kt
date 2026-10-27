@@ -23,11 +23,10 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
-import com.rodeo.hud.core.Gesture
+import com.rodeo.hud.core.HandGesture
 import com.rodeo.hud.core.Severity
 import com.rodeo.hud.core.VoiceCommand
 import com.rodeo.hud.core.Warning
-import com.rodeo.hud.core.WaveDetector
 import com.rodeo.hud.data.Ride
 import com.rodeo.hud.nav.Place
 import com.rodeo.hud.ride.RideService
@@ -55,7 +54,7 @@ class MainActivity : ComponentActivity(), HudActions {
     private var summary by mutableStateOf<Ride?>(null)
     private var voiceOpen by mutableStateOf(false)
     private var holdingLocation = false
-    private lateinit var wave: WaveDetector
+    private var askedCamera = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +64,7 @@ class MainActivity : ComponentActivity(), HudActions {
             hide(WindowInsetsCompat.Type.systemBars())
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
-        wave = WaveDetector(this) { gesture -> onGesture(gesture) }
+        g.gestures.onGesture = { gesture -> onGesture(gesture) }
         handleIntent(intent)
 
         setContent {
@@ -74,6 +73,8 @@ class MainActivity : ComponentActivity(), HudActions {
             val loc by g.location.location.collectAsState()
 
             LaunchedEffect(profile.themeMode) { g.ambient.mode = profile.themeMode }
+            LaunchedEffect(profile.gestureControl, profile.onboarded) { syncGestures() }
+            LaunchedEffect(profile.swapSwipe) { g.gestures.swap = profile.swapSwipe }
             LaunchedEffect(Unit) {
                 while (true) {
                     g.ambient.tick()
@@ -84,14 +85,11 @@ class MainActivity : ComponentActivity(), HudActions {
             LaunchedEffect(loc?.latitude?.let { (it * 20).toInt() }, loc?.longitude?.let { (it * 20).toInt() }) {
                 loc?.let { g.weather.refreshIfStale(it.latitude, it.longitude) }
             }
-            LaunchedEffect(profile.onboarded) {
-                if (profile.onboarded) g.nav.init(this@MainActivity)
-            }
 
             RodeoTheme(profile, dark) {
                 Box(Modifier.fillMaxSize()) {
                     if (!profile.onboarded) {
-                        Onboarding(onDone = { ensureLocation(); g.nav.init(this@MainActivity) })
+                        Onboarding(onDone = { ensureLocation() })
                     } else {
                         BackHandler(enabled = screen != Screen.HUD) { screen = Screen.HUD }
                         when (screen) {
@@ -102,6 +100,7 @@ class MainActivity : ComponentActivity(), HudActions {
                                 onBack = { screen = Screen.HUD },
                                 onChangeBike = { g.profile.update { it.copy(onboarded = false) } },
                                 onSimulateCrash = { screen = Screen.HUD; g.ride.simulateCrash() },
+                                onDropTest = { g.ride.startDropTest() },
                             )
                             Screen.PACK -> PackScreen(onBack = { screen = Screen.HUD })
                         }
@@ -129,7 +128,7 @@ class MainActivity : ComponentActivity(), HudActions {
         g.ambient.start()
         g.guardian.start()
         g.music.start()
-        if (g.profile.profile.value.waveControl) wave.start()
+        syncGestures()
     }
 
     override fun onResume() {
@@ -139,7 +138,7 @@ class MainActivity : ComponentActivity(), HudActions {
     }
 
     override fun onStop() {
-        wave.stop()
+        g.gestures.stop()
         g.ambient.stop()
         g.music.stop()
         if (holdingLocation) {
@@ -221,13 +220,13 @@ class MainActivity : ComponentActivity(), HudActions {
             VoiceCommand.DISMISS -> g.warnings.dismissTop()
             VoiceCommand.FIND_BIKE -> {
                 val parked = g.rides.lastParked()
-                if (parked?.parkLat != null && g.nav.state.value.ready) {
+                if (parked?.parkLat != null && parked.parkLng != null) {
                     g.nav.navigateTo(Place("Parked bike", "", parked.parkLat, parked.parkLng!!), walking = true)
                 } else screen = Screen.RIDES
             }
             VoiceCommand.NAVIGATE_HOME -> {
                 val p = g.profile.profile.value
-                if (p.homeLat != null && p.homeLng != null && g.nav.state.value.ready) {
+                if (p.homeLat != null && p.homeLng != null) {
                     g.nav.navigateTo(Place(p.homeLabel.ifBlank { "Home" }, "", p.homeLat, p.homeLng))
                 } else g.warnings.post(Warning("home", "Home not set", "Set it in Settings > Home", Severity.INFO))
             }
@@ -235,12 +234,29 @@ class MainActivity : ComponentActivity(), HudActions {
         }
     }
 
-    private fun onGesture(gesture: Gesture) {
-        if (!g.profile.profile.value.waveControl) return
+    /** Camera gestures run only while the HUD is on screen and the rider has them switched on. */
+    private fun syncGestures() {
+        val p = g.profile.profile.value
+        if (p.onboarded && p.gestureControl && lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)) {
+            if (g.gestures.hasPermission) g.gestures.start(this)
+            else if (!askedCamera) {
+                askedCamera = true
+                requestPermissions(arrayOf(Manifest.permission.CAMERA), 8)
+            }
+        } else g.gestures.stop()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 8) syncGestures()
+    }
+
+    private fun onGesture(gesture: HandGesture) {
+        if (!g.profile.profile.value.gestureControl || g.sos.state.value !is com.rodeo.hud.sos.SosState.Idle) return
         when (gesture) {
-            Gesture.WAVE -> g.music.next()
-            Gesture.DOUBLE_WAVE -> g.warnings.dismissTop()
-            Gesture.HOLD -> voice()
+            HandGesture.SWIPE_RIGHT -> g.music.next()
+            HandGesture.SWIPE_LEFT -> g.music.previous()
+            HandGesture.PALM_COVER -> g.music.playPause()
         }
     }
 

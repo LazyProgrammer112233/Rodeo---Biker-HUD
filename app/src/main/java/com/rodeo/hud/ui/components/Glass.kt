@@ -52,7 +52,7 @@ fun GlassCard(
             .clip(CardShape)
             .background(c.glass)
             .background(Brush.verticalGradient(listOf(Color.White.copy(alpha = if (c.dark) 0.04f else 0.25f), Color.Transparent)))
-            .border(BorderStroke(if (accentBorder != null) 1.5.dp else 1.dp, accentBorder ?: c.glassBorder), CardShape)
+            .border(BorderStroke(if (accentBorder != null || !c.dark) 1.5.dp else 1.dp, accentBorder ?: c.glassBorder), CardShape)
             .padding(padding),
         content = content,
     )

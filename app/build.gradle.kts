@@ -24,8 +24,6 @@ android {
         versionCode = 1
         versionName = "0.1.0-p1"
 
-        manifestPlaceholders["MAPS_API_KEY"] = secret("MAPS_API_KEY").ifEmpty { "NO_KEY" }
-        buildConfigField("String", "MAPS_API_KEY", "\"${secret("MAPS_API_KEY")}\"")
         buildConfigField("String", "FIREBASE_API_KEY", "\"${secret("FIREBASE_API_KEY")}\"")
         buildConfigField("String", "FIREBASE_APP_ID", "\"${secret("FIREBASE_APP_ID")}\"")
         buildConfigField("String", "FIREBASE_PROJECT_ID", "\"${secret("FIREBASE_PROJECT_ID")}\"")
@@ -69,11 +67,6 @@ android {
     }
 }
 
-// The Navigation SDK bundles its own copy of the Maps SDK.
-configurations.all {
-    exclude(group = "com.google.android.gms", module = "play-services-maps")
-}
-
 dependencies {
     val composeBom = platform("androidx.compose:compose-bom:2024.12.01")
     implementation(composeBom)
@@ -93,7 +86,12 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
 
     implementation("com.google.android.gms:play-services-location:21.3.0")
-    implementation("com.google.android.libraries.navigation:navigation:6.0.0")
+    // Keyless map: OpenStreetMap tiles. Turn-by-turn hands off to the Google Maps app.
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
+
+    // Camera hand gestures, analysed on the phone.
+    implementation("androidx.camera:camera-camera2:1.4.1")
+    implementation("androidx.camera:camera-lifecycle:1.4.1")
 
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-database")
