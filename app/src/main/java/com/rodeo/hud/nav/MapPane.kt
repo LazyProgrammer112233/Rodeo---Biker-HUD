@@ -110,7 +110,7 @@ fun MapPane(
                     enabled = !lockInput,
                     nearLat = loc?.latitude, nearLng = loc?.longitude,
                     home = if (profile.homeLat != null) Place(profile.homeLabel.ifBlank { "Home" }, "", profile.homeLat!!, profile.homeLng!!) else null,
-                    parked = parked?.parkLat?.let { Place("Parked bike", "", it, parked.parkLng!!) },
+                    parked = parked?.let { r -> r.parkLat?.let { lat -> Place("Parked bike", "", lat, r.parkLng ?: 0.0) } },
                     onPick = { p, walk -> g.nav.navigateTo(p, walking = walk) },
                 )
             }

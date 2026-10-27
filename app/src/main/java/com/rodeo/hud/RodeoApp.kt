@@ -48,12 +48,12 @@ class AppGraph(app: Application) {
     val hazardSync = HazardSync(app, hazards)
     val nav = com.rodeo.hud.nav.NavController(warnings)
 
-    val sos = SosManager(app, scope, { profile.profile.value }) {
+    val sos: SosManager = SosManager(app, scope, { profile.profile.value }) {
         val loc = location.location.value
         SosSnapshot(loc?.latitude, loc?.longitude, ride.speedKmh.value, loc?.takeIf { it.hasBearing() }?.bearing)
     }
 
-    val ride = RideEngine(
+    val ride: RideEngine = RideEngine(
         scope, location, sensors, rides, hazards, warnings, sos,
         crashEnabled = { profile.profile.value.crashDetection },
         onHazardLogged = { hazardSync.onHazard(it) },

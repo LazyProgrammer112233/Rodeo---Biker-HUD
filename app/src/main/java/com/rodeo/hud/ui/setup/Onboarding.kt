@@ -211,7 +211,7 @@ private fun ModelList(onPick: (String) -> Unit) {
                     Text(m.name, color = c.text, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text("Since ${m.firstYear} · ${m.paints.size} colours", color = c.textMuted, fontSize = 12.sp)
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy((-6).dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                     m.paints.take(4).forEach { p ->
                         Box(Modifier.size(16.dp).clip(CircleShape).background(Color(p.hex)).border(1.dp, c.background, CircleShape))
                     }

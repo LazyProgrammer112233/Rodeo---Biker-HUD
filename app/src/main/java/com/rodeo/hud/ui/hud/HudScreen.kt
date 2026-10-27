@@ -40,7 +40,7 @@ import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.TwoWheeler
-import androidx.compose.material.icons.filled.Warehouse
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material.icons.filled.WifiOff
@@ -200,7 +200,7 @@ private fun StatusRow(actions: HudActions, lockInput: Boolean) {
             )
         }
         SmallIcon(Icons.Filled.History, "Rides", enabled = !lockInput) { actions.openRides() }
-        SmallIcon(Icons.Filled.Warehouse, "Garage", enabled = !lockInput) { actions.openGarage() }
+        SmallIcon(Icons.Filled.Build, "Garage", enabled = !lockInput) { actions.openGarage() }
         SmallIcon(Icons.Filled.Settings, "Settings", enabled = !lockInput) { actions.openSettings() }
     }
 }

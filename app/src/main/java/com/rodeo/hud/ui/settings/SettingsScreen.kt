@@ -18,7 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CarCrash
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.TwoWheeler
 import androidx.compose.material3.Icon
@@ -87,7 +87,7 @@ fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onSimulateCrash
             GlassCard(Modifier.fillMaxWidth()) {
                 SectionLabel("Safety")
                 ToggleRow("Crash detection", profile.crashDetection, sub = "Impact + stillness starts a 30 s countdown, then SOS") { v -> g.profile.update { it.copy(crashDetection = v) } }
-                GhostButton("Simulate crash (test, sends nothing)", icon = Icons.Filled.CarCrash) { onSimulateCrash() }
+                GhostButton("Simulate crash (test, sends nothing)", icon = Icons.Filled.Warning) { onSimulateCrash() }
                 Spacer(Modifier.height(8.dp))
                 SectionLabel("SOS contacts")
                 Spacer(Modifier.height(6.dp))
