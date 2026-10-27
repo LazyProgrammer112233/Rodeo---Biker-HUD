@@ -251,6 +251,10 @@ class Assistant(private val context: Context, private val g: AppGraph) : VoiceBr
                 }
                 brain.final(e.alternatives, now, e.source)
             }
+            is VoskEngine.Event.Keywords -> {
+                if ((training != null && !training.done) || expectDestination) return
+                brain.keywords(e.words, now)
+            }
             is VoskEngine.Event.MicError -> {
                 _ui.update { it.copy(error = e.message) }
                 // Another app may have taken the mic for a moment (a call); try again shortly.
@@ -263,6 +267,8 @@ class Assistant(private val context: Context, private val g: AppGraph) : VoiceBr
     }
 
     // --- VoiceBrain.Output ---
+
+    override fun onReplay(fromSec: Double) = engine.replayCommands(fromSec)
 
     override fun onWake() {
         replyJob?.cancel()

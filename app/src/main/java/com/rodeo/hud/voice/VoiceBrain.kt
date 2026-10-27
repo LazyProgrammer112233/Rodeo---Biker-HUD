@@ -16,6 +16,8 @@ class VoiceBrain(
     private var wake: WakeMatcher,
     private val out: Output,
     var repeatedSosEnabled: Boolean = true,
+    /** How sure the keyword spotter must be of a word. */
+    var keywordConf: Double = 0.75,
 ) {
     interface Output {
         fun onWake()
@@ -23,6 +25,8 @@ class VoiceBrain(
         /** Awake but what was said didn't make sense; [final] means the window has closed. */
         fun onNothing(heard: String, final: Boolean)
         fun onHeard(text: String) {}
+        /** Feed the command recogniser again from [fromSec] (keyword-spotter time) to now. */
+        fun onReplay(fromSec: Double) {}
     }
 
     enum class Mode { IDLE, AWAKE, COUNTDOWN }
@@ -69,7 +73,9 @@ class VoiceBrain(
     /** Recogniser's running guess for the utterance in progress. */
     fun partial(text: String, now: Long, source: Int = OPEN) {
         if (text.isBlank() || consumed[source]) return
-        if (source == KEYWORDS) { keywords(listOf(text), now, final = false); return }
+        // The keyword spotter's running guesses flicker between its few phrases; only its
+        // finished results (with confidences) are used.
+        if (source == KEYWORDS) return
         out.onHeard(text)
         val words = Phonetic.words(text)
         when (mode) {
@@ -95,33 +101,45 @@ class VoiceBrain(
         }
     }
 
+    /** A word from the keyword spotter, with the recogniser's confidence and its time in the stream. */
+    data class Word(val text: String, val conf: Double, val start: Double, val end: Double)
+
     /**
-     * The keyword spotter only ever hears the wake phrase, SOS words or nothing. It wakes the
-     * assistant, and sends SOS for the wake phrase plus an SOS word or an SOS word said twice.
-     * A lone SOS word after waking counts once the utterance has ended.
+     * The keyword spotter's result for a finished utterance. It only knows the wake phrase and the
+     * SOS words, so it keeps hearing them through engine and wind noise, but it also squeezes other
+     * speech into them; words below [keywordConf] count as unknown. It wakes the assistant (and
+     * the command recogniser replays what was said after the wake phrase), and sends SOS for the
+     * wake phrase plus an SOS word, an SOS word said twice, or an SOS word while awake.
      */
-    private fun keywords(texts: List<String>, now: Long, final: Boolean) {
-        if (final) {
-            val was = consumed[KEYWORDS]
-            consumed[KEYWORDS] = false
-            if (was) return
-        }
-        for (t in texts) {
-            val words = Phonetic.words(t)
-            if (words.isEmpty()) continue
-            if (repeatedSosEnabled && Commands.isRepeatedSos(words)) { fire(Parsed(VoiceCommand.SOS), t, fromPartial = !final, source = KEYWORDS); return }
-            val hit = wake.find(words)
-            if (hit != null && mode != Mode.COUNTDOWN) {
-                if (mode != Mode.AWAKE) {
-                    enterAwake(now, 0, fromSpeech = false)
-                    out.onHeard(t)
-                }
-                if (Commands.isSos(words.drop(hit.end))) { fire(Parsed(VoiceCommand.SOS), t, fromPartial = !final, source = KEYWORDS); return }
-            } else if ((mode == Mode.AWAKE || mode == Mode.COUNTDOWN) && final && Commands.isSos(words)) {
-                fire(Parsed(VoiceCommand.SOS), t, fromPartial = false, source = KEYWORDS)
-                return
+    fun keywords(result: List<Word>, now: Long) {
+        if (mode == Mode.COUNTDOWN || result.isEmpty()) return
+        val words = result.map { if (it.conf >= keywordConf) Phonetic.words(it.text).joinToString(" ").ifEmpty { "unk" } else "unk" }
+            .flatMap { it.split(' ') }
+        val heard = result.joinToString(" ") { it.text }
+        if (repeatedSosEnabled && Commands.isRepeatedSos(words)) { fire(Parsed(VoiceCommand.SOS), heard, fromPartial = false, source = KEYWORDS); return }
+        val hit = wake.find(words)
+        if (hit != null) {
+            val wasAwake = mode == Mode.AWAKE
+            if (!wasAwake) {
+                out.onHeard(heard)
+                enterAwake(now, 0, fromSpeech = false)
             }
+            if (Commands.isSos(words.drop(hit.end))) { fire(Parsed(VoiceCommand.SOS), heard, fromPartial = false, source = KEYWORDS); return }
+            // Hand what came after the wake phrase to the command recogniser.
+            if (!wasAwake) result.getOrNull(wakeWordIndex(result, hit.end) - 1)?.let { out.onReplay(it.end) }
+            return
         }
+        if (mode == Mode.AWAKE && Commands.isSos(words)) fire(Parsed(VoiceCommand.SOS), heard, fromPartial = false, source = KEYWORDS)
+    }
+
+    /** Maps a position in the split word list back to the recogniser's word list. */
+    private fun wakeWordIndex(result: List<Word>, splitIndex: Int): Int {
+        var n = 0
+        for ((i, w) in result.withIndex()) {
+            n += Phonetic.words(w.text).size.coerceAtLeast(1)
+            if (n >= splitIndex) return i + 1
+        }
+        return result.size
     }
 
     /**
@@ -129,7 +147,7 @@ class VoiceBrain(
      */
     fun final(alternatives: List<String>, now: Long, source: Int = OPEN) {
         val texts = alternatives.filter { it.isNotBlank() }
-        if (source == KEYWORDS) { keywords(texts, now, final = true); return }
+        if (source == KEYWORDS) return
         val wasConsumed = consumed[source]
         consumed[source] = false
         if (texts.isEmpty() || wasConsumed) {

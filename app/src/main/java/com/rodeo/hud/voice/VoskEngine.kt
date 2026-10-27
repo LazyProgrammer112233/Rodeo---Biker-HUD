@@ -40,6 +40,8 @@ class VoskEngine(private val context: Context) {
     sealed interface Event {
         data class Partial(val text: String, val source: Int) : Event
         data class Final(val alternatives: List<String>, val source: Int) : Event
+        /** The keyword spotter's finished utterance, word by word. */
+        data class Keywords(val words: List<VoiceBrain.Word>) : Event
         data class MicError(val message: String) : Event
     }
 
@@ -66,6 +68,8 @@ class VoskEngine(private val context: Context) {
     @Volatile var grammar: List<String> = Commands.GRAMMAR
     @Volatile private var wake: Pair<String, List<String>> = "Hey Rodeo" to emptyList()
     private val keywordsChanged = AtomicBoolean(true)
+    /** Keyword-spotter time (s) to replay the command recogniser from, or NaN. */
+    @Volatile private var replayFrom = Double.NaN
 
     /** The rider's wake phrase and what training heard; rebuilds the keyword spotter. */
     fun setWake(phrase: String, aliases: List<String>) {
@@ -140,6 +144,12 @@ class VoskEngine(private val context: Context) {
         if (on) commandsReset.set(true)
     }
 
+    /**
+     * The keyword spotter heard the wake phrase only once the rider had finished speaking: run the
+     * command recogniser over what was said after it ([fromSec], spotter time) before going on.
+     */
+    fun replayCommands(fromSec: Double) { replayFrom = fromSec }
+
     /** Forget the utterance in progress, e.g. after the assistant acted on it. */
     fun resetOpen() = openReset.set(true)
 
@@ -193,9 +203,12 @@ class VoskEngine(private val context: Context) {
             val clean = ShortArray(buf.size)
             val silence = ShortArray(buf.size)
             val highPass = HighPass()
+            // The last few seconds of cleaned audio, for replaying into the command recogniser.
+            val ring = ShortArray(rate * RING_SECONDS)
+            var fed = 0L // samples written to the ring
+            var kwsStart = 0L // ring position when the keyword spotter started
             var lastPartial = ""
             var lastCmdPartial = ""
-            var lastKwsPartial = ""
             var errors = 0
             while (!stopFlag.get()) {
                 val n = rec.read(buf, 0, buf.size)
@@ -211,6 +224,8 @@ class VoskEngine(private val context: Context) {
                 highPass.process(buf, n, clean)
                 // While Rodeo speaks, feed silence: the recogniser closes the utterance cleanly.
                 val data = if (muted) silence else clean
+                for (i in 0 until n) ring[((fed + i) % ring.size).toInt()] = data[i]
+                fed += n
 
                 if (keywordsChanged.getAndSet(false)) {
                     runCatching { kws?.close() }
@@ -218,20 +233,12 @@ class VoskEngine(private val context: Context) {
                     val words = Commands.keywordGrammar(phrase, aliases)
                     kws = if (words.isEmpty()) null else runCatching {
                         Recognizer(m, rate.toFloat(), JSONArray().apply { words.forEach { put(it) }; put("[unk]") }.toString())
-                            .apply { setEndpointerMode(ENDPOINT_SHORT) }
+                            .apply { setEndpointerMode(ENDPOINT_SHORT); setWords(true) }
                     }.getOrNull()
-                    lastKwsPartial = ""
+                    kwsStart = fed - n
                 }
                 val k = kws
-                if (k != null) {
-                    if (k.acceptWaveForm(data, n)) {
-                        post(Event.Final(alternatives(k.result), VoiceBrain.KEYWORDS))
-                        lastKwsPartial = ""
-                    } else {
-                        val p = partial(k.partialResult)
-                        if (p != lastKwsPartial) { lastKwsPartial = p; if (p.isNotBlank()) post(Event.Partial(p, VoiceBrain.KEYWORDS)) }
-                    }
-                }
+                if (k != null && k.acceptWaveForm(data, n)) keywordWords(k.result).takeIf { it.isNotEmpty() }?.let { post(Event.Keywords(it)) }
 
                 if (openReset.getAndSet(false)) { open.reset(); lastPartial = "" }
                 if (open.acceptWaveForm(data, n)) {
@@ -251,6 +258,23 @@ class VoskEngine(private val context: Context) {
                         lastCmdPartial = ""
                     }
                     val c = cmd
+                    val from = replayFrom
+                    if (c != null && !from.isNaN()) {
+                        replayFrom = Double.NaN
+                        // Feed what was said after the wake phrase (up to, not including, this chunk).
+                        val start = maxOf(kwsStart + (from * rate).toLong(), fed - ring.size + n, 0L)
+                        val end = fed - n
+                        c.reset()
+                        lastCmdPartial = ""
+                        var pos = start
+                        val chunk = ShortArray(rate / 10)
+                        while (pos < end) {
+                            val len = minOf(chunk.size.toLong(), end - pos).toInt()
+                            for (i in 0 until len) chunk[i] = ring[((pos + i) % ring.size).toInt()]
+                            if (c.acceptWaveForm(chunk, len)) post(Event.Final(alternatives(c.result), VoiceBrain.COMMANDS))
+                            pos += len
+                        }
+                    }
                     if (c != null) {
                         if (c.acceptWaveForm(data, n)) {
                             post(Event.Final(alternatives(c.result), VoiceBrain.COMMANDS))
@@ -285,6 +309,12 @@ class VoskEngine(private val context: Context) {
     }.toString()
 
     private fun post(e: Event) = main.post { onEvent(e) }
+
+    private fun keywordWords(json: String): List<VoiceBrain.Word> = runCatching {
+        val arr = JSONObject(json).optJSONArray("result") ?: return@runCatching emptyList()
+        (0 until arr.length()).map { arr.getJSONObject(it) }
+            .map { VoiceBrain.Word(it.optString("word"), it.optDouble("conf", 0.0), it.optDouble("start"), it.optDouble("end")) }
+    }.getOrDefault(emptyList())
 
     private fun partial(json: String): String = runCatching { JSONObject(json).optString("partial") }.getOrDefault("").trim()
 
@@ -331,5 +361,6 @@ class VoskEngine(private val context: Context) {
         const val ASSET_DIR = "vosk-model"
         /** Vosk's short endpointer: an utterance ends after about half a second of quiet. */
         private const val ENDPOINT_SHORT = 1
+        private const val RING_SECONDS = 8
     }
 }

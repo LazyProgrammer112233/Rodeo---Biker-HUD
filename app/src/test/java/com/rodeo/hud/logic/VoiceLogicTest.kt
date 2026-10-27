@@ -87,6 +87,7 @@ class VoiceLogicTest {
         override fun onWake() { events += "wake" }
         override fun onCommand(p: Parsed, heard: String) { events += p.command.name + if (p.arg.isNotEmpty()) ":" + p.arg else "" }
         override fun onNothing(heard: String, final: Boolean) { events += if (final) "nothing" else "again" }
+        override fun onReplay(fromSec: Double) { events += "replay@%.2f".format(fromSec) }
     }
 
     private fun brain(phrase: String = "Hey Doku"): Pair<VoiceBrain, Rec> {
@@ -187,40 +188,41 @@ class VoiceLogicTest {
         return VoiceBrain(WakeMatcher("Hey Doku", listOf("hey doug", "i do care")), r) to r
     }
 
+    private fun kw(vararg w: Pair<String, Double>): List<VoiceBrain.Word> =
+        w.mapIndexed { i, (t, c) -> VoiceBrain.Word(t, c, i * 0.4, i * 0.4 + 0.35) }
+
     @Test fun keywordSpotterWakeAndSos() {
         val (b, r) = trained()
-        b.partial("hey doug", 400, VoiceBrain.KEYWORDS)
-        assertEquals(VoiceBrain.Mode.AWAKE, b.mode)
-        b.partial("hey doug emergency", 900, VoiceBrain.KEYWORDS)
-        b.final(listOf("hey doug emergency"), 1_400, VoiceBrain.KEYWORDS)
+        b.keywords(kw("hey" to 0.9, "doug" to 0.95, "emergency" to 0.9), 1_400)
         assertEquals(listOf("wake", "SOS"), r.events)
     }
 
-    @Test fun keywordSpotterWakesThenCommandRecogniserActs() {
-        val (b, r) = trained()
-        b.partial("i do care", 400, VoiceBrain.KEYWORDS)
-        b.final(listOf("i do care"), 900, VoiceBrain.KEYWORDS)
-        b.final(listOf("next song"), 1_800, VoiceBrain.COMMANDS)
-        assertEquals(listOf("wake", "NEXT"), r.events)
+    @Test fun keywordSpotterWakesAndReplaysTheCommand() {
+        val r = Rec()
+        val b = VoiceBrain(WakeMatcher("Hey Doku", listOf("hey doug", "i do care")), r)
+        b.keywords(kw("i" to 0.9, "do" to 0.9, "care" to 0.85, "[unk]" to 0.5, "[unk]" to 0.5), 2_000)
+        assertEquals(listOf("wake", "replay@1.15"), r.events)
+        b.final(listOf("next song"), 2_300, VoiceBrain.COMMANDS)
+        assertEquals(listOf("wake", "replay@1.15", "NEXT"), r.events)
     }
 
-    @Test fun keywordSpotterAloneNeverSaysSorry() {
+    @Test fun keywordSpotterIgnoresUnsureWords() {
         val (b, r) = trained()
-        b.final(listOf("hey doug"), 900, VoiceBrain.KEYWORDS)
-        b.final(listOf("hey doug"), 1_900, VoiceBrain.KEYWORDS)
-        b.tick(2_600)
-        assertEquals(listOf("wake"), r.events)
+        b.keywords(kw("hey" to 0.9, "doug" to 0.4), 900)
+        b.keywords(kw("emergency" to 0.5, "emergency" to 0.6), 1_900)
+        assertEquals(emptyList<String>(), r.events)
+        b.keywords(kw("emergency" to 0.9, "emergency" to 0.95), 2_900)
+        assertEquals(listOf("SOS"), r.events)
     }
 
     @Test fun keywordSpotterSingleSosWordNeedsWake() {
         val (b, r) = trained()
-        b.partial("emergency", 400, VoiceBrain.KEYWORDS)
-        b.final(listOf("emergency"), 900, VoiceBrain.KEYWORDS)
-        b.partial("help", 1_400, VoiceBrain.KEYWORDS)
-        b.final(listOf("help"), 1_900, VoiceBrain.KEYWORDS)
+        b.keywords(kw("emergency" to 0.95), 900)
+        b.keywords(kw("help" to 0.95), 1_900)
         assertEquals(emptyList<String>(), r.events)
+        // Partials from the spotter are never acted on.
         b.partial("emergency emergency", 2_400, VoiceBrain.KEYWORDS)
-        assertEquals(listOf("SOS"), r.events)
+        assertEquals(emptyList<String>(), r.events)
     }
 
     @Test fun commandRecogniserSosWaitsForTheEnd() {

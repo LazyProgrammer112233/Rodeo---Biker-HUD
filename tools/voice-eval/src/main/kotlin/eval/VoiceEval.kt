@@ -35,14 +35,17 @@ data class Clip(
 )
 
 /** Which front end and recognisers a run uses: the high-pass filter, the keyword spotter. */
-data class Config(val name: String, val highPass: Boolean, val keywords: Boolean)
+data class Config(val name: String, val highPass: Boolean, val keywords: Boolean, val keywordConf: Double = 0.75)
 
-val CONFIGS = mapOf(
-    "base" to Config("base", highPass = false, keywords = false),
-    "hp" to Config("hp", highPass = true, keywords = false),
-    "kws" to Config("kws", highPass = false, keywords = true),
-    "hp+kws" to Config("hp+kws", highPass = true, keywords = true),
-)
+val CONFIGS = listOf(
+    Config("base", highPass = false, keywords = false),
+    Config("hp", highPass = true, keywords = false),
+    Config("hp+kws50", highPass = true, keywords = true, keywordConf = 0.5),
+    Config("hp+kws65", highPass = true, keywords = true, keywordConf = 0.65),
+    Config("hp+kws75", highPass = true, keywords = true, keywordConf = 0.75),
+    Config("hp+kws85", highPass = true, keywords = true, keywordConf = 0.85),
+    Config("hp+kws95", highPass = true, keywords = true, keywordConf = 0.95),
+).associateBy { it.name }
 
 data class Outcome(
     val clip: Clip, val phrase: String, val trained: Boolean, val config: String,
@@ -91,7 +94,7 @@ fun main(args: Array<String>) {
     }
 
     val phrases = clips.map { it.phrase }.filter { it.isNotEmpty() }.distinct()
-    val configs = (System.getenv("EVAL_CONFIGS") ?: "base,hp,hp+kws").split(",").mapNotNull { CONFIGS[it.trim()] }
+    val configs = (System.getenv("EVAL_CONFIGS") ?: "hp,hp+kws50,hp+kws75,hp+kws95").split(",").mapNotNull { CONFIGS[it.trim()] }
     val jobs = ArrayList<java.util.concurrent.Future<Outcome>>()
     for (cfg in configs) for (c in clips) {
         if (c.kind == "train") continue
@@ -189,6 +192,12 @@ private fun alternatives(json: String): List<String> = runCatching {
     else listOf(o.optString("text").trim()).filter { it.isNotEmpty() && it != "[unk]" }
 }.getOrDefault(emptyList())
 
+private fun keywordWords(json: String): List<VoiceBrain.Word> = runCatching {
+    val arr = JSONObject(json).optJSONArray("result") ?: return@runCatching emptyList()
+    (0 until arr.length()).map { arr.getJSONObject(it) }
+        .map { VoiceBrain.Word(it.optString("word"), it.optDouble("conf", 0.0), it.optDouble("start"), it.optDouble("end")) }
+}.getOrDefault(emptyList())
+
 private fun partial(json: String) = runCatching { JSONObject(json).optString("partial") }.getOrDefault("").trim()
 
 /** Training: the best guess for one take. */
@@ -219,6 +228,7 @@ private fun run(model: Model, f: File, c: Clip, phrase: String, trained: Boolean
     var commandsOn = false
     var commandsReset = false
     var openReset = false
+    var replayFrom = Double.NaN
     val heard = ArrayList<String>()
     var now = 0L
     lateinit var brain: VoiceBrain
@@ -234,16 +244,16 @@ private fun run(model: Model, f: File, c: Clip, phrase: String, trained: Boolean
             openReset = true
         }
         override fun onNothing(heard: String, final: Boolean) { if (final) nothing = true }
-    })
+        override fun onReplay(fromSec: Double) { replayFrom = fromSec }
+    }, keywordConf = cfg.keywordConf)
     val open = newOpen(model)
     var cmd: Recognizer? = null
     val kws: Recognizer? = if (cfg.keywords) {
         val words = Commands.keywordGrammar(phrase, aliases)
-        Recognizer(model, RATE.toFloat(), JSONArray().apply { words.forEach { put(it) }; put("[unk]") }.toString())
+        Recognizer(model, RATE.toFloat(), JSONArray().apply { words.forEach { put(it) }; put("[unk]") }.toString()).apply { setWords(true) }
     } else null
     var lastPartial = ""
     var lastCmdPartial = ""
-    var lastKwsPartial = ""
     val chunk = RATE / 10
     var i = 0
     try {
@@ -252,17 +262,13 @@ private fun run(model: Model, f: File, c: Clip, phrase: String, trained: Boolean
             val data = pcm.copyOfRange(i, i + n)
             i += n
             now = i * 1000L / RATE
-            if (kws != null) {
-                if (kws.acceptWaveForm(data, n)) {
-                    val alts = alternatives(kws.result)
-                    if (alts.isNotEmpty()) heard += "(kws) " + alts.first()
-                    brain.final(alts, now, VoiceBrain.KEYWORDS)
-                    lastKwsPartial = ""
-                } else {
-                    val p = partial(kws.partialResult)
-                    if (p != lastKwsPartial) { lastKwsPartial = p; if (p.isNotBlank()) brain.partial(p, now, VoiceBrain.KEYWORDS) }
+            if (kws != null && kws.acceptWaveForm(data, n)) {
+                val w = keywordWords(kws.result)
+                if (w.isNotEmpty()) {
+                    heard += "(kws) " + w.joinToString(" ") { "%s:%.2f".format(it.text, it.conf) }
+                    brain.keywords(w, now)
                 }
-                if (command != null) { if (lastKwsPartial.isNotBlank()) heard += "(kws partial) $lastKwsPartial"; break }
+                if (command != null) break
             }
             if (openReset) { openReset = false; open.reset(); lastPartial = "" }
             if (open.acceptWaveForm(data, n)) {
@@ -281,6 +287,23 @@ private fun run(model: Model, f: File, c: Clip, phrase: String, trained: Boolean
                     lastCmdPartial = ""
                 }
                 val r = cmd!!
+                if (!replayFrom.isNaN()) {
+                    // Same as the phone: run the command recogniser over what came after the wake phrase.
+                    val from = (replayFrom * RATE).toInt().coerceIn(0, i - n)
+                    replayFrom = Double.NaN
+                    r.reset()
+                    var pos = from
+                    while (pos < i - n && command == null) {
+                        val len = minOf(chunk, i - n - pos)
+                        if (r.acceptWaveForm(pcm.copyOfRange(pos, pos + len), len)) {
+                            val alts = alternatives(r.result)
+                            if (alts.isNotEmpty()) heard += "(cmd replay) " + alts.first()
+                            brain.final(alts, now, VoiceBrain.COMMANDS)
+                        }
+                        pos += len
+                    }
+                    if (command != null) break
+                }
                 if (r.acceptWaveForm(data, n)) {
                     val alts = alternatives(r.result)
                     if (alts.isNotEmpty()) heard += "(cmd) " + alts.first()
@@ -297,7 +320,21 @@ private fun run(model: Model, f: File, c: Clip, phrase: String, trained: Boolean
         }
         if (command == null) {
             // The rider stops talking; whatever is left in the recognisers comes out.
-            kws?.let { r -> alternatives(r.finalResult).also { if (it.isNotEmpty()) heard += "(kws) " + it.first() }.let { brain.final(it, now, VoiceBrain.KEYWORDS) } }
+            kws?.let { r -> keywordWords(r.finalResult).takeIf { it.isNotEmpty() }?.let { w -> heard += "(kws) " + w.joinToString(" ") { "%s:%.2f".format(it.text, it.conf) }; brain.keywords(w, now) } }
+            // A wake heard only at the very end replays into the command recogniser.
+            if (command == null && !replayFrom.isNaN()) {
+                val r = cmd ?: Recognizer(model, RATE.toFloat(), grammar).also { cmd = it }
+                r.reset()
+                val from = (replayFrom * RATE).toInt().coerceIn(0, pcm.size)
+                replayFrom = Double.NaN
+                var pos = from
+                while (pos < pcm.size) {
+                    val len = minOf(chunk, pcm.size - pos)
+                    if (r.acceptWaveForm(pcm.copyOfRange(pos, pos + len), len)) brain.final(alternatives(r.result).also { if (it.isNotEmpty()) heard += "(cmd replay) " + it.first() }, now, VoiceBrain.COMMANDS)
+                    pos += len
+                }
+                brain.final(alternatives(r.finalResult).also { if (it.isNotEmpty()) heard += "(cmd replay) " + it.first() }, now, VoiceBrain.COMMANDS)
+            }
             val alts = alternatives(open.finalResult)
             if (alts.isNotEmpty()) heard += alts.first()
             brain.final(alts, now, VoiceBrain.OPEN)
