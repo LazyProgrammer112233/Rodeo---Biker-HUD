@@ -20,24 +20,25 @@ Daemon will be stopped at the end of the build
 > Task :app:mergeDebugShaders
 > Task :app:compileDebugShaders NO-SOURCE
 > Task :app:generateDebugAssets UP-TO-DATE
-> Task :app:mergeDebugAssets
 > Task :app:processDebugManifestForPackage
+> Task :app:mergeDebugAssets
+> Task :app:processDebugResources
 > Task :app:compressDebugAssets
 > Task :app:desugarDebugFileDependencies
-> Task :app:processDebugResources
-> Task :app:checkDebugDuplicateClasses
-> Task :app:l8DexDesugarLibDebug
-> Task :app:compileDebugKotlin
-> Task :app:mergeExtDexDebug
 > Task :app:mergeDebugJniLibFolders
-> Task :app:mergeLibDexDebug
+> Task :app:checkDebugDuplicateClasses
 > Task :app:mergeDebugNativeLibs
-> Task :app:validateSigningDebug
-> Task :app:writeDebugAppMetadata
-> Task :app:writeDebugSigningConfigVersions
+> Task :app:l8DexDesugarLibDebug
+> Task :app:mergeLibDexDebug
 
 > Task :app:stripDebugDebugSymbols
 Unable to strip the following libraries, packaging them as they are: libandroidx.graphics.path.so, libimage_processing_util_jni.so, libjnidispatch.so, libmediapipe_tasks_vision_jni.so, libsurface_util_jni.so, libvosk.so.
+
+> Task :app:compileDebugKotlin
+> Task :app:validateSigningDebug
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
+> Task :app:mergeExtDexDebug
 
 > Task :app:compileDebugKotlin
 w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/MainActivity.kt:254:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Please add the '@Deprecated' annotation or suppress the diagnostic.
@@ -64,9 +65,9 @@ w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/jav
 > Task :app:packageDebug
 > Task :app:createDebugApkListingFileRedirect
 > Task :app:assembleDebug
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_5-1793134994780.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_5-1793135323738.json
 
-BUILD SUCCESSFUL in 1m 53s
+BUILD SUCCESSFUL in 1m 17s
 38 actionable tasks: 38 executed
-SIGNING Signer #1 certificate SHA-256 digest: 626e70b05656385f29f85b087c1e3ff00e54f1320a3893392bafeb9e7deeae09
-SIGNING Signer #1 certificate SHA-1 digest: 1853d3e1c27f0220d2b0acee2611947df414bd90
+SIGNING Signer #1 certificate SHA-256 digest: 3c0bdc964f6625de64f2139b6337bbe6cdc5e0f023ff913f3cc3ff4872623d08
+SIGNING Signer #1 certificate SHA-1 digest: e486aee09e12adbbd036e22a28a2ed95d4021923
