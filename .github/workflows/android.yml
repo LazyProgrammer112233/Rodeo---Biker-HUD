@@ -44,6 +44,14 @@ jobs:
           path: ~/.android/debug.keystore
           key: rodeo-debug-keystore-v1
 
+      # Create the debug key up front so the cache always has a file to save.
+      - name: Debug key
+        run: |
+          mkdir -p ~/.android
+          [ -f ~/.android/debug.keystore ] || keytool -genkeypair -keystore ~/.android/debug.keystore \
+            -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 \
+            -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+
       - name: Signing key from secrets
         env:
           SIGNING_KEYSTORE_B64: ${{ secrets.SIGNING_KEYSTORE_B64 }}
@@ -66,13 +74,12 @@ jobs:
           set -o pipefail
           ./gradlew --no-daemon assembleDebug 2>&1 | tee build.log
 
+      # Read the certificate from the APK itself, so the SHA-1 is the one Maps will see.
       - name: Signing fingerprint (for the Maps key restriction)
         if: always()
         run: |
-          KS=${SIGNING_KEYSTORE:-$HOME/.android/debug.keystore}
-          PW=${{ secrets.SIGNING_PASSWORD }}
-          [ -z "$SIGNING_KEYSTORE" ] && PW=android
-          keytool -list -v -keystore "$KS" -storepass "$PW" 2>/dev/null | grep -E "SHA1:" | sed 's/^/SIGNING /' | tee -a build.log || true
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          [ -f "$APK" ] && "$ANDROID_HOME"/build-tools/35.0.0/apksigner verify --print-certs "$APK" 2>&1 | grep -E "SHA-1|SHA-256" | sed 's/^/SIGNING /' | tee -a build.log || true
 
       # Build logs are pushed to the ci-logs branch so failures can be read without log access.
       - name: Publish build log
@@ -82,19 +89,23 @@ jobs:
           cp build.log /tmp/build.log
           git config user.name "rodeo-ci"
           git config user.email "ci@users.noreply.github.com"
-          git fetch origin ci-logs || true
-          git checkout -B ci-logs
-          git rm -rq --cached . || true
-          mkdir -p logs && cp /tmp/build.log "logs/${GITHUB_REF_NAME//\//_}.log"
-          git add -f logs && git commit -qm "Build log for ${GITHUB_SHA::7} (${{ job.status }})" && git push -f origin ci-logs || true
+          # Push and pull request runs finish together, so add to the branch instead of replacing it.
+          for i in 1 2 3; do
+            git fetch -q origin ci-logs && git checkout -qf -B ci-logs origin/ci-logs || { git checkout -qB ci-logs; git rm -rq --cached .; }
+            mkdir -p logs && cp /tmp/build.log "logs/${GITHUB_REF_NAME//\//_}.log"
+            git add -f logs && git commit -qm "Build log for ${GITHUB_SHA::7} (${{ job.status }})" || true
+            git push origin ci-logs && break
+            sleep 3
+          done || true
 
+      # Pull request runs have ref_name "1/merge", so name the APK after the source branch.
       - name: Rename APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk Rodeo-${{ github.ref_name }}.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk "Rodeo-${{ github.head_ref || github.ref_name }}.apk"
 
       - uses: actions/upload-artifact@v4
         with:
           name: Rodeo-apk
-          path: Rodeo-${{ github.ref_name }}.apk
+          path: Rodeo-${{ github.head_ref || github.ref_name }}.apk
 
       - name: Publish rolling pre-release
         if: github.event_name == 'push'
