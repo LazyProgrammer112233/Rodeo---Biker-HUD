@@ -194,13 +194,14 @@ object MapTiles {
 
 /**
  * Night map: invert the light style, then turn the hues back round so water stays blue, parks
- * green and highways amber, with the brightness pulled down a little to avoid glare.
+ * green and highways amber; then stretch the contrast (OSM's light style has little between
+ * roads and land) and cool it slightly towards navy.
  */
 private val NIGHT = ColorMatrixColorFilter(
     floatArrayOf(
-        0.332f, -1.1011f, -0.1109f, 0f, 230.4f,
-        -0.328f, -0.4411f, -0.1109f, 0f, 230.4f,
-        -0.328f, -1.1011f, 0.5491f, 0f, 230.4f,
+        0.4595f, -1.6531f, -0.1665f, 0f, 348.5f,
+        -0.533f, -0.7588f, -0.1802f, 0f, 377.2f,
+        -0.6257f, -2.1004f, 0.9981f, 0f, 442.8f,
         0f, 0f, 0f, 1f, 0f,
     ),
 )

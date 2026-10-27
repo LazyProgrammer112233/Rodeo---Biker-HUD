@@ -36,7 +36,7 @@ class ScreenShots {
     private val sizes = listOf(640 to 360, 915 to 412, 1280 to 800)
     private val looks = listOf(true, false)
 
-    private fun shoot(prefix: String, content: @Composable () -> Unit) {
+    private fun shoot(prefix: String, sizes: List<Pair<Int, Int>> = this.sizes, content: @Composable () -> Unit) {
         var size by mutableStateOf(sizes.first())
         var dark by mutableStateOf(true)
         compose.setContent {
@@ -53,6 +53,12 @@ class ScreenShots {
     }
 
     @Test fun settings() = shoot("screen-settings") { SettingsScreen(onBack = {}, onChangeBike = {}, onSimulateCrash = {}, onDropTest = {}) }
+
+    /** The whole of Settings at phone widths, tall enough that nothing is scrolled out of view. */
+    @Config(qualifiers = "w1400dp-h2400dp-xhdpi")
+    @Test fun settingsFull() = shoot("screen-settings-full", listOf(640 to 2100, 915 to 1900)) {
+        SettingsScreen(onBack = {}, onChangeBike = {}, onSimulateCrash = {}, onDropTest = {})
+    }
 
     @Test fun garage() = shoot("screen-garage") { GarageScreen(onBack = {}) }
 
