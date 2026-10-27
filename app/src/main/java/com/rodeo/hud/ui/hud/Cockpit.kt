@@ -563,10 +563,11 @@ private fun SpeedCluster(s: CockpitState, modifier: Modifier) {
                         val speedW = maxWidth - statsW - gap
                         // Condensed italic digits run about half an em wide; three of them plus the unit must fit.
                         val font = minOf(maxHeight * 0.95f, (speedW - 62.sdp()) / 1.65f)
+                        val statCols = if (maxHeight >= 96.sdp()) 2 else 1
                         Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
                             Box(Modifier.width(speedW)) { SpeedReadout(anim, s.paused, font) }
                             Spacer(Modifier.width(gap))
-                            StatsWell(s, Modifier.width(statsW), columns = if (maxHeight >= 96.sdp()) 2 else 1)
+                            StatsWell(s, Modifier.width(statsW), columns = statCols)
                         }
                     }
                 }
