@@ -32,7 +32,7 @@ object Commands {
         "next", "next song", "skip", "skip song", "previous", "previous song", "go back", "last song",
         "pause", "pause music", "stop music", "stop", "play", "play music", "resume", "resume music",
         "navigate home", "take me home", "go home", "where is my bike", "find my bike", "where did i park",
-        "stop navigation", "end navigation", "cancel navigation", "mute navigation", "mute voice", "unmute navigation", "unmute voice",
+        "stop navigation", "end navigation", "cancel navigation", "mute navigation", "mute voice", "voice off", "voice on", "guidance off", "guidance on",
         "start ride", "start the ride", "end ride", "end the ride", "stop ride", "finish ride",
         "dismiss", "clear", "volume up", "louder", "volume down", "quieter",
         "what is my speed", "speed", "what time is it", "time", "battery", "how far", "how long", "how much longer",
@@ -56,8 +56,8 @@ object Commands {
         val parsed = when {
             has("stop navigation", "end navigation", "cancel navigation", "stop navigating", "exit navigation", "stop route") ->
                 Parsed(VoiceCommand.STOP_NAVIGATION)
-            has("unmute navigation", "unmute voice", "unmute directions", "voice on") -> Parsed(VoiceCommand.UNMUTE_GUIDANCE)
-            has("mute navigation", "mute voice", "mute directions", "voice off", "quiet navigation") -> Parsed(VoiceCommand.MUTE_GUIDANCE)
+            has("unmute navigation", "unmute voice", "unmute directions", "on mute navigation", "voice on", "guidance on") -> Parsed(VoiceCommand.UNMUTE_GUIDANCE)
+            has("mute navigation", "mute voice", "mute directions", "voice off", "guidance off", "quiet navigation") -> Parsed(VoiceCommand.MUTE_GUIDANCE)
             has("where is my bike", "find my bike", "where did i park", "find bike", "my bike", "parked bike", "where is the bike") ->
                 Parsed(VoiceCommand.FIND_BIKE)
             has("start ride", "start the ride", "start riding", "begin ride", "lets ride", "start my ride", "ride start") ->

@@ -557,7 +557,8 @@ private fun SpeedCluster(s: CockpitState, modifier: Modifier) {
                     if (maxHeight > maxWidth * 0.5f) {
                         // Tall cards (tablets): the speed spans the width and the stats sit in one row below.
                         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(gap)) {
-                            BoxWithConstraints(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
+                            // Height limits the digits here, so centre them rather than leave the right half empty.
+                            BoxWithConstraints(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                                 SpeedReadout(anim, s.paused, minOf(maxHeight * 0.95f, (maxWidth - 70.sdp()) / 1.65f))
                             }
                             StatsWell(s, Modifier.fillMaxWidth(), columns = 4)

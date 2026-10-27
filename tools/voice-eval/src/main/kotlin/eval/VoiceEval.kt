@@ -56,7 +56,8 @@ fun main(args: Array<String>) {
     val report = File(args[2])
     val json = File(args[3])
     LibVosk.setLogLevel(LogLevel.WARNINGS)
-    val model = Model(modelDir)
+    // One model per worker thread: the desktop library crashed with a shared one.
+    val models = ThreadLocal.withInitial { Model(modelDir) }
     val clips = JSONArray(File(clipsDir, "manifest.json").readText()).let { a ->
         (0 until a.length()).map { a.getJSONObject(it) }.map { o ->
             Clip(
@@ -67,13 +68,14 @@ fun main(args: Array<String>) {
         }
     }
     println("clips: ${clips.size}")
-    val pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors().coerceIn(1, 8))
+    val threads = System.getenv("EVAL_THREADS")?.toIntOrNull() ?: Runtime.getRuntime().availableProcessors().coerceIn(1, 4)
+    val pool = Executors.newFixedThreadPool(threads)
 
     // What each voice's training gave, the way Settings › Train does it: the open recogniser's
     // best guess for each of three takes.
     val aliases = HashMap<Pair<String, String>, List<String>>()
     clips.filter { it.kind == "train" }.groupBy { it.voice to it.phrase }.forEach { (key, takes) ->
-        val heard = takes.map { c -> pool.submit<String?> { transcribe(model, File(clipsDir, c.file)) } }.mapNotNull { it.get() }
+        val heard = takes.map { c -> pool.submit<String?> { transcribe(models.get(), File(clipsDir, c.file)) } }.mapNotNull { it.get() }
         aliases[key] = heard.map { it.trim().lowercase() }.filter { Phonetic.words(it).size in 1..6 }.distinct()
     }
 
@@ -85,10 +87,13 @@ fun main(args: Array<String>) {
         val targets = if (c.phrase.isEmpty()) phrases else listOf(c.phrase)
         for (p in targets) for (trained in listOf(false, true)) {
             val al = if (trained) aliases[c.voice to p].orEmpty() else emptyList()
-            jobs += pool.submit<Outcome> { run(model, File(clipsDir, c.file), c, p, trained, al) }
+            jobs += pool.submit<Outcome> { run(models.get(), File(clipsDir, c.file), c, p, trained, al) }
         }
     }
-    val results = jobs.map { it.get() }
+    val results = jobs.mapIndexedNotNull { i, j ->
+        if ((i + 1) % 250 == 0) println("ran ${i + 1} of ${jobs.size}")
+        runCatching { j.get() }.onFailure { println("run failed: ${it.cause ?: it}") }.getOrNull()
+    }
     pool.shutdown()
 
     val out = StringBuilder()
