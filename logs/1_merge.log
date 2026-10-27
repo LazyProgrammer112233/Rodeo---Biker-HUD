@@ -16,12 +16,12 @@ Daemon will be stopped at the end of the build
 > Task :app:parseDebugLocalResources
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
-> Task :app:processDebugManifestForPackage
 > Task :app:javaPreCompileDebug
 > Task :app:mergeDebugShaders
 > Task :app:compileDebugShaders NO-SOURCE
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:mergeDebugAssets
+> Task :app:processDebugManifestForPackage
 > Task :app:compressDebugAssets
 > Task :app:processDebugResources
 > Task :app:desugarDebugFileDependencies
@@ -37,28 +37,34 @@ Unable to strip the following libraries, packaging them as they are: libandroidx
 > Task :app:validateSigningDebug
 > Task :app:writeDebugAppMetadata
 > Task :app:writeDebugSigningConfigVersions
-
-> Task :app:compileDebugKotlin FAILED
-e: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/MainActivity.kt:249:5 'onRequestPermissionsResult' overrides nothing.
-e: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/MainActivity.kt:250:55 Argument type mismatch: actual type is 'kotlin.Array<CapturedType(out kotlin.String)>', but 'kotlin.Array<kotlin.String>' was expected.
-e: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/components/Backdrop.kt:298:87 Unresolved reference 'width'.
-e: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/components/Backdrop.kt:299:95 Unresolved reference 'width'.
-
+> Task :app:compileDebugKotlin
 > Task :app:mergeExtDexDebug
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_4-1793110734207.json
 
-FAILURE: Build failed with an exception.
+> Task :app:compileDebugKotlin
+w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/MainActivity.kt:249:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Please add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/MainActivity.kt:250:15 'fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray): Unit' is deprecated. This method has been deprecated in favor of using the Activity Result API
+      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt
+      contracts for common intents available in
+      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for
+      testing, and allow receiving results in separate, testable classes independent from your
+      activity. Use
+      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)} passing
+      in a {@link RequestMultiplePermissions} object for the {@link ActivityResultContract} and
+      handling the result in the {@link ActivityResultCallback#onActivityResult(Object) callback}.
+w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/setup/SetupParts.kt:95:21 'val LocalLifecycleOwner: ProvidableCompositionLocal<LifecycleOwner>' is deprecated. Moved to lifecycle-runtime-compose library in androidx.lifecycle.compose package.
 
-* What went wrong:
-Execution failed for task ':app:compileDebugKotlin'.
-> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
-   > Compilation error. See log for more details
+> Task :app:compileDebugJavaWithJavac
+> Task :app:dexBuilderDebug
+> Task :app:mergeDebugGlobalSynthetics
+> Task :app:processDebugJavaRes
+> Task :app:mergeProjectDexDebug
+> Task :app:mergeDebugJavaResource
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect
+> Task :app:assembleDebug
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_4-1793110832636.json
 
-* Try:
-> Run with --stacktrace option to get the stack trace.
-> Run with --info or --debug option to get more log output.
-> Run with --scan to get full insights.
-> Get more help at https://help.gradle.org.
-
-BUILD FAILED in 56s
-30 actionable tasks: 30 executed
+BUILD SUCCESSFUL in 1m 22s
+38 actionable tasks: 38 executed
+SIGNING Signer #1 certificate SHA-256 digest: acfdb28f700dd92b2b45e1704b1ff983381f859ce076338da23ddc06ccec38b9
+SIGNING Signer #1 certificate SHA-1 digest: 0292df5a18f7923f68801036de5107341c875eb2
