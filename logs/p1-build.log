@@ -10,8 +10,8 @@ Daemon will be stopped at the end of the build
 > Task :app:mapDebugSourceSetPaths
 > Task :app:generateDebugResources
 > Task :app:packageDebugResources
-> Task :app:createDebugCompatibleScreenManifests
 > Task :app:mergeDebugResources
+> Task :app:createDebugCompatibleScreenManifests
 > Task :app:extractDeepLinksDebug
 > Task :app:parseDebugLocalResources
 > Task :app:processDebugMainManifest
@@ -29,6 +29,7 @@ Daemon will be stopped at the end of the build
 > Task :app:checkDebugDuplicateClasses
 > Task :app:mergeDebugNativeLibs
 > Task :app:l8DexDesugarLibDebug
+> Task :app:compileDebugKotlin
 > Task :app:mergeLibDexDebug
 
 > Task :app:stripDebugDebugSymbols
@@ -37,7 +38,6 @@ Unable to strip the following libraries, packaging them as they are: libandroidx
 > Task :app:validateSigningDebug
 > Task :app:writeDebugAppMetadata
 > Task :app:writeDebugSigningConfigVersions
-> Task :app:compileDebugKotlin
 > Task :app:mergeExtDexDebug
 
 > Task :app:compileDebugKotlin
@@ -65,9 +65,9 @@ w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/jav
 > Task :app:packageDebug
 > Task :app:createDebugApkListingFileRedirect
 > Task :app:assembleDebug
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_6-1793124784863.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_6-1793124903152.json
 
-BUILD SUCCESSFUL in 1m 21s
+BUILD SUCCESSFUL in 1m 33s
 38 actionable tasks: 38 executed
-SIGNING Signer #1 certificate SHA-256 digest: 2d631e540801db9723973f0bfe4aa49b2d45cb74a94dac779f689b1011789dbb
-SIGNING Signer #1 certificate SHA-1 digest: e32d9558669b302e62f3f3a8958f55a15125cc84
+SIGNING Signer #1 certificate SHA-256 digest: ebeaefacdbe9096e9d68233f0059d7494263e1e09649675507e639d757259fd7
+SIGNING Signer #1 certificate SHA-1 digest: 63e275f6c2424ba42225b0be162ddabfa87bbda1
