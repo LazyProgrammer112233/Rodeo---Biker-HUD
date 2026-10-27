@@ -29,8 +29,10 @@ import kotlin.math.sqrt
  * Offline speech recognition with Vosk and its small Indian-English model, shipped inside the
  * APK: no internet, no account, no cost, and no beeps or audio-focus grabs from the Google app.
  *
- * One microphone stream feeds two recognisers: an open one (any words, used for the wake phrase
- * and destinations) and, while a command is expected, one limited to the command phrases.
+ * One microphone stream, high-passed to take out engine and wind rumble, feeds up to three
+ * recognisers: an open one (any words, for the wake phrase and destinations), a keyword spotter
+ * that only knows the wake phrase and SOS words (it keeps hearing them in noise), and, while a
+ * command is expected, one limited to the command phrases.
  */
 class VoskEngine(private val context: Context) {
     enum class ModelState { MISSING, LOADING, READY, FAILED }
@@ -62,6 +64,14 @@ class VoskEngine(private val context: Context) {
     @Volatile private var muted = false
     @Volatile private var helmet = false
     @Volatile var grammar: List<String> = Commands.GRAMMAR
+    @Volatile private var wake: Pair<String, List<String>> = "Hey Rodeo" to emptyList()
+    private val keywordsChanged = AtomicBoolean(true)
+
+    /** The rider's wake phrase and what training heard; rebuilds the keyword spotter. */
+    fun setWake(phrase: String, aliases: List<String>) {
+        wake = phrase to aliases
+        keywordsChanged.set(true)
+    }
 
     /** Unpacks (first run only) and loads the model on a background thread. */
     fun prepare() {
@@ -153,6 +163,7 @@ class VoskEngine(private val context: Context) {
         val rate = 16_000
         var open: Recognizer? = null
         var cmd: Recognizer? = null
+        var kws: Recognizer? = null
         var rec: AudioRecord? = null
         var ns: NoiseSuppressor? = null
         var sco = false
@@ -179,9 +190,12 @@ class VoskEngine(private val context: Context) {
             rec.startRecording()
             _running.value = true
             val buf = ShortArray(rate / 10)
+            val clean = ShortArray(buf.size)
             val silence = ShortArray(buf.size)
+            val highPass = HighPass()
             var lastPartial = ""
             var lastCmdPartial = ""
+            var lastKwsPartial = ""
             var errors = 0
             while (!stopFlag.get()) {
                 val n = rec.read(buf, 0, buf.size)
@@ -194,8 +208,30 @@ class VoskEngine(private val context: Context) {
                 var sum = 0.0
                 for (i in 0 until n) sum += buf[i] * buf[i].toDouble()
                 _level.value = (sqrt(sum / n) / 6000.0).toFloat().coerceIn(0f, 1f)
+                highPass.process(buf, n, clean)
                 // While Rodeo speaks, feed silence: the recogniser closes the utterance cleanly.
-                val data = if (muted) silence else buf
+                val data = if (muted) silence else clean
+
+                if (keywordsChanged.getAndSet(false)) {
+                    runCatching { kws?.close() }
+                    val (phrase, aliases) = wake
+                    val words = Commands.keywordGrammar(phrase, aliases)
+                    kws = if (words.isEmpty()) null else runCatching {
+                        Recognizer(m, rate.toFloat(), JSONArray().apply { words.forEach { put(it) }; put("[unk]") }.toString())
+                            .apply { setEndpointerMode(ENDPOINT_SHORT) }
+                    }.getOrNull()
+                    lastKwsPartial = ""
+                }
+                val k = kws
+                if (k != null) {
+                    if (k.acceptWaveForm(data, n)) {
+                        post(Event.Final(alternatives(k.result), VoiceBrain.KEYWORDS))
+                        lastKwsPartial = ""
+                    } else {
+                        val p = partial(k.partialResult)
+                        if (p != lastKwsPartial) { lastKwsPartial = p; if (p.isNotBlank()) post(Event.Partial(p, VoiceBrain.KEYWORDS)) }
+                    }
+                }
 
                 if (openReset.getAndSet(false)) { open.reset(); lastPartial = "" }
                 if (open.acceptWaveForm(data, n)) {
@@ -235,6 +271,8 @@ class VoskEngine(private val context: Context) {
             runCatching { ns?.release() }
             runCatching { open?.close() }
             runCatching { cmd?.close() }
+            runCatching { kws?.close() }
+            keywordsChanged.set(true)
             if (sco) stopSco()
             _level.value = 0f
             _running.value = false

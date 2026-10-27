@@ -11,6 +11,7 @@ import android.media.session.PlaybackState
 import android.os.SystemClock
 import android.util.Log
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasSetTextAction

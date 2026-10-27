@@ -38,6 +38,20 @@ object Commands {
         "what is my speed", "speed", "what time is it", "time", "battery", "how far", "how long", "how much longer",
     )
 
+    /**
+     * The keyword spotter's phrases: the wake phrase (and what training heard) and the SOS words.
+     * Everything else is heard as "[unk]". A made-up name the recogniser doesn't know ("doku")
+     * is dropped by it, which is why training matters: the aliases are words it knows.
+     */
+    fun keywordGrammar(phrase: String, aliases: List<String>, known: (String) -> Boolean = { true }): List<String> {
+        val wakes = (listOf(phrase) + aliases).map { Phonetic.words(it) }
+            .filter { it.isNotEmpty() && it.size <= 6 && it.all(known) }
+            .map { it.joinToString(" ") }
+        val sos = listOf("emergency", "accident", "ambulance", "s o s", "help", "help me", "mayday", "bachao")
+            .filter { p -> p.split(' ').all(known) }
+        return (wakes + sos).distinct()
+    }
+
     fun parse(text: String, countdown: Boolean = false): Parsed {
         val words = Phonetic.words(text)
         if (words.isEmpty()) return Parsed(VoiceCommand.UNKNOWN)

@@ -159,7 +159,7 @@ jobs:
       - name: Voice evaluation
         if: github.event_name == 'push'
         continue-on-error: true
-        timeout-minutes: 30
+        timeout-minutes: 50
         run: |
           set -e
           sudo apt-get install -y -qq espeak-ng > /dev/null 2>&1 || true

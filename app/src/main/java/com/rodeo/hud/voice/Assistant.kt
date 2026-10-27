@@ -88,6 +88,7 @@ class Assistant(private val context: Context, private val g: AppGraph) : VoiceBr
         g.scope.launch {
             g.profile.profile.map { Triple(it.wakePhrase, it.wakeAliases, it.sosWithoutWake) }.distinctUntilChanged().collect { (phrase, aliases, sos) ->
                 brain.setWake(WakeMatcher(phrase, aliases))
+                engine.setWake(phrase, aliases)
                 brain.repeatedSosEnabled = sos
             }
         }
@@ -236,7 +237,7 @@ class Assistant(private val context: Context, private val g: AppGraph) : VoiceBr
         val training = _ui.value.training
         when (e) {
             is VoskEngine.Event.Partial -> {
-                if (training != null && !training.done) { _ui.update { it.copy(heard = e.text) }; return }
+                if (training != null && !training.done) { if (e.source == VoiceBrain.OPEN) _ui.update { it.copy(heard = e.text) }; return }
                 if (expectDestination && e.source == VoiceBrain.OPEN) { _ui.update { it.copy(heard = e.text) }; return }
                 brain.partial(e.text, now, e.source)
             }

@@ -15,6 +15,7 @@ sourceSets {
                 "com/rodeo/hud/voice/Commands.kt",
                 "com/rodeo/hud/voice/WakeMatcher.kt",
                 "com/rodeo/hud/voice/VoiceBrain.kt",
+                "com/rodeo/hud/voice/AudioFront.kt",
                 "eval/**",
             )
         }

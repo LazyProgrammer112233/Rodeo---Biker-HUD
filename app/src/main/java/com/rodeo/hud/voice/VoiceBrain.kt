@@ -8,8 +8,9 @@ package com.rodeo.hud.voice
  *  - Countdown: an SOS is counting down; "cancel" / "I'm okay" stops it and "help" / "send now"
  *    sends it, no wake phrase needed.
  *
- * Two recognisers may feed it: the open one (any words) and a command one limited to the command
- * phrases, which copes better with wind. Whichever understands first wins.
+ * Three recognisers may feed it: the open one (any words); a keyword spotter limited to the wake
+ * phrase and SOS words, which keeps hearing them through engine and wind noise; and, once awake, a
+ * command one limited to the command phrases. Whichever understands first wins.
  */
 class VoiceBrain(
     private var wake: WakeMatcher,
@@ -34,7 +35,7 @@ class VoiceBrain(
     private var skip = 0
     private var utteranceHadWake = false
     /** The current utterance was already acted on from a partial result (per recogniser). */
-    private val consumed = BooleanArray(2)
+    private val consumed = BooleanArray(3)
     private var unknownAt = 0L
     private var unknownHeard = ""
 
@@ -68,6 +69,7 @@ class VoiceBrain(
     /** Recogniser's running guess for the utterance in progress. */
     fun partial(text: String, now: Long, source: Int = OPEN) {
         if (text.isBlank() || consumed[source]) return
+        if (source == KEYWORDS) { keywords(listOf(text), now, final = false); return }
         out.onHeard(text)
         val words = Phonetic.words(text)
         when (mode) {
@@ -84,8 +86,40 @@ class VoiceBrain(
                 if (Commands.isSos(words.drop(hit.end))) fire(Parsed(VoiceCommand.SOS), text, source = source)
             }
             Mode.AWAKE -> {
+                // The command recogniser can force noise into its phrases, so its SOS waits for
+                // the end of the utterance.
+                if (source == COMMANDS) return
                 val rest = if (utteranceHadWake && source == OPEN) words.drop(skip) else words
                 if (Commands.isSos(rest)) fire(Parsed(VoiceCommand.SOS), text, source = source)
+            }
+        }
+    }
+
+    /**
+     * The keyword spotter only ever hears the wake phrase, SOS words or nothing. It wakes the
+     * assistant, and sends SOS for the wake phrase plus an SOS word or an SOS word said twice.
+     * A lone SOS word after waking counts once the utterance has ended.
+     */
+    private fun keywords(texts: List<String>, now: Long, final: Boolean) {
+        if (final) {
+            val was = consumed[KEYWORDS]
+            consumed[KEYWORDS] = false
+            if (was) return
+        }
+        for (t in texts) {
+            val words = Phonetic.words(t)
+            if (words.isEmpty()) continue
+            if (repeatedSosEnabled && Commands.isRepeatedSos(words)) { fire(Parsed(VoiceCommand.SOS), t, fromPartial = !final, source = KEYWORDS); return }
+            val hit = wake.find(words)
+            if (hit != null && mode != Mode.COUNTDOWN) {
+                if (mode != Mode.AWAKE) {
+                    enterAwake(now, 0, fromSpeech = false)
+                    out.onHeard(t)
+                }
+                if (Commands.isSos(words.drop(hit.end))) { fire(Parsed(VoiceCommand.SOS), t, fromPartial = !final, source = KEYWORDS); return }
+            } else if ((mode == Mode.AWAKE || mode == Mode.COUNTDOWN) && final && Commands.isSos(words)) {
+                fire(Parsed(VoiceCommand.SOS), t, fromPartial = false, source = KEYWORDS)
+                return
             }
         }
     }
@@ -95,6 +129,7 @@ class VoiceBrain(
      */
     fun final(alternatives: List<String>, now: Long, source: Int = OPEN) {
         val texts = alternatives.filter { it.isNotBlank() }
+        if (source == KEYWORDS) { keywords(texts, now, final = true); return }
         val wasConsumed = consumed[source]
         consumed[source] = false
         if (texts.isEmpty() || wasConsumed) {
@@ -212,9 +247,10 @@ class VoiceBrain(
     }
 
     companion object {
-        /** The open recogniser (any words) and the command one (grammar-limited). */
+        /** The open recogniser (any words), the command one and the keyword spotter (grammar-limited). */
         const val OPEN = 0
         const val COMMANDS = 1
+        const val KEYWORDS = 2
         const val AWAKE_MS = 7_000L
         const val RETRY_MS = 6_000L
     }

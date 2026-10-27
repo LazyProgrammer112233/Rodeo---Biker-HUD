@@ -181,4 +181,55 @@ class VoiceLogicTest {
         }
         assertEquals(emptyList<String>(), r.events)
     }
+
+    private fun trained(): Pair<VoiceBrain, Rec> {
+        val r = Rec()
+        return VoiceBrain(WakeMatcher("Hey Doku", listOf("hey doug", "i do care")), r) to r
+    }
+
+    @Test fun keywordSpotterWakeAndSos() {
+        val (b, r) = trained()
+        b.partial("hey doug", 400, VoiceBrain.KEYWORDS)
+        assertEquals(VoiceBrain.Mode.AWAKE, b.mode)
+        b.partial("hey doug emergency", 900, VoiceBrain.KEYWORDS)
+        b.final(listOf("hey doug emergency"), 1_400, VoiceBrain.KEYWORDS)
+        assertEquals(listOf("wake", "SOS"), r.events)
+    }
+
+    @Test fun keywordSpotterWakesThenCommandRecogniserActs() {
+        val (b, r) = trained()
+        b.partial("i do care", 400, VoiceBrain.KEYWORDS)
+        b.final(listOf("i do care"), 900, VoiceBrain.KEYWORDS)
+        b.final(listOf("next song"), 1_800, VoiceBrain.COMMANDS)
+        assertEquals(listOf("wake", "NEXT"), r.events)
+    }
+
+    @Test fun keywordSpotterAloneNeverSaysSorry() {
+        val (b, r) = trained()
+        b.final(listOf("hey doug"), 900, VoiceBrain.KEYWORDS)
+        b.final(listOf("hey doug"), 1_900, VoiceBrain.KEYWORDS)
+        b.tick(2_600)
+        assertEquals(listOf("wake"), r.events)
+    }
+
+    @Test fun keywordSpotterSingleSosWordNeedsWake() {
+        val (b, r) = trained()
+        b.partial("emergency", 400, VoiceBrain.KEYWORDS)
+        b.final(listOf("emergency"), 900, VoiceBrain.KEYWORDS)
+        b.partial("help", 1_400, VoiceBrain.KEYWORDS)
+        b.final(listOf("help"), 1_900, VoiceBrain.KEYWORDS)
+        assertEquals(emptyList<String>(), r.events)
+        b.partial("emergency emergency", 2_400, VoiceBrain.KEYWORDS)
+        assertEquals(listOf("SOS"), r.events)
+    }
+
+    @Test fun commandRecogniserSosWaitsForTheEnd() {
+        val (b, r) = brain()
+        b.final(listOf("hey doku"), 1_000)
+        // A grammar recogniser can force engine noise into "accident" mid-utterance.
+        b.partial("accident", 1_400, VoiceBrain.COMMANDS)
+        assertEquals(listOf("wake"), r.events)
+        b.final(listOf("next song"), 2_000, VoiceBrain.COMMANDS)
+        assertEquals(listOf("wake", "NEXT"), r.events)
+    }
 }

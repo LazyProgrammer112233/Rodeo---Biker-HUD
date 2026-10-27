@@ -1,6 +1,7 @@
 package eval
 
 import com.rodeo.hud.voice.Commands
+import com.rodeo.hud.voice.HighPass
 import com.rodeo.hud.voice.Parsed
 import com.rodeo.hud.voice.Phonetic
 import com.rodeo.hud.voice.VoiceBrain
@@ -33,8 +34,18 @@ data class Clip(
     val expect: String, val text: String, val snr: String, val speechEnd: Double, val wakeEnd: Double?,
 )
 
+/** Which front end and recognisers a run uses: the high-pass filter, the keyword spotter. */
+data class Config(val name: String, val highPass: Boolean, val keywords: Boolean)
+
+val CONFIGS = mapOf(
+    "base" to Config("base", highPass = false, keywords = false),
+    "hp" to Config("hp", highPass = true, keywords = false),
+    "kws" to Config("kws", highPass = false, keywords = true),
+    "hp+kws" to Config("hp+kws", highPass = true, keywords = true),
+)
+
 data class Outcome(
-    val clip: Clip, val phrase: String, val trained: Boolean,
+    val clip: Clip, val phrase: String, val trained: Boolean, val config: String,
     val wakeAt: Double?, val command: String?, val commandArg: String, val commandAt: Double?,
     val nothing: Boolean, val heard: List<String>,
 ) {
@@ -80,14 +91,15 @@ fun main(args: Array<String>) {
     }
 
     val phrases = clips.map { it.phrase }.filter { it.isNotEmpty() }.distinct()
+    val configs = (System.getenv("EVAL_CONFIGS") ?: "base,hp,hp+kws").split(",").mapNotNull { CONFIGS[it.trim()] }
     val jobs = ArrayList<java.util.concurrent.Future<Outcome>>()
-    for (c in clips) {
+    for (cfg in configs) for (c in clips) {
         if (c.kind == "train") continue
         // Chatter and "emergency emergency" are tried against every wake phrase.
         val targets = if (c.phrase.isEmpty()) phrases else listOf(c.phrase)
         for (p in targets) for (trained in listOf(false, true)) {
             val al = if (trained) aliases[c.voice to p].orEmpty() else emptyList()
-            jobs += pool.submit<Outcome> { run(models.get(), File(clipsDir, c.file), c, p, trained, al) }
+            jobs += pool.submit<Outcome> { run(models.get(), File(clipsDir, c.file), c, p, trained, al, cfg) }
         }
     }
     val results = jobs.mapIndexedNotNull { i, j ->
@@ -105,8 +117,13 @@ fun main(args: Array<String>) {
     out.appendLine()
 
     fun rate(rs: List<Outcome>) = if (rs.isEmpty()) "  -  " else "%3d%% (%d/%d)".format(100 * rs.count { it.pass } / rs.size, rs.count { it.pass }, rs.size)
-    for (p in phrases) for (trained in listOf(false, true)) {
-        out.appendLine("== \"$p\" ${if (trained) "after training" else "untrained"}")
+    out.appendLine("Configurations: " + configs.joinToString { "${it.name} (high-pass ${if (it.highPass) "on" else "off"}, keyword spotter ${if (it.keywords) "on" else "off"})" })
+    out.appendLine()
+    val best = configs.last().name
+    for (cfg in configs) for (p in phrases) for (trained in listOf(false, true)) {
+        val all = results
+        val results = all.filter { it.config == cfg.name }
+        out.appendLine("== [${cfg.name}] \"$p\" ${if (trained) "after training" else "untrained"}")
         out.appendLine("   %-8s %-18s %-18s %-18s %-18s %-18s".format("noise", "wake+SOS", "wake+command", "emergency x2", "chatter quiet", "false SOS"))
         for (snr in listOf("clean", "10dB", "5dB", "0dB")) {
             val rs = results.filter { it.phrase == p && it.trained == trained && it.clip.snr == snr }
@@ -123,14 +140,14 @@ fun main(args: Array<String>) {
         if (lat.isNotEmpty()) out.appendLine("   SOS reaction after the last word: median %.2f s, slowest %.2f s".format(lat[lat.size / 2], lat.last()))
         out.appendLine()
     }
-    out.appendLine("By voice (trained, all noise levels): wake+SOS / wake+command / chatter quiet")
+    out.appendLine("By voice [$best] (trained, all noise levels): wake+SOS / wake+command / chatter quiet")
     for (v in clips.map { it.voice }.distinct()) {
-        val rs = results.filter { it.trained && it.clip.voice == v }
+        val rs = results.filter { it.config == best && it.trained && it.clip.voice == v }
         out.appendLine("   %-22s %s  %s  %s".format(v, rate(rs.filter { it.clip.kind == "sos" }), rate(rs.filter { it.clip.kind == "cmd" }), rate(rs.filter { it.clip.kind == "chatter" })))
     }
     out.appendLine()
-    out.appendLine("Failures (trained):")
-    results.filter { it.trained && !it.pass }.sortedWith(compareBy({ it.phrase }, { it.clip.kind }, { it.clip.id }, { it.clip.snr })).forEach { r ->
+    out.appendLine("Failures [$best] (trained):")
+    results.filter { it.config == best && it.trained && !it.pass }.sortedWith(compareBy({ it.phrase }, { it.clip.kind }, { it.clip.id }, { it.clip.snr })).forEach { r ->
         out.appendLine("  [${r.phrase}] ${r.clip.voice} ${r.clip.id} ${r.clip.snr}: said \"${r.clip.text}\" -> " +
             (if (r.wakeAt != null) "woke " else "") + (r.command?.let { "$it ${r.commandArg}".trim() } ?: if (r.nothing) "nothing understood" else "no action") +
             " | heard ${r.heard.joinToString(" / ") { "\"$it\"" }}")
@@ -142,7 +159,7 @@ fun main(args: Array<String>) {
     json.writeText(JSONArray().apply {
         results.forEach { r ->
             put(JSONObject().apply {
-                put("file", r.clip.file); put("phrase", r.phrase); put("trained", r.trained); put("kind", r.clip.kind)
+                put("file", r.clip.file); put("phrase", r.phrase); put("trained", r.trained); put("kind", r.clip.kind); put("config", r.config)
                 put("snr", r.clip.snr); put("pass", r.pass); put("command", r.command ?: JSONObject.NULL)
                 put("wakeAt", r.wakeAt ?: JSONObject.NULL); put("heard", JSONArray(r.heard))
             })
@@ -192,8 +209,9 @@ private fun transcribe(model: Model, f: File): String? {
 
 private val grammar = JSONArray().apply { Commands.GRAMMAR.forEach { put(it) }; put("[unk]") }.toString()
 
-private fun run(model: Model, f: File, c: Clip, phrase: String, trained: Boolean, aliases: List<String>): Outcome {
-    val pcm = samples(f)
+private fun run(model: Model, f: File, c: Clip, phrase: String, trained: Boolean, aliases: List<String>, cfg: Config): Outcome {
+    val raw = samples(f)
+    val pcm = if (cfg.highPass) ShortArray(raw.size).also { HighPass().process(raw, raw.size, it) } else raw
     var wakeAt: Double? = null
     var command: Parsed? = null
     var commandAt: Double? = null
@@ -219,8 +237,13 @@ private fun run(model: Model, f: File, c: Clip, phrase: String, trained: Boolean
     })
     val open = newOpen(model)
     var cmd: Recognizer? = null
+    val kws: Recognizer? = if (cfg.keywords) {
+        val words = Commands.keywordGrammar(phrase, aliases)
+        Recognizer(model, RATE.toFloat(), JSONArray().apply { words.forEach { put(it) }; put("[unk]") }.toString())
+    } else null
     var lastPartial = ""
     var lastCmdPartial = ""
+    var lastKwsPartial = ""
     val chunk = RATE / 10
     var i = 0
     try {
@@ -229,6 +252,18 @@ private fun run(model: Model, f: File, c: Clip, phrase: String, trained: Boolean
             val data = pcm.copyOfRange(i, i + n)
             i += n
             now = i * 1000L / RATE
+            if (kws != null) {
+                if (kws.acceptWaveForm(data, n)) {
+                    val alts = alternatives(kws.result)
+                    if (alts.isNotEmpty()) heard += "(kws) " + alts.first()
+                    brain.final(alts, now, VoiceBrain.KEYWORDS)
+                    lastKwsPartial = ""
+                } else {
+                    val p = partial(kws.partialResult)
+                    if (p != lastKwsPartial) { lastKwsPartial = p; if (p.isNotBlank()) brain.partial(p, now, VoiceBrain.KEYWORDS) }
+                }
+                if (command != null) { if (lastKwsPartial.isNotBlank()) heard += "(kws partial) $lastKwsPartial"; break }
+            }
             if (openReset) { openReset = false; open.reset(); lastPartial = "" }
             if (open.acceptWaveForm(data, n)) {
                 val alts = alternatives(open.result)
@@ -255,11 +290,14 @@ private fun run(model: Model, f: File, c: Clip, phrase: String, trained: Boolean
                     val p = partial(r.partialResult)
                     if (p != lastCmdPartial) { lastCmdPartial = p; if (p.isNotBlank()) brain.partial(p, now, VoiceBrain.COMMANDS) }
                 }
+                if (command != null && lastCmdPartial.isNotBlank()) heard += "(cmd partial) $lastCmdPartial"
             }
+            if (command != null && lastPartial.isNotBlank()) heard += "(partial) $lastPartial"
             brain.tick(now)
         }
         if (command == null) {
             // The rider stops talking; whatever is left in the recognisers comes out.
+            kws?.let { r -> alternatives(r.finalResult).also { if (it.isNotEmpty()) heard += "(kws) " + it.first() }.let { brain.final(it, now, VoiceBrain.KEYWORDS) } }
             val alts = alternatives(open.finalResult)
             if (alts.isNotEmpty()) heard += alts.first()
             brain.final(alts, now, VoiceBrain.OPEN)
@@ -271,6 +309,7 @@ private fun run(model: Model, f: File, c: Clip, phrase: String, trained: Boolean
     } finally {
         open.close()
         cmd?.close()
+        kws?.close()
     }
-    return Outcome(c, phrase, trained, wakeAt, command?.command?.name, command?.arg.orEmpty(), commandAt, nothing, heard)
+    return Outcome(c, phrase, trained, cfg.name, wakeAt, command?.command?.name, command?.arg.orEmpty(), commandAt, nothing, heard)
 }
