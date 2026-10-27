@@ -26,21 +26,22 @@ Daemon will be stopped at the end of the build
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:javaPreCompileDebugUnitTest
 > Task :app:mergeDebugAssets UP-TO-DATE
-> Task :app:bundleDebugClassesToCompileJar
 > Task :app:bundleDebugClassesToRuntimeJar
+> Task :app:bundleDebugClassesToCompileJar
 > Task :app:packageDebugUnitTestForUnitTest
 > Task :app:generateDebugUnitTestConfig
 > Task :app:processDebugJavaRes UP-TO-DATE
 
 > Task :app:compileDebugUnitTestKotlin
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/test/java/com/rodeo/hud/logic/NavReplayTest.kt:27:9 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'java.io.File?'.
+e: The daemon has terminated unexpectedly on startup attempt #1 with error code: 0. The daemon process output:
+    1. Kotlin compile daemon is ready
 
 > Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
 > Task :app:processDebugUnitTestJavaRes
 > Task :app:testDebugUnitTest
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_8-1793123457401.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_8-1793124427024.json
 
-BUILD SUCCESSFUL in 1m 10s
+BUILD SUCCESSFUL in 1m 3s
 28 actionable tasks: 8 executed, 20 up-to-date
 testsuite name="com.rodeo.hud.logic.GestureLogicTest" tests="12" skipped="0" failures="0"
 testsuite name="com.rodeo.hud.logic.NavLogicTest" tests="9" skipped="0" failures="0"

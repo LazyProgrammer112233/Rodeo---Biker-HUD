@@ -1,22 +1,19 @@
-=== osrm-chandigarh-sukhna.json  (OSRM, 5.2 km, 9 min, 91 points, 12 steps)
+=== osrm-chandigarh-sukhna.json  (OSRM, 5.2 km, 9 min, 91 points, 11 steps)
    step 0 DEPART at 0: Head off
    step 1 RIGHT at 2: At the end of the road, turn right
-   step 2 STRAIGHT at 4: Continue straight
-   step 3 RIGHT at 5: Turn right
-   step 4 LEFT at 8: Turn left
-   step 5 LEFT at 12: Turn left onto Himalaya Marg
-   step 6 ROUNDABOUT_LEFT at 38: At the roundabout, take the 2nd exit onto Himalaya Marg
-   step 7 RIGHT at 48: At the end of the road, turn right onto Uttar Marg
-   step 8 LEFT at 52: Turn left
-   step 9 LEFT at 74: At the end of the road, turn left
-   step 10 RIGHT at 81: Turn right
-   step 11 ARRIVE at 90: You have arrived
+   step 2 RIGHT at 5: Turn right
+   step 3 LEFT at 8: Turn left
+   step 4 LEFT at 12: Turn left onto Himalaya Marg
+   step 5 ROUNDABOUT_LEFT at 38: At the roundabout, take the 2nd exit onto Himalaya Marg
+   step 6 RIGHT at 48: At the end of the road, turn right onto Uttar Marg
+   step 7 LEFT at 52: Turn left
+   step 8 LEFT at 74: At the end of the road, turn left
+   step 9 RIGHT at 81: Turn right
+   step 10 ARRIVE at 90: You have arrived
    @     0 m  "Route ready. 5.2 kilometres, about 9 minutes"
    @     0 m  "In 60 metres, at the end of the road, turn right"
    @    11 m  "At the end of the road, turn right"
-   @    60 m  "In 150 metres, continue straight"
-   @   144 m  "Continue straight"
-   @   199 m  "In 100 metres, turn right"
+   @   144 m  "In 150 metres, turn right"
    @   265 m  "Turn right"
    @   310 m  "In 150 metres, turn left"
    @   397 m  "Turn left"
@@ -36,10 +33,9 @@
    @  4680 m  "At the end of the road, turn left"
    @  4791 m  "In 150 metres, turn right"
    @  4918 m  "Turn right"
-   @  4986 m  "In 150 metres, you have arrived"
+   @  4986 m  "In 150 metres, you will arrive at your destination"
    @  5106 m  "You have arrived"
-   @  5122 m  "You have arrived"
-   turns=10 spokenAtTurn=10 offRoute=false arrived=true
+   turns=10 spokenAtTurn=9 inOrder=true offRoute=false arrived=true
 
 === valhalla-bengaluru-nandi.json  (Valhalla, 61.2 km, 2 h 29 min, 1096 points, 12 steps)
    step 0 DEPART at 0: Drive east
@@ -83,8 +79,7 @@
    @ 60703 m  "In 500 metres, your destination will be on the left"
    @ 61042 m  "In 150 metres, your destination will be on the left"
    @ 61154 m  "Your destination is on the left."
-   @ 61166 m  "You have arrived"
-   turns=10 spokenAtTurn=10 offRoute=false arrived=true
+   turns=11 spokenAtTurn=11 inOrder=true offRoute=false arrived=true
 
 === valhalla-chandigarh-sukhna.json  (Valhalla, 5.2 km, 20 min, 91 points, 12 steps)
    step 0 DEPART at 0: Drive southeast
@@ -103,8 +98,8 @@
    @    87 m  "In 150 metres, turn left"
    @   199 m  "Turn left."
    @   245 m  "In 60 metres, make a right U-turn"
-   @   265 m  "In 70 metres, turn left"
-   @   381 m  "Make a right U-turn."
+   @   265 m  "Make a right U-turn."
+   @   312 m  "In 100 metres, turn left"
    @   397 m  "Turn left."
    @   431 m  "In 60 metres, bear left"
    @   443 m  "Bear left."
@@ -126,8 +121,7 @@
    @  4918 m  "Bear right."
    @  4986 m  "In 150 metres, you will arrive at your destination"
    @  5106 m  "You have arrived at your destination."
-   @  5122 m  "You have arrived"
-   turns=10 spokenAtTurn=10 offRoute=false arrived=true
+   turns=11 spokenAtTurn=11 inOrder=true offRoute=false arrived=true
 
 === valhalla-delhi-cp-indiagate.json  (Valhalla, 4.7 km, 16 min, 210 points, 7 steps)
    step 0 DEPART at 0: Drive north on Outer Circle
@@ -153,8 +147,7 @@
    @  4512 m  "Enter the roundabout and take the 1st exit."
    @  4552 m  "In 150 metres, your destination will be on the right"
    @  4658 m  "Your destination is on the right."
-   @  4674 m  "You have arrived"
-   turns=5 spokenAtTurn=5 offRoute=false arrived=true
+   turns=6 spokenAtTurn=6 inOrder=true offRoute=false arrived=true
 
 === valhalla-mumbai-bandra-juhu.json  (Valhalla, 5.5 km, 22 min, 201 points, 5 steps)
    step 0 DEPART at 0: Drive north on Dr. BR Ambedkar Road
@@ -174,8 +167,7 @@
    @  5351 m  "Turn left."
    @  5396 m  "In 90 metres, you will arrive at your destination"
    @  5443 m  "You have arrived at your destination."
-   @  5461 m  "You have arrived"
-   turns=3 spokenAtTurn=3 offRoute=false arrived=true
+   turns=4 spokenAtTurn=4 inOrder=true offRoute=false arrived=true
 
 === valhalla-walk-to-bike.json  (Valhalla, 0.3 km, 4 min, 21 points, 7 steps)
    step 0 DEPART at 0: Walk east
@@ -195,7 +187,7 @@
    @   185 m  "Keep left at the fork."
    @   202 m  "In 90 metres, your destination will be on the left"
    @   261 m  "You have arrived"
-   turns=5 spokenAtTurn=5 offRoute=false arrived=true
+   turns=6 spokenAtTurn=5 inOrder=true offRoute=false arrived=true
 
 
 problems:

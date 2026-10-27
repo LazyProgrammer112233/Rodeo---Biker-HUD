@@ -5,17 +5,38 @@
 == valhalla walk-to-bike: {"trip":{"locations":[{"type":"break","lat":12.9716,"lon":77.5946,"original_index":0},{"type":"break","lat":12.9731,"lon":77.5961,"side_of_street":"left","original_index":1}],"legs":[{"maneuvers":[{"type":1,"instruction":"Walk east.","verbal_succinct_transition_instruction":"Walk east. Then Turn lef
 == osrm: {"code":"Ok","routes":[{"legs":[{"steps":[{"intersections":[{"out":0,"entry":[true],"bearings":[53],"location":[76.78316,30.73984]},{"out":0,"in":2,"entry":[true,true,false],"bearings":[60,150,240],"location":[76.783285,30.73992]}],"driving_side":"right","geometry":"_wesy@obnmqC_DyFiQq[","maneuver":
 == photon: {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"osm_type":"W","osm_id":1227950655,"osm_key":"highway","osm_value":"primary","type":"street","name":"Nandi Hills Road","city":"Devanahalli","county":"Devanahalli taluku","state":"Karnataka","country":"India","postcode":"562110",
-== nominatim: [{"place_id":253629100,"licence":"Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright","osm_type":"node","osm_id":4827607329,"lat":"13.3688849","lon":"77.6842015","category":"amenity","type":"police","place_rank":30,"importance":3.750133516437045e-05,"addresstype":"amenity","name"
-== tile voyager 200 image/png 2049
-== tile dark 200 image/png 2513
-== tile osm 200 image/png 30130
+== nominatim: [{"place_id":253299442,"licence":"Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright","osm_type":"node","osm_id":332155217,"lat":"13.3701322","lon":"77.6841533","category":"leisure","type":"playground","place_rank":30,"importance":3.750133516437045e-05,"addresstype":"leisure","na
+== tile osm blr 00 200 image/png 37766
+== tile hot blr 00 200 image/png 35901
+== tile osm blr 01 200 image/png 39078
+== tile hot blr 01 200 image/png 38374
+== tile osm blr 10 200 image/png 42470
+== tile hot blr 10 200 image/png 40350
+== tile osm blr 11 200 image/png 36332
+== tile hot blr 11 200 image/png 37150
+== tile osm del 00 200 image/png 36420
+== tile hot del 00 200 image/png 35515
+== tile osm del 01 200 image/png 32175
+== tile hot del 01 200 image/png 30021
+== tile osm del 10 200 image/png 37253
+== tile hot del 10 200 image/png 39329
+== tile osm del 11 200 image/png 29203
+== tile hot del 11 200 image/png 28543
+== tile osm bom 00 200 image/png 39360
+== tile hot bom 00 200 image/png 37203
+== tile osm bom 01 200 image/png 18214
+== tile hot bom 01 200 image/png 17494
+== tile osm bom 10 200 image/png 33757
+== tile hot bom 10 200 image/png 32538
+== tile osm bom 11 200 image/png 29357
+== tile hot bom 11 200 image/png 28852
 total 64
-drwxr-xr-x 2 runner runner  4096 Oct 27 17:50 .
-drwxr-xr-x 3 runner runner  4096 Oct 27 17:50 ..
--rw-r--r-- 1 runner runner  9141 Oct 27 17:50 osrm-chandigarh-sukhna.json
--rw-r--r-- 1 runner runner  1252 Oct 27 17:50 photon-nandi.json
--rw-r--r-- 1 runner runner 12425 Oct 27 17:50 valhalla-bengaluru-nandi.json
--rw-r--r-- 1 runner runner  7076 Oct 27 17:50 valhalla-chandigarh-sukhna.json
--rw-r--r-- 1 runner runner  7289 Oct 27 17:50 valhalla-delhi-cp-indiagate.json
--rw-r--r-- 1 runner runner  3884 Oct 27 17:50 valhalla-mumbai-bandra-juhu.json
--rw-r--r-- 1 runner runner  3860 Oct 27 17:50 valhalla-walk-to-bike.json
+drwxr-xr-x 2 runner runner  4096 Oct 27 18:06 .
+drwxr-xr-x 3 runner runner  4096 Oct 27 18:06 ..
+-rw-r--r-- 1 runner runner  9141 Oct 27 18:06 osrm-chandigarh-sukhna.json
+-rw-r--r-- 1 runner runner  1252 Oct 27 18:06 photon-nandi.json
+-rw-r--r-- 1 runner runner 12425 Oct 27 18:06 valhalla-bengaluru-nandi.json
+-rw-r--r-- 1 runner runner  7076 Oct 27 18:06 valhalla-chandigarh-sukhna.json
+-rw-r--r-- 1 runner runner  7289 Oct 27 18:06 valhalla-delhi-cp-indiagate.json
+-rw-r--r-- 1 runner runner  3884 Oct 27 18:06 valhalla-mumbai-bandra-juhu.json
+-rw-r--r-- 1 runner runner  3860 Oct 27 18:06 valhalla-walk-to-bike.json
