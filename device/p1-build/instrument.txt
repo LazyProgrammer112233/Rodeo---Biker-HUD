@@ -55,44 +55,14 @@ INSTRUMENTATION_STATUS: class=com.rodeo.hud.DeviceTest
 INSTRUMENTATION_STATUS: current=4
 INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
 INSTRUMENTATION_STATUS: numtests=4
-INSTRUMENTATION_STATUS: stack=java.lang.NullPointerException: Attempt to read from field 'android.os.MessageQueue android.os.Looper.mQueue' on a null object reference in method 'void android.os.Handler.<init>(android.os.Looper, android.os.Handler$Callback, boolean, boolean)'
-	at android.os.Handler.<init>(Handler.java:264)
-	at android.os.Handler.<init>(Handler.java:257)
-	at android.os.Handler.<init>(Handler.java:162)
-	at android.media.session.MediaSession$CallbackMessageHandler.<init>(MediaSession.java:1569)
-	at android.media.session.MediaSession.setCallback(MediaSession.java:249)
-	at android.media.session.MediaSession.setCallback(MediaSession.java:224)
-	at com.rodeo.hud.DeviceTest.d_musicCardShowsTheSong(DeviceTest.kt:189)
-
-INSTRUMENTATION_STATUS: stream=
-Error in d_musicCardShowsTheSong(com.rodeo.hud.DeviceTest):
-java.lang.NullPointerException: Attempt to read from field 'android.os.MessageQueue android.os.Looper.mQueue' on a null object reference in method 'void android.os.Handler.<init>(android.os.Looper, android.os.Handler$Callback, boolean, boolean)'
-	at android.os.Handler.<init>(Handler.java:264)
-	at android.os.Handler.<init>(Handler.java:257)
-	at android.os.Handler.<init>(Handler.java:162)
-	at android.media.session.MediaSession$CallbackMessageHandler.<init>(MediaSession.java:1569)
-	at android.media.session.MediaSession.setCallback(MediaSession.java:249)
-	at android.media.session.MediaSession.setCallback(MediaSession.java:224)
-	at com.rodeo.hud.DeviceTest.d_musicCardShowsTheSong(DeviceTest.kt:189)
-
+INSTRUMENTATION_STATUS: stream=.
 INSTRUMENTATION_STATUS: test=d_musicCardShowsTheSong
-INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS_CODE: 0
 INSTRUMENTATION_RESULT: stream=
 
-Time: 207.154
-There was 1 failure:
-1) d_musicCardShowsTheSong(com.rodeo.hud.DeviceTest)
-java.lang.NullPointerException: Attempt to read from field 'android.os.MessageQueue android.os.Looper.mQueue' on a null object reference in method 'void android.os.Handler.<init>(android.os.Looper, android.os.Handler$Callback, boolean, boolean)'
-	at android.os.Handler.<init>(Handler.java:264)
-	at android.os.Handler.<init>(Handler.java:257)
-	at android.os.Handler.<init>(Handler.java:162)
-	at android.media.session.MediaSession$CallbackMessageHandler.<init>(MediaSession.java:1569)
-	at android.media.session.MediaSession.setCallback(MediaSession.java:249)
-	at android.media.session.MediaSession.setCallback(MediaSession.java:224)
-	at com.rodeo.hud.DeviceTest.d_musicCardShowsTheSong(DeviceTest.kt:189)
+Time: 230.155
 
-FAILURES!!!
-Tests run: 4,  Failures: 1
+OK (4 tests)
 
 
 INSTRUMENTATION_CODE: -1
