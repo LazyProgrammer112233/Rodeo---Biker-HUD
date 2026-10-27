@@ -16,21 +16,19 @@ Daemon will be stopped at the end of the build
 > Task :app:mergeDebugResources
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
+> Task :app:processDebugManifestForPackage
 > Task :app:javaPreCompileDebug
 > Task :app:mergeDebugShaders
 > Task :app:compileDebugShaders NO-SOURCE
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:mergeDebugAssets
-> Task :app:processDebugManifestForPackage
-> Task :app:compressDebugAssets
 > Task :app:processDebugResources
+> Task :app:compressDebugAssets
 > Task :app:desugarDebugFileDependencies
 > Task :app:mergeDebugJniLibFolders
 > Task :app:checkDebugDuplicateClasses
 > Task :app:mergeDebugNativeLibs
 > Task :app:l8DexDesugarLibDebug
-> Task :app:compileDebugKotlin
-> Task :app:mergeExtDexDebug
 > Task :app:mergeLibDexDebug
 
 > Task :app:stripDebugDebugSymbols
@@ -40,10 +38,11 @@ Unable to strip the following libraries, packaging them as they are: libandroidx
 > Task :app:writeDebugAppMetadata
 > Task :app:writeDebugSigningConfigVersions
 > Task :app:preDebugAndroidTestBuild SKIPPED
+> Task :app:compileDebugKotlin
 > Task :app:processDebugAndroidTestManifest
 > Task :app:generateDebugAndroidTestBuildConfig
-> Task :app:generateDebugAndroidTestResValues
 > Task :app:checkDebugAndroidTestAarMetadata
+> Task :app:generateDebugAndroidTestResValues
 > Task :app:mapDebugAndroidTestSourceSetPaths
 > Task :app:generateDebugAndroidTestResources
 > Task :app:javaPreCompileDebugAndroidTest
@@ -56,9 +55,10 @@ Unable to strip the following libraries, packaging them as they are: libandroidx
 > Task :app:desugarDebugAndroidTestFileDependencies
 > Task :app:processDebugAndroidTestResources
 > Task :app:checkDebugAndroidTestDuplicateClasses
-> Task :app:mergeDebugAndroidTestJniLibFolders
-> Task :app:mergeExtDexDebugAndroidTest
+> Task :app:mergeExtDexDebug
 > Task :app:mergeLibDexDebugAndroidTest
+> Task :app:mergeExtDexDebugAndroidTest
+> Task :app:mergeDebugAndroidTestJniLibFolders
 > Task :app:mergeDebugAndroidTestNativeLibs NO-SOURCE
 > Task :app:stripDebugAndroidTestDebugSymbols NO-SOURCE
 > Task :app:validateSigningDebugAndroidTest
@@ -87,28 +87,20 @@ w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/jav
 > Task :app:bundleDebugClassesToCompileJar
 > Task :app:mergeProjectDexDebug
 > Task :app:mergeDebugJavaResource
-
-> Task :app:compileDebugAndroidTestKotlin FAILED
-e: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/androidTest/java/com/rodeo/hud/DeviceTest.kt:259:30 Unresolved reference 'getOrNull'.
-e: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/androidTest/java/com/rodeo/hud/DeviceTest.kt:259:87 Unresolved reference 'text'.
-e: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/androidTest/java/com/rodeo/hud/DeviceTest.kt:259:89 Unresolved reference 'it'.
-
+> Task :app:compileDebugAndroidTestKotlin
 > Task :app:packageDebug
 > Task :app:createDebugApkListingFileRedirect
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_3-1793134996446.json
+> Task :app:assembleDebug
+> Task :app:compileDebugAndroidTestJavaWithJavac
+> Task :app:dexBuilderDebugAndroidTest
+> Task :app:mergeDebugAndroidTestGlobalSynthetics
+> Task :app:processDebugAndroidTestJavaRes
+> Task :app:mergeProjectDexDebugAndroidTest
+> Task :app:mergeDebugAndroidTestJavaResource
+> Task :app:packageDebugAndroidTest
+> Task :app:createDebugAndroidTestApkListingFileRedirect
+> Task :app:assembleDebugAndroidTest
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_3-1793135315250.json
 
-FAILURE: Build failed with an exception.
-
-* What went wrong:
-Execution failed for task ':app:compileDebugAndroidTestKotlin'.
-> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
-   > Compilation error. See log for more details
-
-* Try:
-> Run with --stacktrace option to get the stack trace.
-> Run with --info or --debug option to get more log output.
-> Run with --scan to get full insights.
-> Get more help at https://help.gradle.org.
-
-BUILD FAILED in 2m
-59 actionable tasks: 59 executed
+BUILD SUCCESSFUL in 1m 17s
+67 actionable tasks: 67 executed
