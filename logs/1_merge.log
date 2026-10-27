@@ -10,67 +10,52 @@ Daemon will be stopped at the end of the build
 > Task :app:mapDebugSourceSetPaths
 > Task :app:generateDebugResources
 > Task :app:packageDebugResources
-> Task :app:createDebugCompatibleScreenManifests
 > Task :app:mergeDebugResources
+> Task :app:createDebugCompatibleScreenManifests
 > Task :app:extractDeepLinksDebug
 > Task :app:parseDebugLocalResources
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
 > Task :app:javaPreCompileDebug
+> Task :app:processDebugManifestForPackage
 > Task :app:mergeDebugShaders
 > Task :app:compileDebugShaders NO-SOURCE
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:mergeDebugAssets
 > Task :app:compressDebugAssets
-> Task :app:desugarDebugFileDependencies
-> Task :app:processDebugManifestForPackage
-> Task :app:checkDebugDuplicateClasses
 > Task :app:processDebugResources
-> Task :app:l8DexDesugarLibDebug
+> Task :app:desugarDebugFileDependencies
 > Task :app:mergeDebugJniLibFolders
-> Task :app:mergeLibDexDebug
+> Task :app:checkDebugDuplicateClasses
 > Task :app:mergeDebugNativeLibs
-> Task :app:validateSigningDebug
-> Task :app:writeDebugAppMetadata
-> Task :app:writeDebugSigningConfigVersions
+> Task :app:l8DexDesugarLibDebug
+> Task :app:mergeLibDexDebug
 
 > Task :app:stripDebugDebugSymbols
 Unable to strip the following libraries, packaging them as they are: libandroidx.graphics.path.so, libimage_processing_util_jni.so, libsurface_util_jni.so.
 
+> Task :app:validateSigningDebug
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
 > Task :app:compileDebugKotlin
-e: The daemon has terminated unexpectedly on startup attempt #1 with error code: 0. The daemon process output:
-    1. Kotlin compile daemon is ready
-
 > Task :app:mergeExtDexDebug
 
-> Task :app:compileDebugKotlin
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/MainActivity.kt:251:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Please add the '@Deprecated' annotation or suppress the diagnostic.
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/MainActivity.kt:252:15 'fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray): Unit' is deprecated. This method has been deprecated in favor of using the Activity Result API
-      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt
-      contracts for common intents available in
-      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for
-      testing, and allow receiving results in separate, testable classes independent from your
-      activity. Use
-      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)} passing
-      in a {@link RequestMultiplePermissions} object for the {@link ActivityResultContract} and
-      handling the result in the {@link ActivityResultCallback#onActivityResult(Object) callback}.
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/hud/MapChrome.kt:262:53 'val Icons.Filled.VolumeUp: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.VolumeUp.
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/hud/MapChrome.kt:262:80 'val Icons.Filled.VolumeOff: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.VolumeOff.
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/hud/Overlays.kt:315:27 'val Icons.Filled.VolumeUp: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.VolumeUp.
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/setup/SetupParts.kt:96:21 'val LocalLifecycleOwner: ProvidableCompositionLocal<LifecycleOwner>' is deprecated. Moved to lifecycle-runtime-compose library in androidx.lifecycle.compose package.
+> Task :app:compileDebugKotlin FAILED
+e: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/hud/Cockpit.kt:569:80 'val maxHeight: Dp' cannot be called in this context with an implicit receiver. Use an explicit receiver if necessary.
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_5-1793121001976.json
 
-> Task :app:compileDebugJavaWithJavac
-> Task :app:dexBuilderDebug
-> Task :app:mergeDebugGlobalSynthetics
-> Task :app:processDebugJavaRes
-> Task :app:mergeProjectDexDebug
-> Task :app:mergeDebugJavaResource
-> Task :app:packageDebug
-> Task :app:createDebugApkListingFileRedirect
-> Task :app:assembleDebug
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_5-1793120588343.json
+FAILURE: Build failed with an exception.
 
-BUILD SUCCESSFUL in 1m 23s
-38 actionable tasks: 38 executed
-SIGNING Signer #1 certificate SHA-256 digest: 8f2dcaf3377fb43b614279052df4f019e914a1faf2b0c67ce20f6a9f41ab124e
-SIGNING Signer #1 certificate SHA-1 digest: 7194f7ac08bd1eb79bbc135519c26a216ed1e9fc
+* What went wrong:
+Execution failed for task ':app:compileDebugKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 59s
+30 actionable tasks: 30 executed
