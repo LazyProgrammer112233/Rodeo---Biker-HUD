@@ -47,6 +47,7 @@ import com.rodeo.hud.ui.components.Radar
 import com.rodeo.hud.ui.components.SectionLabel
 import com.rodeo.hud.ui.setup.Field
 import com.rodeo.hud.ui.theme.LocalHud
+import com.rodeo.hud.ui.theme.LocalType
 
 /** Pack mode: start or join a group ride by code, see everyone live. */
 @Composable
@@ -64,7 +65,7 @@ fun PackScreen(onBack: () -> Unit) {
                 Box(Modifier.size(52.dp).clickable(onClick = onBack), contentAlignment = Alignment.Center) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = c.text)
                 }
-                Text("Pack mode", color = c.text, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text("Pack mode", color = c.text, style = LocalType.current.headlineXl)
             }
             if (!pack.active) {
                 Text(
@@ -81,8 +82,8 @@ fun PackScreen(onBack: () -> Unit) {
             } else {
                 GlassCard(Modifier.fillMaxWidth(), accentBorder = c.accent) {
                     SectionLabel(if (pack.demo) "Demo pack" else "Pack code")
-                    Text(pack.code.orEmpty(), color = c.text, fontSize = 40.sp, fontWeight = FontWeight.Black, letterSpacing = 6.sp)
-                    Text("Share this code with your group · spread %.1f km".format(pack.spreadKm), color = c.textMuted, fontSize = 13.sp)
+                    Text(pack.code.orEmpty(), color = c.text, style = LocalType.current.display.copy(letterSpacing = 6.sp))
+                    Text("Share this code with your group · spread %.1f km".format(pack.spreadKm), color = c.textMuted, style = LocalType.current.body)
                 }
                 LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     items(pack.members, key = { it.id }) { m ->
@@ -95,7 +96,7 @@ fun PackScreen(onBack: () -> Unit) {
                                 Text(m.name + if (m.isMe) " (you)" else "" + if (m.isLead) " · lead" else "", color = c.text, fontWeight = FontWeight.Medium)
                                 Text(
                                     (if (stopped) "Stopped" else "${m.speedKmh.toInt()} km/h") + (d?.takeIf { !m.isMe }?.let { " · %.1f km away".format(it / 1000) } ?: ""),
-                                    color = if (stopped) c.warning else c.textMuted, fontSize = 12.sp,
+                                    color = if (stopped) c.warning else c.textMuted, style = LocalType.current.bodySm,
                                 )
                             }
                         }

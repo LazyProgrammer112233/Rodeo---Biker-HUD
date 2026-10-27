@@ -7,3 +7,4 @@ captures/
 .kotlin/
 *.keystore
 secrets.properties
+app/src/main/res/font/*.ttf

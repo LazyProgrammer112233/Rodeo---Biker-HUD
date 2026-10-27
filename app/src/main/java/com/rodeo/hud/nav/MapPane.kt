@@ -8,49 +8,9 @@ import android.graphics.DashPathEffect
 import android.graphics.drawable.BitmapDrawable
 import android.view.MotionEvent
 import androidx.compose.foundation.Canvas
-import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.material.icons.filled.Navigation
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.rodeo.hud.data.Geo
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.CustomZoomButtonsController
-import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.Marker
-import org.osmdroid.views.overlay.Polygon
-import org.osmdroid.views.overlay.Polyline
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocalParking
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -60,31 +20,41 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.rodeo.hud.data.Geo
 import com.rodeo.hud.data.Hazard
 import com.rodeo.hud.graph
 import com.rodeo.hud.pack.PackMember
+import com.rodeo.hud.ui.hud.MapChrome
+import com.rodeo.hud.ui.hud.MapChromeActions
+import com.rodeo.hud.ui.hud.MapChromeState
 import com.rodeo.hud.ui.theme.LocalHud
 import kotlinx.coroutines.launch
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.CustomZoomButtonsController
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polygon
+import org.osmdroid.views.overlay.Polyline
 
 /**
- * The map half of the HUD: OpenStreetMap inside Rodeo (no API key), heading-up while riding.
- * Turn-by-turn voice guidance hands off to the Google Maps app in two-wheeler mode.
+ * The map half of the HUD: OpenStreetMap inside Rodeo (no API key), heading-up while riding,
+ * with the search, quick places, turn card and map buttons drawn over it by [MapChrome].
  */
 @Composable
 fun MapPane(
@@ -103,13 +73,69 @@ fun MapPane(
     val parked = g.rides.rides.collectAsState().value.firstOrNull { it.parkLat != null }
     val profile by g.profile.profile.collectAsState()
     var follow by remember { mutableStateOf(true) }
+    var mapView by remember { mutableStateOf<MapView?>(null) }
+    val results = remember { mutableStateListOf<Place>() }
+    var searching by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    fun kmTo(lat: Double, lng: Double): String? = loc?.let { "%.1f km".format(Geo.distanceM(it.latitude, it.longitude, lat, lng) / 1000.0) }
+
+    val home = if (profile.homeLat != null && profile.homeLng != null) Place(profile.homeLabel.ifBlank { "Home" }, "", profile.homeLat!!, profile.homeLng!!) else null
+    val parkedPlace = parked?.let { r -> r.parkLat?.let { lat -> r.parkLng?.let { lng -> Place("Parked bike", "", lat, lng) } } }
+    val dest = nav.destination
+    val chrome = MapChromeState(
+        following = follow,
+        lockInput = lockInput,
+        guidance = dest?.let { d ->
+            GuidanceUi(
+                maneuver = Maneuver.DEPART,
+                distance = kmTo(d.lat, d.lng) ?: "--",
+                instruction = "Head to ${d.title}",
+                destination = d.title,
+                status = "straight line",
+            )
+        },
+        home = home, homeSub = home?.let { kmTo(it.lat, it.lng) },
+        parked = parkedPlace, parkedSub = parkedPlace?.let { kmTo(it.lat, it.lng) },
+        results = results.toList(),
+        searching = searching,
+        bearingDeg = loc?.takeIf { it.hasBearing() }?.bearing,
+        speedKmh = loc?.takeIf { it.hasSpeed() }?.let { it.speed * 3.6f } ?: 0f,
+    )
+    val actions = remember {
+        object : MapChromeActions {
+            override fun search(query: String) {
+                if (query.isBlank()) return
+                searching = true
+                results.clear()
+                scope.launch {
+                    val l = g.location.location.value
+                    results.addAll(NavController.search(ctx, query, l?.latitude, l?.longitude))
+                    searching = false
+                }
+            }
+            override fun clearResults() { results.clear(); searching = false }
+            override fun pick(place: Place, walking: Boolean) {
+                results.clear()
+                follow = true
+                g.nav.navigateTo(place, walking)
+            }
+            override fun stopGuidance() = g.nav.stop()
+            override fun toggleGuidanceVoice() { g.nav.openGuidance() }
+            override fun recenter() { follow = true }
+            override fun zoomIn() { mapView?.controller?.zoomIn() }
+            override fun zoomOut() { mapView?.controller?.zoomOut() }
+            override fun voiceSearch() { g.nav.openGuidance() }
+        }
+    }
 
     Box(modifier) {
         OsmMap(
             Modifier.fillMaxSize(), dark, lowPower, follow, loc, members, hazards,
-            parked?.parkLat?.let { lat -> parked.parkLng?.let { lng -> GeoPoint(lat, lng) } },
-            nav.destination,
+            parkedPlace?.let { GeoPoint(it.lat, it.lng) },
+            dest,
             onUserPan = { follow = false },
+            onView = { mapView = it },
         )
         if (follow && loc != null) {
             // Rider arrow sits at the centre of the heading-up map.
@@ -122,123 +148,9 @@ fun MapPane(
                 drawPath(path, c.accent)
             }
         }
-        Text(
-            "© OpenStreetMap contributors", color = Color(0xFF333333), fontSize = 10.sp,
-            modifier = Modifier.align(Alignment.BottomEnd).padding(6.dp).background(Color.White.copy(alpha = 0.7f), RoundedCornerShape(6.dp)).padding(horizontal = 6.dp, vertical = 2.dp),
-        )
-        if (!follow) {
-            Box(
-                Modifier.align(Alignment.BottomStart).padding(10.dp).size(56.dp).clip16().background(c.accent).clickable { follow = true },
-                contentAlignment = Alignment.Center,
-            ) { Icon(Icons.Filled.MyLocation, "Recenter", tint = c.onAccent) }
-        }
-
-        Column(Modifier.align(Alignment.TopStart).padding(10.dp).fillMaxWidth()) {
-            val dest = nav.destination
-            if (dest != null) {
-                val km = loc?.let { Geo.distanceM(it.latitude, it.longitude, dest.lat, dest.lng) / 1000.0 }
-                GuidanceChip(dest, km, onOpen = { g.nav.openGuidance() }, onStop = { g.nav.stop() })
-            } else {
-                SearchBox(
-                    enabled = !lockInput,
-                    nearLat = loc?.latitude, nearLng = loc?.longitude,
-                    home = if (profile.homeLat != null) Place(profile.homeLabel.ifBlank { "Home" }, "", profile.homeLat!!, profile.homeLng!!) else null,
-                    parked = parked?.let { r -> r.parkLat?.let { lat -> Place("Parked bike", "", lat, r.parkLng ?: 0.0) } },
-                    onPick = { p, walk -> g.nav.navigateTo(p, walking = walk) },
-                )
-            }
-        }
+        MapChrome(chrome, actions, Modifier.fillMaxSize())
     }
 }
-
-@Composable
-private fun GuidanceChip(dest: Place, km: Double?, onOpen: () -> Unit, onStop: () -> Unit) {
-    val c = LocalHud.current
-    Row(
-        Modifier.clip16().background(c.surface).border(1.5.dp, c.accent, RoundedCornerShape(16.dp)).padding(start = 14.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(Modifier.weight(1f, fill = false)) {
-            Text(dest.title, color = c.text, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(km?.let { "%.1f km away (straight line)".format(it) } ?: "Destination set", color = c.textMuted, fontSize = 13.sp)
-        }
-        Spacer(Modifier.width(10.dp))
-        Box(Modifier.size(48.dp).clip16().background(c.accent).clickable(onClick = onOpen), contentAlignment = Alignment.Center) {
-            Icon(Icons.Filled.Navigation, "Voice guidance in Google Maps", tint = c.onAccent)
-        }
-        Spacer(Modifier.width(6.dp))
-        Box(Modifier.size(48.dp).clip16().background(c.danger.copy(alpha = 0.15f)).clickable(onClick = onStop), contentAlignment = Alignment.Center) {
-            Icon(Icons.Filled.Close, "Clear destination", tint = c.danger)
-        }
-    }
-}
-
-@Composable
-private fun SearchBox(
-    enabled: Boolean,
-    nearLat: Double?, nearLng: Double?,
-    home: Place?, parked: Place?,
-    onPick: (Place, Boolean) -> Unit,
-) {
-    val c = LocalHud.current
-    val ctx = LocalContext.current
-    val scope = rememberCoroutineScope()
-    var query by remember { mutableStateOf("") }
-    val results = remember { mutableStateListOf<Place>() }
-    Column {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(
-                Modifier.weight(1f).heightIn(min = 52.dp).clip16().background(c.glass).border(1.dp, c.glassBorder, RoundedCornerShape(16.dp)).padding(horizontal = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(Icons.Filled.Search, null, tint = c.textMuted)
-                Spacer(Modifier.width(8.dp))
-                Box(Modifier.weight(1f)) {
-                    if (query.isEmpty()) Text(if (enabled) "Where to?" else "Stop to search · or say \"navigate home\"", color = c.textMuted, fontSize = 15.sp)
-                    BasicTextField(
-                        value = query,
-                        onValueChange = { query = it },
-                        enabled = enabled,
-                        singleLine = true,
-                        textStyle = TextStyle(color = c.text, fontSize = 16.sp),
-                        cursorBrush = SolidColor(c.accent),
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                        keyboardActions = KeyboardActions(onSearch = {
-                            scope.launch {
-                                results.clear()
-                                results.addAll(NavController.search(ctx, query, nearLat, nearLng))
-                            }
-                        }),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-            }
-            if (home != null) QuickChip(Icons.Filled.Home, "Home") { onPick(home, false) }
-            if (parked != null) QuickChip(Icons.Filled.LocalParking, "Bike") { onPick(parked, true) }
-        }
-        if (results.isNotEmpty()) {
-            LazyColumn(Modifier.padding(top = 6.dp).heightIn(max = 220.dp).clip16().background(c.surface)) {
-                items(results) { p ->
-                    Column(Modifier.fillMaxWidth().clickable { results.clear(); query = ""; onPick(p, false) }.padding(horizontal = 14.dp, vertical = 10.dp)) {
-                        Text(p.title, color = c.text, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text(p.subtitle, color = c.textMuted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun QuickChip(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit) {
-    val c = LocalHud.current
-    Box(
-        Modifier.size(52.dp).clip16().background(c.glass).border(1.dp, c.glassBorder, RoundedCornerShape(16.dp)).clickable(onClick = onClick),
-        contentAlignment = Alignment.Center,
-    ) { Icon(icon, label, tint = c.text) }
-}
-
-private fun Modifier.clip16() = this.clip(RoundedCornerShape(16.dp))
 
 /** Dark map: invert the light OSM style and pull the saturation down so it reads as night mode. */
 private val NIGHT = ColorMatrixColorFilter(
@@ -272,6 +184,7 @@ private fun OsmMap(
     parked: GeoPoint?,
     destination: Place?,
     onUserPan: () -> Unit,
+    onView: (MapView) -> Unit,
 ) {
     val ctx = LocalContext.current
     val c = LocalHud.current
@@ -293,6 +206,7 @@ private fun OsmMap(
             }
         }
     }
+    LaunchedEffect(view) { onView(view) }
 
     DisposableEffect(lifecycle) {
         val obs = LifecycleEventObserver { _, e ->

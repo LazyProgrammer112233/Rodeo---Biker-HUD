@@ -117,6 +117,16 @@ class SosManager(
         }
     }
 
+    /** Skips whatever is left of the countdown and sends now (button or a voice "emergency"). */
+    fun fireNow(reason: SosReason = SosReason.MANUAL) {
+        val current = _state.value
+        if (current is SosState.Active) return
+        val cd = current as? SosState.Countdown
+        job?.cancel()
+        stopAlarm()
+        job = scope.launch { fire(cd?.reason ?: reason, cd?.dryRun ?: false) }
+    }
+
     fun cancel() {
         job?.cancel()
         stopAlarm()

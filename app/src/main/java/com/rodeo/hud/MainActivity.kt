@@ -128,6 +128,7 @@ class MainActivity : ComponentActivity(), HudActions {
         g.ambient.start()
         g.guardian.start()
         g.music.start()
+        g.audioRoutes.start()
         syncGestures()
     }
 
@@ -141,6 +142,7 @@ class MainActivity : ComponentActivity(), HudActions {
         g.gestures.stop()
         g.ambient.stop()
         g.music.stop()
+        g.audioRoutes.stop()
         if (holdingLocation) {
             g.location.release()
             holdingLocation = false

@@ -57,6 +57,7 @@ import com.rodeo.hud.ui.components.PrimaryButton
 import com.rodeo.hud.ui.components.SectionLabel
 import com.rodeo.hud.ui.components.SpeedGauge
 import com.rodeo.hud.ui.theme.LocalHud
+import com.rodeo.hud.ui.theme.LocalType
 import com.rodeo.hud.ui.theme.LocalHudStyle
 import java.time.Year
 
@@ -98,7 +99,7 @@ fun Onboarding(onDone: () -> Unit) {
                         Step.PAINT -> "Year and colour"
                         Step.SOS -> "Who should we alert in an emergency?"
                     },
-                    color = c.text, fontSize = 24.sp, fontWeight = FontWeight.Bold,
+                    color = c.text, style = LocalType.current.headlineXl,
                 )
                 Spacer(Modifier.weight(1f))
                 StepDots(step.ordinal, Step.entries.size)
@@ -157,9 +158,9 @@ private fun Welcome() {
     val c = LocalHud.current
     val profile by g.profile.profile.collectAsState()
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Your bike's own HUD. Mount the phone sideways, tap Start Ride, and Rodeo handles maps, music, safety and your ride log.", color = c.textMuted, fontSize = 16.sp)
+        Text("Your bike's own HUD. Mount the phone sideways, tap Start Ride, and Rodeo handles maps, music, safety and your ride log.", color = c.textMuted, style = LocalType.current.bodyLg)
         SectionLabel("Sign in")
-        Text("Login comes in a later build. For now, just tell us your name.", color = c.textMuted, fontSize = 13.sp)
+        Text("Login comes in a later build. For now, just tell us your name.", color = c.textMuted, style = LocalType.current.body)
         Field(if (profile.riderName == "Rider") "" else profile.riderName, { v -> g.profile.update { it.copy(riderName = v.ifBlank { "Rider" }) } }, "Your name", Modifier.width(320.dp))
     }
 }
@@ -184,8 +185,8 @@ private fun BrandGrid(query: String, onQuery: (String) -> Unit, onPick: (String)
                 ) {
                     Box(Modifier.size(28.dp, 6.dp).clip(RoundedCornerShape(3.dp)).background(accent))
                     Spacer(Modifier.height(10.dp))
-                    Text(b.name, color = c.text, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text("${b.models.size} models", color = c.textMuted, fontSize = 12.sp)
+                    Text(b.name, color = c.text, fontWeight = FontWeight.SemiBold, style = LocalType.current.bodyLg, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text("${b.models.size} models", color = c.textMuted, style = LocalType.current.bodySm)
                 }
             }
         }
@@ -209,7 +210,7 @@ private fun ModelList(onPick: (String) -> Unit) {
             ) {
                 Column(Modifier.weight(1f)) {
                     Text(m.name, color = c.text, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text("Since ${m.firstYear} · ${m.paints.size} colours", color = c.textMuted, fontSize = 12.sp)
+                    Text("Since ${m.firstYear} · ${m.paints.size} colours", color = c.textMuted, style = LocalType.current.bodySm)
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                     m.paints.take(4).forEach { p ->
@@ -273,7 +274,7 @@ private fun PaintRow(paints: List<Paint>, selectedHex: Long?, selectedName: Stri
                 ) {
                     if (sel) Icon(Icons.Filled.Check, null, tint = if (Color(p.hex).luminance() > 0.5f) Color.Black else Color.White)
                 }
-                Text(p.name, color = c.textMuted, fontSize = 11.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
+                Text(p.name, color = c.textMuted, style = LocalType.current.bodySm, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
             }
         }
     }
@@ -294,18 +295,18 @@ private fun ThemePreview(modifier: Modifier) {
         SectionLabel("Live preview")
         Spacer(Modifier.height(6.dp))
         com.rodeo.hud.ui.components.BrandWordmark(big = false)
-        Text(listOfNotNull(profile.model, profile.year?.toString(), profile.paintName).joinToString(" · ").ifBlank { "Choose your bike" }, color = c.text, fontSize = 15.sp)
+        Text(listOfNotNull(profile.model, profile.year?.toString(), profile.paintName).joinToString(" · ").ifBlank { "Choose your bike" }, color = c.text, style = LocalType.current.bodyLg)
         Spacer(Modifier.weight(1f))
         SpeedGauge(62f, Modifier.fillMaxWidth(), height = 130.dp)
         Spacer(Modifier.weight(1f))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("48.2 km", "41 avg", "1:12").forEach {
-                Text(it, color = c.text, fontSize = 13.sp, modifier = Modifier.clip(RoundedCornerShape(10.dp)).background(c.tint.copy(alpha = 0.18f)).padding(horizontal = 10.dp, vertical = 6.dp))
+                Text(it, color = c.text, style = LocalType.current.body, modifier = Modifier.clip(RoundedCornerShape(10.dp)).background(c.tint.copy(alpha = 0.18f)).padding(horizontal = 10.dp, vertical = 6.dp))
             }
         }
         Spacer(Modifier.height(10.dp))
         Box(Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(c.accent))
-        if (style.tagline.isNotBlank()) Text(style.tagline, color = c.textMuted, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp))
+        if (style.tagline.isNotBlank()) Text(style.tagline, color = c.textMuted, style = LocalType.current.bodySm, modifier = Modifier.padding(top = 8.dp))
       }
       }
     }

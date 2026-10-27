@@ -45,6 +45,7 @@ import com.rodeo.hud.ui.setup.PermissionsPanel
 import com.rodeo.hud.ui.setup.SosContactsEditor
 import com.rodeo.hud.ui.setup.ToggleRow
 import com.rodeo.hud.ui.theme.LocalHud
+import com.rodeo.hud.ui.theme.LocalType
 
 @Composable
 fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onSimulateCrash: () -> Unit, onDropTest: () -> Unit) {
@@ -64,7 +65,7 @@ fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onSimulateCrash
                 Box(Modifier.size(52.dp).clickable(onClick = onBack), contentAlignment = Alignment.Center) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = c.text)
                 }
-                Text("Settings", color = c.text, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text("Settings", color = c.text, style = LocalType.current.headlineXl)
             }
             GlassCard(Modifier.fillMaxWidth()) {
                 SectionLabel("Bike and look")
@@ -85,7 +86,7 @@ fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onSimulateCrash
                 }
                 Text(
                     if (g.ambient.hasLightSensor) "Light sensor: ${lux?.toInt() ?: "–"} lux" else "No light sensor: theme follows sunrise and sunset only",
-                    color = c.textMuted, fontSize = 12.sp,
+                    color = c.textMuted, style = LocalType.current.bodySm,
                 )
                 ToggleRow("Map on the right", profile.mapOnRight, sub = "Turn off to mirror the HUD") { v -> g.profile.update { it.copy(mapOnRight = v) } }
             }
@@ -101,7 +102,7 @@ fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onSimulateCrash
                 }
                 Text(
                     crashTest.text.ifBlank { "Drop test runs the real sensor check: drop the phone onto a bed and leave it still. Both tests send nothing." },
-                    color = if (crashTest.text.isBlank()) c.textMuted else c.text, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp),
+                    color = if (crashTest.text.isBlank()) c.textMuted else c.text, style = LocalType.current.body, modifier = Modifier.padding(top = 6.dp),
                 )
                 Spacer(Modifier.height(8.dp))
                 SectionLabel("SOS contacts")
@@ -126,9 +127,9 @@ fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onSimulateCrash
                         }
                         else -> "Watching for gestures. Swipe about 10 to 20 cm from the camera."
                     },
-                    color = c.textMuted, fontSize = 12.sp,
+                    color = c.textMuted, style = LocalType.current.bodySm,
                 )
-                Text("Bluetooth remotes: media keys control music; arrow keys and Enter move between HUD buttons.", color = c.textMuted, fontSize = 12.sp)
+                Text("Bluetooth remotes: media keys control music; arrow keys and Enter move between HUD buttons.", color = c.textMuted, style = LocalType.current.bodySm)
             }
             GlassCard(Modifier.fillMaxWidth()) {
                 SectionLabel("Home")
@@ -143,11 +144,11 @@ fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onSimulateCrash
             PermissionsPanel()
             GlassCard(Modifier.fillMaxWidth()) {
                 SectionLabel("Services")
-                Text("Map: OpenStreetMap (no key) · voice guidance: Google Maps app, two-wheeler mode", color = c.text, fontSize = 14.sp)
-                Text("SOS: SMS from the default SIM" + if (g.sos.canSendSms) "" else " · SMS permission off", color = c.text, fontSize = 14.sp)
-                Text("Pack mode and pothole sharing: " + if (g.pack.online) "online (Firebase)" else "demo / on-device only", color = c.text, fontSize = 14.sp)
-                Text("Weather: Open-Meteo", color = c.text, fontSize = 14.sp)
-                Text("Version ${BuildConfig.VERSION_NAME}", color = c.textMuted, fontSize = 12.sp)
+                Text("Map: OpenStreetMap (no key) · voice guidance: Google Maps app, two-wheeler mode", color = c.text, style = LocalType.current.body)
+                Text("SOS: SMS from the default SIM" + if (g.sos.canSendSms) "" else " · SMS permission off", color = c.text, style = LocalType.current.body)
+                Text("Pack mode and pothole sharing: " + if (g.pack.online) "online (Firebase)" else "demo / on-device only", color = c.text, style = LocalType.current.body)
+                Text("Weather: Open-Meteo", color = c.text, style = LocalType.current.body)
+                Text("Version ${BuildConfig.VERSION_NAME}", color = c.textMuted, style = LocalType.current.bodySm)
             }
         }
     }

@@ -7,6 +7,7 @@ import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.rodeo.hud.core.AmbientController
+import com.rodeo.hud.core.AudioRoutes
 import com.rodeo.hud.core.CameraGestures
 import com.rodeo.hud.core.CrashDetector
 import com.rodeo.hud.core.DeviceGuardian
@@ -46,6 +47,7 @@ class AppGraph(app: Application) {
     val weather = WeatherService(warnings)
     val ambient = AmbientController(app)
     val music = MusicController(app)
+    val audioRoutes = AudioRoutes(app)
     val voice = VoiceCommander(app)
     val gestures = CameraGestures(app)
     val pack = PackService(app, scope, warnings) { profile.profile.value.riderName }

@@ -61,6 +61,23 @@ jobs:
             echo "SIGNING_KEYSTORE=$RUNNER_TEMP/rodeo.jks" >> $GITHUB_ENV
           fi
 
+      # Barlow Condensed and Inter (SIL Open Font License) are fetched at build time.
+      - name: Fonts
+        run: |
+          set -e
+          D=app/src/main/res/font
+          mkdir -p $D
+          G=https://github.com/google/fonts/raw/main/ofl/barlowcondensed
+          for p in SemiBold:semibold Bold:bold ExtraBold:extrabold Black:black BoldItalic:bold_italic ExtraBoldItalic:extrabold_italic BlackItalic:black_italic; do
+            curl -sSLf --retry 3 -o "$D/barlow_condensed_${p#*:}.ttf" "$G/BarlowCondensed-${p%%:*}.ttf"
+          done
+          curl -sSLf --retry 3 -o /tmp/inter.zip https://github.com/rsms/inter/releases/download/v4.0/Inter-4.0.zip
+          unzip -q -o /tmp/inter.zip 'extras/ttf/Inter-Regular.ttf' 'extras/ttf/Inter-Medium.ttf' 'extras/ttf/Inter-SemiBold.ttf' 'extras/ttf/Inter-Bold.ttf' -d /tmp/inter
+          for p in Regular:regular Medium:medium SemiBold:semibold Bold:bold; do
+            cp "/tmp/inter/extras/ttf/Inter-${p%%:*}.ttf" "$D/inter_${p#*:}.ttf"
+          done
+          ls -la $D
+
       - name: Build debug APK
         env:
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
@@ -72,6 +89,18 @@ jobs:
           chmod +x gradlew
           set -o pipefail
           ./gradlew --no-daemon assembleDebug 2>&1 | tee build.log
+
+      # Render the HUD at phone and tablet sizes, day and night, for several brands, so clipped
+      # text or buttons show up without a device. The images go to the ci-logs branch.
+      - name: Screenshots
+        if: github.event_name == 'push'
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          ./gradlew --no-daemon testDebugUnitTest --tests 'com.rodeo.hud.shots.*' 2>&1 | tee shots.log | grep -E "^e: |FAILED|BUILD|tests completed" | tail -60
+          for f in app/build/test-results/testDebugUnitTest/*.xml; do
+            grep -q "<failure" "$f" && sed -n '/<failure/,/<\/failure>/p' "$f" | head -60 >> shots.log
+          done; true
 
       # Read the certificate from the APK itself, so the SHA-1 is the one Maps will see.
       - name: Signing fingerprint (for the Maps key restriction)
@@ -86,12 +115,20 @@ jobs:
         run: |
           [ -f build.log ] || echo "no build log (failed before Gradle)" > build.log
           cp build.log /tmp/build.log
+          REF="${GITHUB_REF_NAME//\//_}"
+          rm -rf /tmp/shots && mkdir -p /tmp/shots
+          [ -f shots.log ] && cp shots.log /tmp/shots.log
+          ls app/build/shots/*.png >/dev/null 2>&1 && cp app/build/shots/*.png /tmp/shots/
           git config user.name "rodeo-ci"
           git config user.email "ci@users.noreply.github.com"
           # Push and pull request runs finish together, so add to the branch instead of replacing it.
           for i in 1 2 3; do
             git fetch -q origin ci-logs && git checkout -qf -B ci-logs origin/ci-logs || { git checkout -qB ci-logs; git rm -rq --cached .; }
-            mkdir -p logs && cp /tmp/build.log "logs/${GITHUB_REF_NAME//\//_}.log"
+            mkdir -p logs && cp /tmp/build.log "logs/$REF.log"
+            [ -f /tmp/shots.log ] && cp /tmp/shots.log "logs/$REF-shots.log"
+            if ls /tmp/shots/*.png >/dev/null 2>&1; then
+              rm -rf "shots/$REF" && mkdir -p "shots/$REF" && cp /tmp/shots/*.png "shots/$REF/" && git add -fA shots
+            fi
             git add -f logs && git commit -qm "Build log for ${GITHUB_SHA::7} (${{ job.status }})" || true
             git push origin ci-logs && break
             sleep 3

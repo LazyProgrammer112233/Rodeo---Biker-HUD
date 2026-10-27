@@ -1,11 +1,12 @@
 package com.rodeo.hud.ui.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,51 +15,135 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.rodeo.hud.ui.theme.LocalHud
+import com.rodeo.hud.ui.theme.LocalScale
+import com.rodeo.hud.ui.theme.LocalType
+import com.rodeo.hud.ui.theme.sdp
 
+/** Panel corner radius: 28 px on the 2400 px canvas, scaled to the screen. */
+@Composable
+fun panelShape(): Shape = RoundedCornerShape((20 * LocalScale.current).dp)
+
+@Composable
+fun buttonShape(): Shape = RoundedCornerShape((14 * LocalScale.current).dp)
+
+/** Fallback shape for code that needs a constant. */
 val CardShape = RoundedCornerShape(20.dp)
 
-/** Frosted glass card: translucent fill tinted by the bike's paint, hairline border, soft top sheen. */
+/**
+ * Text that never clips: it shrinks (down to [minScale]) until it fits its width and line count.
+ * Use for every label that sits in a fixed-size box.
+ */
+@Composable
+fun FitText(
+    text: String,
+    style: TextStyle,
+    color: Color,
+    modifier: Modifier = Modifier,
+    maxLines: Int = 1,
+    minScale: Float = 0.45f,
+    textAlign: TextAlign? = null,
+) {
+    var factor by remember(text, style) { mutableFloatStateOf(1f) }
+    var ready by remember(text, style) { mutableStateOf(false) }
+    // When the space changes (resize, split screen), start again from full size.
+    var lastMax by remember(text, style) { mutableIntStateOf(-1) }
+    val size: TextUnit = style.fontSize * factor
+    Text(
+        text,
+        color = color,
+        style = style.copy(fontSize = size, lineHeight = if (style.lineHeight.isSpecified()) style.lineHeight * factor else style.lineHeight),
+        maxLines = maxLines,
+        softWrap = maxLines > 1,
+        overflow = TextOverflow.Clip,
+        textAlign = textAlign,
+        modifier = modifier.drawWithContent { if (ready) drawContent() },
+        onTextLayout = { r ->
+            val max = r.layoutInput.constraints.maxWidth
+            if (lastMax != -1 && max != lastMax && factor < 1f) {
+                lastMax = max
+                factor = 1f
+                ready = false
+            } else {
+                lastMax = max
+                if (r.hasVisualOverflow && factor > minScale) factor = (factor * 0.9f).coerceAtLeast(minScale)
+                else ready = true
+            }
+        },
+    )
+}
+
+private fun TextUnit.isSpecified() = this != TextUnit.Unspecified
+
+/** Cockpit plate: solid graphite (night) or white with a dark rule (day), optional accent rim light on top. */
 @Composable
 fun GlassCard(
     modifier: Modifier = Modifier,
     accentBorder: Color? = null,
-    padding: PaddingValues = PaddingValues(14.dp),
+    padding: PaddingValues = PaddingValues(14.sdp()),
+    rim: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val c = LocalHud.current
+    val shape = panelShape()
     Column(
         modifier
-            .clip(CardShape)
+            .clip(shape)
             .background(c.glass)
-            .background(Brush.verticalGradient(listOf(Color.White.copy(alpha = if (c.dark) 0.04f else 0.25f), Color.Transparent)))
-            .border(BorderStroke(if (accentBorder != null || !c.dark) 1.5.dp else 1.dp, accentBorder ?: c.glassBorder), CardShape)
+            .then(
+                if (c.dark) Modifier.background(Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.035f), Color.Transparent)))
+                else Modifier,
+            )
+            .border(BorderStroke(if (accentBorder != null) maxOf(c.borderWidth, 1.5.dp) else c.borderWidth, accentBorder ?: c.glassBorder), shape)
+            .then(
+                if (rim) Modifier.drawWithContent {
+                    drawContent()
+                    drawLine(
+                        Brush.horizontalGradient(listOf(Color.Transparent, c.accent, Color.Transparent)),
+                        Offset(size.width * 0.05f, 1f), Offset(size.width * 0.95f, 1f), 2.dp.toPx(),
+                    )
+                } else Modifier,
+            )
             .padding(padding),
         content = content,
     )
 }
 
-/** Glove-size tile button (min 64 dp). */
+/** Glove tile: big icon with a status jewel, label underneath that shrinks rather than clips. */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HudTile(
@@ -68,79 +153,164 @@ fun HudTile(
     active: Boolean = false,
     enabled: Boolean = true,
     tint: Color? = null,
-    minSize: Dp = 64.dp,
+    jewel: Color? = null,
+    minSize: Dp = 56.dp,
     onLongClick: (() -> Unit)? = null,
     onClick: () -> Unit,
 ) {
     val c = LocalHud.current
-    val fg = when {
-        tint != null -> tint
-        active -> c.accent
-        else -> c.text
-    }
+    val t = LocalType.current
+    val shape = buttonShape()
+    val fg = tint ?: if (active) c.accent else c.text
     Box(
         modifier
             .defaultMinSize(minSize, minSize)
-            .clip(CardShape)
-            .background(if (active) c.accent.copy(alpha = 0.14f) else c.glass)
-            .border(1.dp, if (active) c.accent.copy(alpha = 0.6f) else c.glassBorder, CardShape)
+            .clip(shape)
+            .background(if (active) c.accent.copy(alpha = if (c.dark) 0.16f else 0.12f) else c.surfaceHigh)
+            .border(c.borderWidth, if (active) c.accent else c.glassBorder, shape)
             .alpha(if (enabled) 1f else 0.4f)
             .combinedClickable(enabled = enabled, role = Role.Button, onClick = onClick, onLongClick = onLongClick)
-            .padding(8.dp),
+            .padding(horizontal = 6.sdp(), vertical = 6.sdp()),
         contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Icon(icon, contentDescription = label, tint = fg, modifier = Modifier.size(26.dp))
-            Spacer(Modifier.size(4.dp))
-            Text(label, color = c.textMuted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(icon, contentDescription = label, tint = fg, modifier = Modifier.size(24.sdp()))
+                if (jewel != null) {
+                    Spacer(Modifier.width(4.sdp()))
+                    Box(Modifier.size(7.sdp()).clip(CircleShape).background(jewel))
+                }
+            }
+            Spacer(Modifier.height(3.sdp()))
+            FitText(label.uppercase(), t.micro, c.textMuted, textAlign = TextAlign.Center)
         }
     }
 }
 
-/** Primary pill button used outside the ride screen. */
+/** Solid accent button, Barlow caps. */
 @Composable
-fun PrimaryButton(text: String, modifier: Modifier = Modifier, enabled: Boolean = true, icon: ImageVector? = null, onClick: () -> Unit) {
+fun PrimaryButton(text: String, modifier: Modifier = Modifier, enabled: Boolean = true, icon: ImageVector? = null, color: Color? = null, onClick: () -> Unit) {
     val c = LocalHud.current
+    val bg = color ?: c.accent
+    val fg = if (color == null) c.onAccent else Color.White
+    val shape = buttonShape()
     Row(
         modifier
-            .defaultMinSize(minHeight = 56.dp)
-            .clip(RoundedCornerShape(28.dp))
-            .background(if (enabled) c.accent else c.textMuted.copy(alpha = 0.3f))
+            .defaultMinSize(minHeight = 52.sdp())
+            .clip(shape)
+            .background(if (enabled) bg else c.textSubtle.copy(alpha = 0.3f))
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
-            .padding(horizontal = 24.dp, vertical = 14.dp),
+            .padding(horizontal = 18.sdp(), vertical = 10.sdp()),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
     ) {
         if (icon != null) {
-            Icon(icon, null, tint = c.onAccent, modifier = Modifier.size(22.dp))
-            Spacer(Modifier.width(8.dp))
+            Icon(icon, null, tint = fg, modifier = Modifier.size(22.sdp()))
+            Spacer(Modifier.width(8.sdp()))
         }
-        Text(text, color = c.onAccent, fontWeight = FontWeight.SemiBold, fontSize = 17.sp)
+        FitText(text.uppercase(), LocalType.current.headlineSm, fg)
     }
 }
 
 @Composable
 fun GhostButton(text: String, modifier: Modifier = Modifier, icon: ImageVector? = null, onClick: () -> Unit) {
     val c = LocalHud.current
+    val shape = buttonShape()
     Row(
         modifier
-            .defaultMinSize(minHeight = 52.dp)
-            .clip(RoundedCornerShape(26.dp))
-            .border(1.dp, c.glassBorder, RoundedCornerShape(26.dp))
+            .defaultMinSize(minHeight = 48.sdp())
+            .clip(shape)
+            .background(c.surfaceHigh)
+            .border(c.borderWidth, c.glassBorder, shape)
             .clickable(role = Role.Button, onClick = onClick)
-            .padding(horizontal = 20.dp, vertical = 12.dp),
+            .padding(horizontal = 16.sdp(), vertical = 8.sdp()),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
     ) {
         if (icon != null) {
-            Icon(icon, null, tint = c.text, modifier = Modifier.size(20.dp))
-            Spacer(Modifier.width(8.dp))
+            Icon(icon, null, tint = c.accent, modifier = Modifier.size(20.sdp()))
+            Spacer(Modifier.width(8.sdp()))
         }
-        Text(text, color = c.text, fontWeight = FontWeight.Medium, fontSize = 16.sp)
+        FitText(text.uppercase(), LocalType.current.headlineSm, c.text)
     }
 }
 
 @Composable
 fun SectionLabel(text: String, modifier: Modifier = Modifier) {
-    Text(text.uppercase(), color = LocalHud.current.textMuted, fontSize = 12.sp, letterSpacing = 1.4.sp, fontWeight = FontWeight.SemiBold, modifier = modifier)
+    Text(text.uppercase(), color = LocalHud.current.textMuted, style = LocalType.current.label, modifier = modifier, maxLines = 1, overflow = TextOverflow.Ellipsis)
+}
+
+/** Status pill with a glowing jewel, e.g. VIBRATION LOW. */
+@Composable
+fun StatusChip(text: String, color: Color, modifier: Modifier = Modifier) {
+    val c = LocalHud.current
+    val shape = RoundedCornerShape(50)
+    Row(
+        modifier
+            .clip(shape)
+            .background(color.copy(alpha = if (c.dark) 0.16f else 0.12f))
+            .then(if (c.dark) Modifier else Modifier.border(2.dp, color, shape))
+            .padding(horizontal = 10.sdp(), vertical = 4.sdp()),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(Modifier.size(7.sdp()).clip(CircleShape).background(color))
+        Spacer(Modifier.width(6.sdp()))
+        FitText(text.uppercase(), LocalType.current.label, if (c.dark) color else c.text)
+    }
+}
+
+/** Small boxed metric: micro label over a big Barlow figure and unit. */
+@Composable
+fun StatBox(label: String, value: String, unit: String = "", modifier: Modifier = Modifier, valueColor: Color? = null, boxed: Boolean = true) {
+    val c = LocalHud.current
+    val t = LocalType.current
+    val shape = RoundedCornerShape(12.sdp())
+    Column(
+        modifier
+            .then(
+                if (boxed) Modifier.clip(shape).background(if (c.dark) c.surfaceLowest.copy(alpha = 0.8f) else c.surfaceHigh)
+                    .then(if (c.dark) Modifier else Modifier.border(c.borderWidth, c.glassBorder, shape))
+                    .padding(horizontal = 10.sdp(), vertical = 6.sdp())
+                else Modifier,
+            ),
+    ) {
+        FitText(label.uppercase(), t.micro, c.textMuted)
+        Row(verticalAlignment = Alignment.Bottom) {
+            FitText(value, t.headlineLg, valueColor ?: c.text, modifier = Modifier.weight(1f, fill = false))
+            if (unit.isNotEmpty()) {
+                Spacer(Modifier.width(3.sdp()))
+                Text(unit.uppercase(), color = c.accent, style = t.label, maxLines = 1, modifier = Modifier.padding(bottom = 2.sdp()))
+            }
+        }
+    }
+}
+
+/**
+ * 24-segment skewed bar (DESIGN.md rev-bar). Lit segments run accent, then amber, then red.
+ * Rodeo drives it with speed, since a phone cannot read engine RPM.
+ */
+@Composable
+fun RevBar(fraction: Float, modifier: Modifier = Modifier, segments: Int = 24) {
+    val c = LocalHud.current
+    Canvas(modifier) {
+        val gap = 3.dp.toPx()
+        val skew = size.height * 0.35f
+        val w = (size.width - gap * (segments - 1) - skew) / segments
+        val lit = (fraction.coerceIn(0f, 1f) * segments).let { if (fraction > 0.005f) maxOf(1f, it) else it }.toInt()
+        for (i in 0 until segments) {
+            val x = i * (w + gap)
+            val zone = i.toFloat() / segments
+            val on = i < lit
+            val col = when {
+                !on -> if (c.dark) Color.White.copy(alpha = 0.08f) else Color(0xFFE5E7EB)
+                zone >= 0.85f -> c.danger
+                zone >= 0.65f -> c.warning
+                else -> c.accent
+            }
+            val p = Path().apply {
+                moveTo(x + skew, 0f); lineTo(x + skew + w, 0f); lineTo(x + w, size.height); lineTo(x, size.height); close()
+            }
+            drawPath(p, col)
+        }
+    }
 }

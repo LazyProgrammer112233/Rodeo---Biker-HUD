@@ -65,6 +65,7 @@ import com.rodeo.hud.graph
 import com.rodeo.hud.ui.components.GhostButton
 import com.rodeo.hud.ui.components.GlassCard
 import com.rodeo.hud.ui.theme.LocalHud
+import com.rodeo.hud.ui.theme.LocalType
 
 private data class Perm(val title: String, val why: String, val perms: List<String>, val special: String? = null)
 
@@ -120,7 +121,7 @@ fun PermissionsPanel(modifier: Modifier = Modifier) {
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(p.title, color = c.text, fontWeight = FontWeight.SemiBold)
-                    Text(p.why, color = c.textMuted, fontSize = 13.sp)
+                    Text(p.why, color = c.textMuted, style = LocalType.current.body)
                 }
                 if (!ok) Text("Grant", color = c.accent, fontWeight = FontWeight.SemiBold)
             }
@@ -149,7 +150,7 @@ fun SosContactsEditor(modifier: Modifier = Modifier, showTest: Boolean = false) 
             ) {
                 Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
                     Text(contact.name, color = c.text, fontWeight = FontWeight.Medium)
-                    Text(contact.phone, color = c.textMuted, fontSize = 13.sp)
+                    Text(contact.phone, color = c.textMuted, style = LocalType.current.body)
                 }
                 Box(Modifier.size(48.dp).clickable { g.profile.update { p -> p.copy(sosContacts = p.sosContacts - contact) } }, contentAlignment = Alignment.Center) {
                     Icon(Icons.Filled.Close, "Remove", tint = c.textMuted)
@@ -171,7 +172,7 @@ fun SosContactsEditor(modifier: Modifier = Modifier, showTest: Boolean = false) 
                 )
             }
         }
-        Text("SOS goes out as SMS from your default SIM, in the background. No internet or WhatsApp needed.", color = c.textMuted, fontSize = 12.sp)
+        Text("SOS goes out as SMS from your default SIM, in the background. No internet or WhatsApp needed.", color = c.textMuted, style = LocalType.current.bodySm)
         if (showTest && profile.sosContacts.isNotEmpty()) {
             GhostButton("Send a test SMS to my contacts", Modifier.fillMaxWidth(), icon = Icons.Filled.Sms) { g.sos.sendTest() }
             SmsStatusList()
@@ -196,9 +197,9 @@ fun SmsStatusList(modifier: Modifier = Modifier) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(10.dp).clip(CircleShape).background(color))
                 Spacer(Modifier.width(8.dp))
-                Text(s.contact.name, color = c.text, fontWeight = FontWeight.Medium, fontSize = 15.sp)
+                Text(s.contact.name, color = c.text, fontWeight = FontWeight.Medium, style = LocalType.current.bodyLg)
                 Spacer(Modifier.width(8.dp))
-                Text(label, color = color, fontSize = 14.sp)
+                Text(label, color = color, style = LocalType.current.body)
             }
         }
     }
@@ -230,7 +231,7 @@ fun Field(value: String, onChange: (String) -> Unit, hint: String, modifier: Mod
         if (value.isEmpty()) Text(hint, color = c.textMuted)
         BasicTextField(
             value, onChange, singleLine = true,
-            textStyle = TextStyle(color = c.text, fontSize = 16.sp),
+            textStyle = LocalType.current.bodyLg.copy(color = c.text),
             cursorBrush = SolidColor(c.accent),
             keyboardOptions = KeyboardOptions(keyboardType = keyboard),
             modifier = Modifier.fillMaxWidth(),
@@ -244,7 +245,7 @@ fun ToggleRow(label: String, checked: Boolean, sub: String? = null, onChange: (B
     Row(Modifier.fillMaxWidth().clickable { onChange(!checked) }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
             Text(label, color = c.text)
-            if (sub != null) Text(sub, color = c.textMuted, fontSize = 12.sp)
+            if (sub != null) Text(sub, color = c.textMuted, style = LocalType.current.bodySm)
         }
         Switch(
             checked, onChange,

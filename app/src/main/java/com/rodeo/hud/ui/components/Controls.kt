@@ -11,18 +11,19 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -34,20 +35,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.rodeo.hud.ui.theme.LocalHud
+import com.rodeo.hud.ui.theme.LocalType
+import com.rodeo.hud.ui.theme.sdp
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-/** SOS: hold for [holdMs] to start the countdown; a ring fills while held. */
+/** SOS tile: hold for [holdMs]; a white ring around the emergency icon fills while held. */
 @Composable
 fun HoldToTrigger(
     label: String,
@@ -58,13 +60,15 @@ fun HoldToTrigger(
     onTriggered: () -> Unit,
 ) {
     val c = LocalHud.current
+    val t = LocalType.current
     val progress = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
+    val shape = buttonShape()
     Box(
         modifier
-            .clip(RoundedCornerShape(20.dp))
-            .background(color.copy(alpha = 0.16f))
-            .border(2.dp, color, RoundedCornerShape(20.dp))
+            .clip(shape)
+            .background(Brush.horizontalGradient(listOf(c.dangerContainer, if (c.dark) Color(0xFFB3000F) else color)))
+            .border(c.borderWidth, if (c.dark) color.copy(alpha = 0.5f) else c.glassBorder, shape)
             .pointerInput(Unit) {
                 detectTapGestures(onPress = {
                     val job = scope.launch {
@@ -77,18 +81,34 @@ fun HoldToTrigger(
                     job.cancel()
                     scope.launch { progress.animateTo(0f, tween(200)) }
                 })
-            },
+            }
+            .padding(horizontal = 6.sdp()),
         contentAlignment = Alignment.Center,
     ) {
-        Canvas(Modifier.fillMaxSize().padding(6.dp)) {
-            if (progress.value > 0f) {
-                drawArc(color, -90f, 360f * progress.value, false, Offset.Zero, Size(size.width, size.height),
-                    style = Stroke(4.dp.toPx(), cap = StrokeCap.Round))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(30.sdp()), contentAlignment = Alignment.Center) {
+                Canvas(Modifier.size(30.sdp())) {
+                    val sw = 3.dp.toPx()
+                    drawArc(Color.White.copy(alpha = 0.25f), 0f, 360f, false, Offset(sw / 2, sw / 2), Size(size.width - sw, size.height - sw), style = Stroke(sw))
+                    if (progress.value > 0f) {
+                        drawArc(Color.White, -90f, 360f * progress.value, false, Offset(sw / 2, sw / 2), Size(size.width - sw, size.height - sw), style = Stroke(sw, cap = StrokeCap.Round))
+                    }
+                }
+                // Six-armed emergency asterisk, drawn so it looks the same on every phone.
+                Canvas(Modifier.size(14.sdp())) {
+                    val r = size.minDimension / 2f
+                    for (k in 0 until 3) {
+                        val a = Math.toRadians(90.0 + k * 60.0)
+                        val d = Offset((kotlin.math.cos(a) * r).toFloat(), (kotlin.math.sin(a) * r).toFloat())
+                        drawLine(Color.White, center - d * 0.85f, center + d * 0.85f, r * 0.42f, StrokeCap.Round)
+                    }
+                }
             }
-        }
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(label, color = c.text, fontWeight = FontWeight.Black, fontSize = 22.sp)
-            Text(sublabel, color = c.textMuted, fontSize = 11.sp)
+            Spacer(Modifier.width(6.sdp()))
+            Column {
+                FitText(label.uppercase(), t.headlineSm, Color.White)
+                FitText(sublabel.uppercase(), t.micro, Color.White.copy(alpha = 0.9f))
+            }
         }
     }
 }
@@ -98,18 +118,23 @@ fun HoldToTrigger(
 fun SlideToConfirm(text: String, modifier: Modifier = Modifier, color: Color = LocalHud.current.accent, onConfirm: () -> Unit) {
     val c = LocalHud.current
     val density = LocalDensity.current
+    val h = 60.sdp()
+    val shape = RoundedCornerShape(50)
     BoxWithConstraints(
         modifier
             .fillMaxWidth()
-            .height(64.dp)
-            .clip(RoundedCornerShape(32.dp))
-            .background(c.glass)
-            .border(1.dp, c.glassBorder, RoundedCornerShape(32.dp)),
+            .height(h)
+            .clip(shape)
+            .background(c.surfaceHigh)
+            .border(c.borderWidth, c.glassBorder, shape),
     ) {
-        val knob = 56.dp
+        val knob = h - 8.dp
         val maxPx = with(density) { (maxWidth - knob - 8.dp).toPx() }
         var x by remember { mutableFloatStateOf(0f) }
-        Text(text, color = c.textMuted, fontSize = 15.sp, modifier = Modifier.align(Alignment.Center))
+        FitText(
+            text.uppercase(), LocalType.current.label, c.textMuted,
+            modifier = Modifier.align(Alignment.Center).padding(start = knob + 12.dp, end = 12.dp),
+        )
         Box(
             Modifier
                 .offset { IntOffset(x.roundToInt() + with(density) { 4.dp.roundToPx() }, with(density) { 4.dp.roundToPx() }) }

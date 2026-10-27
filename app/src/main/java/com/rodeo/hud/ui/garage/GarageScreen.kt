@@ -62,6 +62,7 @@ import com.rodeo.hud.ui.components.GlassCard
 import com.rodeo.hud.ui.components.SectionLabel
 import com.rodeo.hud.ui.setup.Field
 import com.rodeo.hud.ui.theme.LocalHud
+import com.rodeo.hud.ui.theme.LocalType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.Instant
@@ -88,10 +89,10 @@ fun GarageScreen(onBack: () -> Unit) {
                 Box(Modifier.size(52.dp).clickable(onClick = onBack), contentAlignment = Alignment.Center) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = c.text)
                 }
-                Text("Garage", color = c.text, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text("Garage", color = c.text, style = LocalType.current.headlineXl)
             }
             GlassCard(Modifier.fillMaxWidth(), accentBorder = c.accent.copy(alpha = 0.4f)) {
-                Text(profile.bikeLabel.ifBlank { "Your bike" }, color = c.text, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+                Text(profile.bikeLabel.ifBlank { "Your bike" }, color = c.text, style = LocalType.current.headlineLg)
                 Text(profile.paintName.orEmpty(), color = c.textMuted)
                 Spacer(Modifier.height(10.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -108,13 +109,13 @@ fun GarageScreen(onBack: () -> Unit) {
                         )
                     }
                 }
-                Text("Now $odo km · Rodeo adds every ride automatically", color = c.textMuted, fontSize = 12.sp, modifier = Modifier.padding(top = 6.dp))
+                Text("Now $odo km · Rodeo adds every ride automatically", color = c.textMuted, style = LocalType.current.bodySm, modifier = Modifier.padding(top = 6.dp))
                 Spacer(Modifier.height(8.dp))
                 SectionLabel("Next service at (km)")
                 Field(garage.nextServiceKm?.toString() ?: "", { v -> g.garage.update { it.copy(nextServiceKm = v.filter { ch -> ch.isDigit() }.toIntOrNull()) } }, "e.g. ${odo + 3000}", keyboard = KeyboardType.Number)
                 garage.nextServiceKm?.let { s ->
                     val left = s - odo
-                    Text(if (left > 0) "$left km to service" else "Service overdue by ${-left} km", color = if (left <= 200) c.warning else c.textMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp))
+                    Text(if (left > 0) "$left km to service" else "Service overdue by ${-left} km", color = if (left <= 200) c.warning else c.textMuted, style = LocalType.current.body, modifier = Modifier.padding(top = 4.dp))
                 }
             }
             GlassCard(Modifier.fillMaxWidth()) {
@@ -156,7 +157,7 @@ private fun DocCard(doc: BikeDocument, onChange: (BikeDocument) -> Unit) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(doc.type.label, color = c.text, fontWeight = FontWeight.SemiBold)
-                Text(status.first, color = status.second, fontSize = 13.sp)
+                Text(status.first, color = status.second, style = LocalType.current.body)
             }
             Row(
                 Modifier.clip(RoundedCornerShape(12.dp)).background(c.glass).clickable { picking = true }.padding(horizontal = 12.dp, vertical = 10.dp),
@@ -164,7 +165,7 @@ private fun DocCard(doc: BikeDocument, onChange: (BikeDocument) -> Unit) {
             ) {
                 Icon(Icons.Filled.Event, null, tint = c.text, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(6.dp))
-                Text(doc.due?.format(DateTimeFormatter.ofPattern("d MMM yyyy")) ?: if (doc.type == DocType.SERVICE) "Set date" else "Set expiry", color = c.text, fontSize = 14.sp)
+                Text(doc.due?.format(DateTimeFormatter.ofPattern("d MMM yyyy")) ?: if (doc.type == DocType.SERVICE) "Set date" else "Set expiry", color = c.text, style = LocalType.current.body)
             }
             Spacer(Modifier.width(8.dp))
             val thumb = rememberThumb(doc.photoUri)

@@ -58,6 +58,7 @@ import com.rodeo.hud.ui.components.GlassCard
 import com.rodeo.hud.ui.components.PrimaryButton
 import com.rodeo.hud.ui.components.SectionLabel
 import com.rodeo.hud.ui.theme.LocalHud
+import com.rodeo.hud.ui.theme.LocalType
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -81,9 +82,9 @@ fun RidesScreen(onBack: () -> Unit, onNavigated: () -> Unit) {
                 Box(Modifier.size(52.dp).clickable(onClick = onBack), contentAlignment = Alignment.Center) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = c.text)
                 }
-                Text("Rides", color = c.text, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text("Rides", color = c.text, style = LocalType.current.headlineXl)
                 Spacer(Modifier.weight(1f))
-                Text("%.0f km total".format(g.rides.totalKm()), color = c.textMuted, fontSize = 13.sp)
+                Text("%.0f km total".format(g.rides.totalKm()), color = c.textMuted, style = LocalType.current.body)
             }
             Spacer(Modifier.height(8.dp))
             if (rides.isEmpty()) Text("Your rides will show up here after you tap Start Ride.", color = c.textMuted)
@@ -95,7 +96,7 @@ fun RidesScreen(onBack: () -> Unit, onNavigated: () -> Unit) {
                         accentBorder = if (sel) c.accent else null,
                     ) {
                         Text(SimpleDateFormat("EEE d MMM · h:mm a", Locale.getDefault()).format(Date(r.startTime)), color = c.text, fontWeight = FontWeight.Medium)
-                        Text("%.1f km · %s · avg %d km/h".format(r.distanceM / 1000, formatDuration(r.durationMs), r.avgSpeedKmh.toInt()), color = c.textMuted, fontSize = 13.sp)
+                        Text("%.1f km · %s · avg %d km/h".format(r.distanceM / 1000, formatDuration(r.durationMs), r.avgSpeedKmh.toInt()), color = c.textMuted, style = LocalType.current.body)
                     }
                 }
             }
@@ -136,7 +137,7 @@ private fun Metric(label: String, value: String) {
     val c = LocalHud.current
     Column {
         SectionLabel(label)
-        Text(value, color = c.text, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+        Text(value, color = c.text, style = LocalType.current.headlineMd)
     }
 }
 
@@ -187,7 +188,7 @@ private fun Legend(color: androidx.compose.ui.graphics.Color, text: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.size(10.dp).clip(RoundedCornerShape(5.dp)).background(color))
         Spacer(Modifier.width(6.dp))
-        Text(text, color = LocalHud.current.textMuted, fontSize = 12.sp)
+        Text(text, color = LocalHud.current.textMuted, style = LocalType.current.bodySm)
     }
 }
 
