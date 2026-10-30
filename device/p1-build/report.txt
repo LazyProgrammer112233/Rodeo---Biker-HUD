@@ -35,7 +35,7 @@ spoken: Route ready. 3.9 kilometres, about 15 minutes / In 30 metres, turn left 
 arrived=true offRouteFixes=0 tiles=OSM tileCache=1640 KB
 
 == Nandi Hills: search ranking and rerouting
-results: Nandi Hills — Nandi Hills, Karnataka, India | Nandi Hills Playground — Nandi Hill Road, Sultanapete, Karnataka | Nandi Hills State Forest — Suddahalli, Chikkaballapura taluk, Chikkaballapura, Karnataka, India | Mulberry Shades Bengaluru Nandi Hills, A Tribute Portfolio Resort — A Tribute Portfolio Resort, Nandhi Hills Road, Mudiganahalli, Devanahalli taluku
+results: Nandi Hills — Nandi Hills, Karnataka, India | Nandi Hills Playground — Nandi Hill Road, Sultanapete, Karnataka | Nandi Hills State Forest — Suddahalli, Chikkaballapura taluk, Chikkaballapura, Karnataka, India | Mulberry Shades Bengaluru Nandi Hills, A Tribute Portfolio Resort — A Tribute Portfolio Resort, SH104, Nandi, Devanahalli taluku, Bengaluru North, K
 route state: error=null
 route: Valhalla, 58.2 km, 2 h 19 min, 12 steps
    off@0 offRoute=false routing=false
