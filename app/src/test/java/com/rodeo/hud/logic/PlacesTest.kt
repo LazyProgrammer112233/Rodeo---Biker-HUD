@@ -48,6 +48,16 @@ class PlacesTest {
         assertEquals(listOf(near, far, other), ranked)
     }
 
+    @Test fun aMatchInTownBeatsAnExactOneInAnotherState() {
+        // Rider in Gurugram searching "ambience mall": the Jaipur one must not come first.
+        val ggnLat = 28.4595; val ggnLng = 77.0266
+        val jaipur = Place("Ambience Mall", "Jaipur, Rajasthan", 26.85, 75.80)
+        val gurugram = Place("Ambience Mall Gurgaon", "NH 48, Gurugram", 28.5045, 77.0970)
+        val unrelated = Place("Cyber Hub", "Gurugram", 28.4950, 77.0890)
+        val ranked = Places.rank("ambience mall", listOf(jaipur, unrelated, gurugram), ggnLat, ggnLng)
+        assertEquals(listOf(gurugram, jaipur, unrelated), ranked)
+    }
+
     @Test fun startOfNameAndPartialWords() {
         val garden = Place("Lalbagh Botanical Garden", "", 12.9507, 77.5848)
         val gate = Place("Lalbagh West Gate", "", 12.9496, 77.5826)

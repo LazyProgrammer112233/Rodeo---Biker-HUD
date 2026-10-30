@@ -78,9 +78,10 @@ object Places {
     private fun far(p: Place, lat: Double?, lng: Double?): Double = km(p, lat, lng).let {
         when {
             it < 15 -> 0.0
-            it < 100 -> 0.3
-            it < 500 -> 0.8
-            else -> 1.6
+            it < 100 -> 0.4
+            it < 500 -> 1.2
+            // A partial match in town beats an exact one in another state; a match anywhere still beats no match.
+            else -> 2.5
         }
     }
 

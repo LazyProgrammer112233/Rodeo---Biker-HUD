@@ -86,7 +86,11 @@ fun MapPane(
     val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) { MapTiles.check() }
 
-    fun kmTo(lat: Double, lng: Double): String? = loc?.let { "%.1f km".format(Geo.distanceM(it.latitude, it.longitude, lat, lng) / 1000.0) }
+    /** Straight-line distance, marked as such so it isn't mistaken for the road distance. */
+    fun kmTo(lat: Double, lng: Double): String? = loc?.let {
+        val km = Geo.distanceM(it.latitude, it.longitude, lat, lng) / 1000.0
+        if (km < 10) "%.1f km".format(km) else "%.0f km".format(km)
+    }
 
     val home = if (profile.homeLat != null && profile.homeLng != null) Place(profile.homeLabel.ifBlank { "Home" }, "", profile.homeLat!!, profile.homeLng!!) else null
     val parkedPlace = parked?.let { r -> r.parkLat?.let { lat -> r.parkLng?.let { lng -> Place("Parked bike", "", lat, lng) } } }
@@ -94,9 +98,10 @@ fun MapPane(
         following = follow,
         lockInput = lockInput,
         guidance = g.nav.guidance(nav, loc),
-        home = home, homeSub = home?.let { kmTo(it.lat, it.lng) },
-        parked = parkedPlace, parkedSub = parkedPlace?.let { kmTo(it.lat, it.lng) },
+        home = home, homeSub = home?.let { kmTo(it.lat, it.lng)?.let { d -> "≈$d" } },
+        parked = parkedPlace, parkedSub = parkedPlace?.let { kmTo(it.lat, it.lng)?.let { d -> "≈$d" } },
         results = results.toList(),
+        resultKm = results.map { kmTo(it.lat, it.lng) },
         searching = searching,
         searchNote = searchNote,
         bearingDeg = loc?.takeIf { it.hasBearing() }?.bearing,

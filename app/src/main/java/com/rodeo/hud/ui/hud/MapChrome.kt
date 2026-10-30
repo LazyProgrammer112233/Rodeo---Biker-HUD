@@ -19,7 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -86,6 +86,8 @@ data class MapChromeState(
     val parked: Place? = null,
     val parkedSub: String? = null,
     val results: List<Place> = emptyList(),
+    /** Distance to each result, in the same order. */
+    val resultKm: List<String?> = emptyList(),
     val searching: Boolean = false,
     /** Why a search came back empty. */
     val searchNote: String? = null,
@@ -185,7 +187,7 @@ private fun SearchRow(s: MapChromeState, actions: MapChromeActions, narrow: Bool
                 } else if (s.results.isEmpty() && s.searchNote != null) item {
                     Text(s.searchNote, color = c.textMuted, style = t.body, modifier = Modifier.padding(14.sdp()))
                 }
-                items(s.results) { p ->
+                itemsIndexed(s.results) { i, p ->
                     Row(
                         Modifier.fillMaxWidth().testTag("place-result").clickable { query = ""; actions.pick(p, false) }.padding(horizontal = 14.sdp(), vertical = 10.sdp()),
                         verticalAlignment = Alignment.CenterVertically,
@@ -195,6 +197,10 @@ private fun SearchRow(s: MapChromeState, actions: MapChromeActions, narrow: Bool
                         Column(Modifier.weight(1f)) {
                             Text(p.title, color = c.text, style = t.headlineSm, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             if (p.subtitle.isNotBlank()) Text(p.subtitle, color = c.textMuted, style = t.bodySm, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                        s.resultKm.getOrNull(i)?.let { km ->
+                            Spacer(Modifier.width(8.sdp()))
+                            Text(km, color = c.accent, style = t.label, maxLines = 1)
                         }
                     }
                 }

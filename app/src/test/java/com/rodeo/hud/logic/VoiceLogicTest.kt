@@ -58,6 +58,12 @@ class VoiceLogicTest {
         assertEquals(VoiceCommand.PREVIOUS, cmd("previous song"))
         assertEquals(VoiceCommand.PAUSE, cmd("pause the music"))
         assertEquals(VoiceCommand.PAUSE, cmd("stop music"))
+        // First consonant clipped after the wake word.
+        assertEquals(VoiceCommand.PAUSE, cmd("top the music"))
+        assertEquals(VoiceCommand.NEXT, cmd("keep this song"))
+        assertEquals(VoiceCommand.STOP_NAVIGATION, cmd("top navigation"))
+        assertEquals(VoiceCommand.START_RIDE, cmd("dart the ride"))
+        assertEquals(VoiceCommand.END_RIDE, cmd("and the ride"))
         assertEquals(VoiceCommand.PLAY, cmd("play music"))
         assertEquals(VoiceCommand.NAVIGATE_HOME, cmd("take me home"))
         assertEquals(VoiceCommand.NAVIGATE_HOME, cmd("navigate home"))
