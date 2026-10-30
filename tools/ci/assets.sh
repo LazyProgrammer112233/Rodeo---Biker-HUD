@@ -1,5 +1,5 @@
 #!/bin/bash
-# Fonts (SIL Open Font License) and the offline speech and hand models, fetched at build time.
+# Fonts (SIL Open Font License) and the offline speech models, fetched at build time.
 set -e
 D=app/src/main/res/font
 mkdir -p $D
@@ -21,6 +21,5 @@ if [ ! -f $A/vosk-model/am/final.mdl ]; then
   rm -rf /tmp/vosk && unzip -q /tmp/vosk.zip -d /tmp/vosk
   rm -rf $A/vosk-model && mv /tmp/vosk/*/ $A/vosk-model
 fi
-[ -s $A/gesture_recognizer.task ] || curl -sSLf --retry 3 -o $A/gesture_recognizer.task \
-  https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/latest/gesture_recognizer.task
+rm -f $A/gesture_recognizer.task
 du -sh $A/*

@@ -114,12 +114,6 @@ dependencies {
 
     // Offline speech for the wake phrase and commands (model downloaded into assets on CI).
     implementation("com.alphacephei:vosk-android:0.3.75")
-    // Google's on-device hand model for camera gestures (model downloaded into assets on CI).
-    implementation("com.google.mediapipe:tasks-vision:0.10.14")
-
-    // Camera hand gestures, analysed on the phone.
-    implementation("androidx.camera:camera-camera2:1.4.1")
-    implementation("androidx.camera:camera-lifecycle:1.4.1")
 
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-database")

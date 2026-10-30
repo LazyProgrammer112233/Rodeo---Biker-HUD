@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Hearing
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Sensors
 import androidx.compose.material.icons.filled.TwoWheeler
 import androidx.compose.material3.Icon
@@ -44,7 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rodeo.hud.BuildConfig
-import com.rodeo.hud.core.HandGesture
+import com.rodeo.hud.core.TapTemplates
 import com.rodeo.hud.data.ListenMode
 import com.rodeo.hud.data.ThemeMode
 import com.rodeo.hud.graph
@@ -61,7 +62,7 @@ import com.rodeo.hud.voice.VoskEngine
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onSimulateCrash: () -> Unit, onDropTest: () -> Unit) {
+fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onTapSetup: () -> Unit, onSimulateCrash: () -> Unit, onDropTest: () -> Unit) {
     val ctx = LocalContext.current
     val g = ctx.graph
     val c = LocalHud.current
@@ -69,8 +70,6 @@ fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onSimulateCrash
     val loc by g.location.location.collectAsState()
     val lux by g.ambient.lux.collectAsState()
     val crashTest by g.crash.status.collectAsState()
-    val camOn by g.gestures.running.collectAsState()
-    val lastGesture by g.gestures.last.collectAsState()
     val voice by g.assistant.ui.collectAsState()
     val navState by g.nav.state.collectAsState()
     val level by g.assistant.level.collectAsState()
@@ -177,7 +176,7 @@ fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onSimulateCrash
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(vertical = 6.dp)) {
                     ListenMode.entries.forEach { m ->
                         Choice(
-                            when (m) { ListenMode.OFF -> "Off (tap the mic)"; ListenMode.RIDING -> "During rides"; ListenMode.ALWAYS -> "Whenever Rodeo is open" },
+                            when (m) { ListenMode.OFF -> "Off (tap the mic)"; ListenMode.RIDING -> "On the HUD screen"; ListenMode.ALWAYS -> "HUD and background rides" },
                             profile.listenMode == m,
                         ) { g.profile.update { it.copy(listenMode = m) } }
                     }
@@ -195,27 +194,29 @@ fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onSimulateCrash
             }
             GlassCard(Modifier.fillMaxWidth()) {
                 SectionLabel("Controls")
-                ToggleRow("Wave over the phone", profile.waveControl, sub = if (g.waves.available)
-                    "Wave over the top of the screen (the earpiece sensor), gloves on: 1 wave = pause / play · 2 quick waves = next · 3 = previous"
-                else "This phone has no proximity sensor") { v -> g.profile.update { it.copy(waveControl = v) } }
-                ToggleRow("Camera gestures", profile.gestureControl, sub = "Show an open palm to the selfie camera for half a second = pause / play · sweep your hand right = next song · left = previous") { v ->
-                    g.profile.update { it.copy(gestureControl = v) }
+                val templates = remember(profile.tapTemplates) { TapTemplates.fromJson(profile.tapTemplates) }
+                ToggleRow(
+                    "Tap the phone's top edge", profile.tapControl,
+                    sub = "Knock on the edge facing up: left end = previous song · middle = play / pause · double-tap the right end = next. Works with gloves, in the dark and in glare.",
+                ) { v -> g.profile.update { it.copy(tapControl = v) } }
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    GhostButton(if (templates?.ready == true) "Redo tap setup" else "Set up taps on my mount", icon = Icons.Filled.TouchApp) { onTapSetup() }
+                    Text(
+                        when {
+                            !g.taps.available -> "This phone has no motion sensor"
+                            templates?.ready == true -> "Learned from ${templates.samples.values.sumOf { it.size }} of your taps"
+                            else -> "Not set up yet: about one minute, on the bike's mount"
+                        },
+                        color = if (templates?.ready == true) c.textMuted else c.warning, style = LocalType.current.bodySm, modifier = Modifier.weight(1f),
+                    )
                 }
-                ToggleRow("Swap left and right", profile.swapSwipe, sub = "Use this if swipes feel reversed on your mount") { v -> g.profile.update { it.copy(swapSwipe = v) } }
-                Text(
-                    when {
-                        !profile.gestureControl -> "Gestures are off"
-                        !g.gestures.hasPermission -> "Needs camera permission (see Permissions)"
-                        !camOn -> "Camera starting…"
-                        lastGesture != null -> "Watching · last: " + when (lastGesture!!.gesture) {
-                            HandGesture.SWIPE_RIGHT -> "next song"
-                            HandGesture.SWIPE_LEFT -> "previous song"
-                            HandGesture.PALM_COVER -> "pause / play"
-                        }
-                        else -> "Watching for your hand, 20 to 60 cm from the screen."
-                    },
-                    color = c.textMuted, style = LocalType.current.bodySm,
-                )
+                ToggleRow(
+                    "Volume keys skip songs", profile.volumeKeyMusic,
+                    sub = "On the HUD: the volume key on your left = previous, on your right = next, hold either = play / pause. Change the volume by voice or on the music card.",
+                ) { v -> g.profile.update { it.copy(volumeKeyMusic = v) } }
+                ToggleRow("Wave over the phone", profile.waveControl, sub = if (g.waves.available)
+                    "Wave over the top of the screen (the earpiece sensor): 1 wave = pause / play · 2 quick waves = next · 3 = previous"
+                else "This phone has no proximity sensor") { v -> g.profile.update { it.copy(waveControl = v) } }
                 Text("Bluetooth remotes: media keys control music; arrow keys and Enter move between HUD buttons.", color = c.textMuted, style = LocalType.current.bodySm)
             }
             GlassCard(Modifier.fillMaxWidth()) {

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.Surface
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -22,7 +23,10 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
-import com.rodeo.hud.core.HandGesture
+import com.rodeo.hud.core.ControlSource
+import com.rodeo.hud.core.MusicAction
+import com.rodeo.hud.core.TapTemplates
+import com.rodeo.hud.core.TapZone
 import com.rodeo.hud.core.Severity
 import com.rodeo.hud.core.Warning
 import com.rodeo.hud.data.Ride
@@ -38,12 +42,13 @@ import com.rodeo.hud.voice.AssistantHost
 import com.rodeo.hud.ui.pack.PackScreen
 import com.rodeo.hud.ui.rides.RidesScreen
 import com.rodeo.hud.ui.settings.SettingsScreen
+import com.rodeo.hud.ui.settings.TapSetupScreen
 import com.rodeo.hud.ui.setup.Onboarding
 import com.rodeo.hud.ui.theme.RodeoTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-enum class Screen { HUD, RIDES, GARAGE, SETTINGS, PACK }
+enum class Screen { HUD, RIDES, GARAGE, SETTINGS, PACK, BIKE, TAPS }
 
 private const val ACTION_VOICE_HANDS_FREE = "android.speech.action.VOICE_SEARCH_HANDS_FREE"
 
@@ -53,9 +58,7 @@ class MainActivity : ComponentActivity(), HudActions, AssistantHost {
     private var showEndSlider by mutableStateOf(false)
     private var summary by mutableStateOf<Ride?>(null)
     private var holdingLocation = false
-    private var askedCamera = false
     private var askedMic = false
-    private var lastGestureAt = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,14 +68,27 @@ class MainActivity : ComponentActivity(), HudActions, AssistantHost {
             hide(WindowInsetsCompat.Type.systemBars())
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
-        g.gestures.onGesture = { gesture -> onGesture(gesture, wave = false) }
-        g.waves.onWaves = { n ->
-            val gesture = when (n) {
-                1 -> HandGesture.PALM_COVER
-                2 -> HandGesture.SWIPE_RIGHT
-                else -> HandGesture.SWIPE_LEFT
+        g.taps.rotation = ::rotation
+        g.taps.onAction = { action, zone, n ->
+            val how = when {
+                n == 2 -> "Double tap ${zone.name.lowercase()}"
+                else -> "Tap ${zone.name.lowercase()}"
             }
-            if (onGesture(gesture, wave = true)) g.gestures.announce(gesture, n)
+            g.controls.act(action, ControlSource.TAP, how)
+        }
+        g.taps.onHint = { zone, n ->
+            if (zone == TapZone.RIGHT && n == 1) g.controls.hint(ControlSource.TAP, "Double-tap the right end for next song")
+            else if (n == 2) g.controls.hint(ControlSource.TAP, "Single tap ${zone.name.lowercase()} · double tap is for the right end")
+        }
+        g.waves.onWaves = { n ->
+            if (g.profile.profile.value.waveControl) {
+                val action = when (n) {
+                    1 -> MusicAction.PLAY_PAUSE
+                    2 -> MusicAction.NEXT
+                    else -> MusicAction.PREVIOUS
+                }
+                g.controls.act(action, ControlSource.WAVE, if (n == 1) "Wave" else "$n waves")
+            }
         }
         g.assistant.host = this
         handleIntent(intent)
@@ -83,8 +99,11 @@ class MainActivity : ComponentActivity(), HudActions, AssistantHost {
             val loc by g.location.location.collectAsState()
 
             LaunchedEffect(profile.themeMode) { g.ambient.mode = profile.themeMode }
-            LaunchedEffect(profile.gestureControl, profile.waveControl, profile.onboarded) { syncGestures() }
-            LaunchedEffect(profile.swapSwipe) { g.gestures.swap = profile.swapSwipe }
+            LaunchedEffect(profile.tapControl, profile.waveControl, profile.onboarded, screen) { syncGestures() }
+            LaunchedEffect(profile.tapTemplates, profile.tapMinPeak) {
+                g.taps.classifier.templates = TapTemplates.fromJson(profile.tapTemplates)
+                g.taps.minPeak = profile.tapMinPeak
+            }
             LaunchedEffect(Unit) {
                 while (true) {
                     g.ambient.tick()
@@ -101,18 +120,21 @@ class MainActivity : ComponentActivity(), HudActions, AssistantHost {
                     if (!profile.onboarded) {
                         Onboarding(onDone = { ensureLocation() })
                     } else {
-                        BackHandler(enabled = screen != Screen.HUD) { screen = Screen.HUD }
+                        BackHandler(enabled = screen != Screen.HUD && screen != Screen.BIKE && screen != Screen.TAPS) { screen = Screen.HUD }
                         when (screen) {
                             Screen.HUD -> HudScreen(this@MainActivity, showEndSlider, dark)
                             Screen.RIDES -> RidesScreen(onBack = { screen = Screen.HUD }, onNavigated = { screen = Screen.HUD })
                             Screen.GARAGE -> GarageScreen(onBack = { screen = Screen.HUD })
                             Screen.SETTINGS -> SettingsScreen(
                                 onBack = { screen = Screen.HUD },
-                                onChangeBike = { g.profile.update { it.copy(onboarded = false) } },
+                                onChangeBike = { screen = Screen.BIKE },
+                                onTapSetup = { screen = Screen.TAPS },
                                 onSimulateCrash = { screen = Screen.HUD; g.ride.simulateCrash() },
                                 onDropTest = { g.ride.startDropTest() },
                             )
                             Screen.PACK -> PackScreen(onBack = { screen = Screen.HUD })
+                            Screen.TAPS -> TapSetupScreen(onBack = { screen = Screen.SETTINGS })
+                            Screen.BIKE -> Onboarding(editBike = true, onCancel = { screen = Screen.SETTINGS }, onDone = { screen = Screen.SETTINGS })
                         }
                         summary?.let { RideSummary(it) { summary = null } }
                         VoiceOverlay()
@@ -161,7 +183,7 @@ class MainActivity : ComponentActivity(), HudActions, AssistantHost {
     }
 
     override fun onStop() {
-        g.gestures.stop()
+        g.taps.stop()
         g.waves.stop()
         g.ambient.stop()
         g.music.stop()
@@ -237,44 +259,56 @@ class MainActivity : ComponentActivity(), HudActions, AssistantHost {
     override fun openSettings() { screen = Screen.SETTINGS }
     override fun openPack() { screen = Screen.PACK }
 
-    /** Gestures run only while the HUD is on screen and the rider has them switched on. */
+    /** Taps and waves run only while Rodeo is on screen and the rider has them switched on (tap setup needs taps too). */
     private fun syncGestures() {
         val p = g.profile.profile.value
         val started = lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)
         if (p.onboarded && p.waveControl && started) g.waves.start() else g.waves.stop()
-        if (p.onboarded && p.gestureControl && lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)) {
-            if (g.gestures.hasPermission) g.gestures.start(this)
-            else if (!askedCamera) {
-                askedCamera = true
-                requestPermissions(arrayOf(Manifest.permission.CAMERA), 8)
-            }
-        } else g.gestures.stop()
+        if (p.onboarded && started && (p.tapControl || screen == Screen.TAPS)) g.taps.start() else g.taps.stop()
     }
+
+    @Suppress("DEPRECATION")
+    private fun rotation(): Int = runCatching { windowManager.defaultDisplay.rotation }.getOrDefault(Surface.ROTATION_90)
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 8) syncGestures()
         if (requestCode == 7 || requestCode == 9) {
             g.assistant.sync()
             if (requestCode == 7 && g.assistant.micAllowed) g.assistant.wakeManually()
         }
     }
 
-    /** Music from a camera gesture or a wave over the phone. Returns whether it was acted on. */
-    private fun onGesture(gesture: HandGesture, wave: Boolean): Boolean {
+    private var volumeDownAt = 0L
+    private var volumeHeld = false
+
+    /**
+     * On the HUD the volume keys skip songs: the key on the rider's left = previous, on the right =
+     * next, holding either = play / pause. Most phones have both keys on one long edge, volume up
+     * nearer the top, so which key is "left" depends on which way round the phone is mounted.
+     */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        val code = event.keyCode
         val p = g.profile.profile.value
-        if (!(if (wave) p.waveControl else p.gestureControl)) return false
-        if (g.sos.state.value !is com.rodeo.hud.sos.SosState.Idle) return false
-        // One hand movement can reach both the camera and the proximity sensor: act once.
-        val now = System.currentTimeMillis()
-        if (now - lastGestureAt < 1_200) return false
-        lastGestureAt = now
-        when (gesture) {
-            HandGesture.SWIPE_RIGHT -> g.music.next()
-            HandGesture.SWIPE_LEFT -> g.music.previous()
-            HandGesture.PALM_COVER -> g.music.playPause()
+        if ((code == KeyEvent.KEYCODE_VOLUME_UP || code == KeyEvent.KEYCODE_VOLUME_DOWN) &&
+            p.onboarded && p.volumeKeyMusic && screen == Screen.HUD && g.sos.state.value is com.rodeo.hud.sos.SosState.Idle
+        ) {
+            when (event.action) {
+                KeyEvent.ACTION_DOWN -> if (event.repeatCount == 0) {
+                    volumeDownAt = event.eventTime
+                    volumeHeld = false
+                } else if (!volumeHeld && event.eventTime - volumeDownAt >= 550) {
+                    volumeHeld = true
+                    g.controls.act(MusicAction.PLAY_PAUSE, ControlSource.KEY, "Hold volume key")
+                }
+                KeyEvent.ACTION_UP -> if (!volumeHeld) {
+                    val upIsLeft = rotation() != Surface.ROTATION_270
+                    val left = (code == KeyEvent.KEYCODE_VOLUME_UP) == upIsLeft
+                    g.controls.act(if (left) MusicAction.PREVIOUS else MusicAction.NEXT, ControlSource.KEY, if (left) "Left volume key" else "Right volume key")
+                }
+            }
+            return true
         }
-        return true
+        return super.dispatchKeyEvent(event)
     }
 
     /** Bluetooth handlebar remotes: media keys control music; D-pad / Enter move focus (handled by Compose). */

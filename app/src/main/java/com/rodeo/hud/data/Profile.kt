@@ -28,10 +28,14 @@ data class Profile(
     val mapOnRight: Boolean = true,
     val sosContacts: List<SosContact> = emptyList(),
     val crashDetection: Boolean = true,
-    /** Camera swipe gestures for music (front camera, on-device only). */
-    val gestureControl: Boolean = true,
-    /** Flip left and right if swipes feel reversed on a particular mount. */
-    val swapSwipe: Boolean = false,
+    /** Taps on the phone's top edge control music (left = previous, middle = play / pause, double right = next). */
+    val tapControl: Boolean = true,
+    /** The rider's own knocks from tap setup ([com.rodeo.hud.core.TapTemplates] JSON), or null before setup. */
+    val tapTemplates: String? = null,
+    /** Knock strength learned in tap setup (m/s²); null uses the default. */
+    val tapMinPeak: Float? = null,
+    /** On the HUD, the left volume key = previous song, the right one = next, holding either = play / pause. */
+    val volumeKeyMusic: Boolean = true,
     val regNumber: String = "",
     val bloodGroup: String = "",
     val allergies: String = "",
@@ -42,13 +46,13 @@ data class Profile(
     val wakePhrase: String = "Hey Rodeo",
     /** What the recogniser heard when the rider trained the wake phrase. */
     val wakeAliases: List<String> = emptyList(),
-    val listenMode: ListenMode = ListenMode.RIDING,
+    val listenMode: ListenMode = ListenMode.ALWAYS,
     /** Take commands through the helmet intercom's microphone after waking. */
     val helmetMic: Boolean = false,
     /** "Emergency emergency" starts SOS even without the wake phrase. */
     val sosWithoutWake: Boolean = true,
     /** Wave a hand over the top of the phone to play / pause. */
-    val waveControl: Boolean = true,
+    val waveControl: Boolean = false,
     val avoidTolls: Boolean = false,
     val avoidHighways: Boolean = false,
 ) {
@@ -88,8 +92,10 @@ class ProfileStore(context: Context) {
             p.sosContacts.forEach { put(JSONObject().put("name", it.name).put("phone", it.phone)) }
         })
         put("crashDetection", p.crashDetection)
-        put("gestureControl", p.gestureControl)
-        put("swapSwipe", p.swapSwipe)
+        put("tapControl", p.tapControl)
+        p.tapTemplates?.let { put("tapTemplates", it) }
+        p.tapMinPeak?.let { put("tapMinPeak", it.toDouble()) }
+        put("volumeKeyMusic", p.volumeKeyMusic)
         put("regNumber", p.regNumber)
         put("bloodGroup", p.bloodGroup)
         put("allergies", p.allergies)
@@ -98,10 +104,10 @@ class ProfileStore(context: Context) {
         p.homeLng?.let { put("homeLng", it) }
         put("wakePhrase", p.wakePhrase)
         put("wakeAliases", JSONArray().apply { p.wakeAliases.forEach { put(it) } })
-        put("listenMode", p.listenMode.name)
+        put("listenMode2", p.listenMode.name)
         put("helmetMic", p.helmetMic)
         put("sosWithoutWake", p.sosWithoutWake)
-        put("waveControl", p.waveControl)
+        put("waveControl2", p.waveControl)
         put("avoidTolls", p.avoidTolls)
         put("avoidHighways", p.avoidHighways)
     }
@@ -126,8 +132,10 @@ class ProfileStore(context: Context) {
             mapOnRight = o.optBoolean("mapOnRight", true),
             sosContacts = contacts,
             crashDetection = o.optBoolean("crashDetection", true),
-            gestureControl = o.optBoolean("gestureControl", true),
-            swapSwipe = o.optBoolean("swapSwipe", false),
+            tapControl = o.optBoolean("tapControl", true),
+            tapTemplates = o.optStringOrNull("tapTemplates"),
+            tapMinPeak = if (o.has("tapMinPeak")) o.getDouble("tapMinPeak").toFloat() else null,
+            volumeKeyMusic = o.optBoolean("volumeKeyMusic", true),
             regNumber = o.optString("regNumber"),
             bloodGroup = o.optString("bloodGroup"),
             allergies = o.optString("allergies"),
@@ -136,10 +144,12 @@ class ProfileStore(context: Context) {
             homeLng = if (o.has("homeLng")) o.getDouble("homeLng") else null,
             wakePhrase = o.optString("wakePhrase").ifBlank { "Hey Rodeo" },
             wakeAliases = o.optJSONArray("wakeAliases")?.let { a -> (0 until a.length()).map { a.getString(it) } } ?: emptyList(),
-            listenMode = runCatching { ListenMode.valueOf(o.optString("listenMode")) }.getOrDefault(ListenMode.RIDING),
+            // Saved under a new key: older builds defaulted to "during rides only", which left the wake
+            // phrase deaf on the parked HUD.
+            listenMode = runCatching { ListenMode.valueOf(o.optString("listenMode2")) }.getOrDefault(ListenMode.ALWAYS),
             helmetMic = o.optBoolean("helmetMic", false),
             sosWithoutWake = o.optBoolean("sosWithoutWake", true),
-            waveControl = o.optBoolean("waveControl", true),
+            waveControl = o.optBoolean("waveControl2", false),
             avoidTolls = o.optBoolean("avoidTolls", false),
             avoidHighways = o.optBoolean("avoidHighways", false),
         )

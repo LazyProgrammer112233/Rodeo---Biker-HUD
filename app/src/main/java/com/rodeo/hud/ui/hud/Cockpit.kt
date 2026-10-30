@@ -47,7 +47,7 @@ import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.PanTool
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.PowerSettingsNew
@@ -132,7 +132,7 @@ interface CockpitControls : HudActions {
     fun musicAccess()
     fun bluetooth()
     fun wifi()
-    fun toggleGestures()
+    fun toggleTaps()
 }
 
 /** Everything the cockpit shows, as plain values, so the layout can be previewed and screenshot-tested. */
@@ -176,7 +176,7 @@ data class CockpitState(
     val listening: Boolean = false,
     /** The wake phrase is armed (the assistant is listening in the background). */
     val wakeArmed: Boolean = false,
-    val gesturesOn: Boolean = false,
+    val tapsOn: Boolean = false,
     val showEndSlider: Boolean = false,
     val lockInput: Boolean = false,
 )
@@ -791,9 +791,9 @@ private fun TileRow(s: CockpitState, actions: CockpitControls, narrow: Boolean) 
         HudTile(Icons.Filled.Mic, "Voice", tile.weight(1f), active = s.listening, jewel = if (s.listening || s.wakeArmed) c.ok else null) { actions.voice() }
         if (!s.riding) {
             HudTile(
-                Icons.Filled.PanTool, "Gestures", tile.weight(1f), active = s.gesturesOn,
-                jewel = if (s.gesturesOn) c.ok else null,
-            ) { actions.toggleGestures() }
+                Icons.Filled.TouchApp, "Taps", tile.weight(1f), active = s.tapsOn,
+                jewel = if (s.tapsOn) c.ok else null,
+            ) { actions.toggleTaps() }
         }
         HoldToTrigger("SOS", "Hold 2 s", c.danger, tile.weight(1.35f)) { actions.sos() }
         if (s.riding) HudTile(Icons.Filled.PowerSettingsNew, "End", tile.weight(1f)) { actions.requestEndRide() }

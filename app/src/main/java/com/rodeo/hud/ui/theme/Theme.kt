@@ -165,8 +165,28 @@ private fun vivid(c: Color, amount: Float = 0.2f): Color {
 
 private fun onColor(c: Color) = if (c.luminance() > 0.4f) Color(0xFF0C0E14) else Color.White
 
+/**
+ * The accent: the bike's own paint when it has a real colour (a blue Hunter gets a blue HUD), the
+ * brand colour for black, white, grey and silver bikes, and the heritage colour when asked for.
+ */
+fun accentFor(brand: Brand?, paintHex: Long?, heritage: Boolean = false): Long {
+    if (heritage) brand?.heritageAccent?.let { return it }
+    if (paintHex != null && isChromatic(paintHex)) return paintHex
+    return brand?.accent ?: 0xFFFF6600
+}
+
+/** True when a paint has enough colour to be an accent (not black, white, grey or silver). */
+fun isChromatic(hex: Long): Boolean {
+    val r = (hex shr 16 and 0xFF) / 255f
+    val g = (hex shr 8 and 0xFF) / 255f
+    val b = (hex and 0xFF) / 255f
+    val max = maxOf(r, g, b)
+    val saturation = if (max == 0f) 0f else (max - minOf(r, g, b)) / max
+    return saturation >= 0.3f && max >= 0.22f
+}
+
 fun hudColors(brand: Brand?, paintHex: Long?, dark: Boolean, heritage: Boolean = false): HudColors {
-    val raw = vivid(Color(((if (heritage) brand?.heritageAccent else null) ?: brand?.accent ?: 0xFFFF6600)))
+    val raw = vivid(Color(accentFor(brand, paintHex, heritage)))
     val paint = Color(paintHex ?: 0xFF6E7176)
     return if (dark) {
         // Night: graphite plates on a deep void; accent lifted to 4.5:1 on the base if needed.

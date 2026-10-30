@@ -77,7 +77,6 @@ private val PERMS = listOf(
     Perm("SMS", "Sends SOS texts from your default SIM automatically, even with no data.", listOf(Manifest.permission.SEND_SMS)),
     Perm("Contacts", "Pick SOS contacts.", listOf(Manifest.permission.READ_CONTACTS)),
     Perm("Physical activity", "Auto-pause and crash detection.", listOf(Manifest.permission.ACTIVITY_RECOGNITION)),
-    Perm("Camera", "Swipe gestures for music. Frames are read on the phone and never saved.", listOf(Manifest.permission.CAMERA)),
     Perm("Microphone", "Voice commands with gloves on.", listOf(Manifest.permission.RECORD_AUDIO)),
     Perm(
         "Music access",

@@ -115,8 +115,8 @@ class Assistant(private val context: Context, private val g: AppGraph) : VoiceBr
         val awake = brain.mode == VoiceBrain.Mode.AWAKE
         val wanted = micAllowed && engine.ready && (
             countdown || training || awake || expectDestination ||
-                (visible && p.listenMode == ListenMode.ALWAYS) ||
-                (p.listenMode != ListenMode.OFF && g.ride.live.value.active)
+                (visible && p.listenMode != ListenMode.OFF) ||
+                (p.listenMode == ListenMode.ALWAYS && g.ride.live.value.active)
             )
         if (wanted) {
             engine.start()

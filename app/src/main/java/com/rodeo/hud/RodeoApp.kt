@@ -8,13 +8,14 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.rodeo.hud.core.AmbientController
 import com.rodeo.hud.core.AudioRoutes
-import com.rodeo.hud.core.CameraGestures
 import com.rodeo.hud.core.CrashDetector
 import com.rodeo.hud.core.DeviceGuardian
 import com.rodeo.hud.core.LocationHub
+import com.rodeo.hud.core.MusicControls
 import com.rodeo.hud.core.RideEngine
 import com.rodeo.hud.core.RideSensors
 import com.rodeo.hud.core.Speaker
+import com.rodeo.hud.core.TapSensor
 import com.rodeo.hud.core.WarningCenter
 import com.rodeo.hud.core.WaveSensor
 import com.rodeo.hud.core.WeatherService
@@ -53,7 +54,7 @@ class AppGraph(app: Application) {
     val music = MusicController(app)
     val audioRoutes = AudioRoutes(app)
     val speaker = Speaker(app)
-    val gestures = CameraGestures(app)
+    val taps = TapSensor(app)
     val waves = WaveSensor(app)
     val pack = PackService(app, scope, warnings) { profile.profile.value.riderName }
     val hazardSync = HazardSync(app, hazards)
@@ -71,6 +72,8 @@ class AppGraph(app: Application) {
         crashEnabled = { profile.profile.value.crashDetection },
         onHazardLogged = { hazardSync.onHazard(it) },
     )
+
+    val controls = MusicControls(music) { sos.state.value !is com.rodeo.hud.sos.SosState.Idle }
 
     /** Created last: it listens to everything above. */
     val assistant = Assistant(app, this)

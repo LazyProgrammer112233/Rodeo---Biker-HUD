@@ -102,7 +102,7 @@ class HudShots {
             "Hyper-Velocity (VIP Mix)", "Apex Drivers", "Spotify", playing = true, hasAccess = true,
             durationMs = 224_000, position = { 83_000L }, volumePct = 60,
         ),
-        btOn = true, btDevice = "SENA 50S", wifiOn = true, packCount = 4, packActive = true, gesturesOn = true,
+        btOn = true, btDevice = "SENA 50S", wifiOn = true, packCount = 4, packActive = true, tapsOn = true,
     )
 
     private val riding = parked.copy(
@@ -266,7 +266,7 @@ private object NoActions : CockpitControls {
     override fun musicAccess() = Unit
     override fun bluetooth() = Unit
     override fun wifi() = Unit
-    override fun toggleGestures() = Unit
+    override fun toggleTaps() = Unit
 }
 
 private object NoMap : MapChromeActions {

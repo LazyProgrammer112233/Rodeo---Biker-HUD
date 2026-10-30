@@ -1,11 +1,14 @@
 package com.rodeo.hud.ui.setup
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -45,7 +48,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import com.rodeo.hud.ui.theme.isChromatic
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rodeo.hud.data.Catalog
@@ -63,29 +68,49 @@ import java.time.Year
 
 private enum class Step { WELCOME, PERMISSIONS, BRAND, MODEL, PAINT, SOS }
 
-/** First run: stub login, permissions, bike (brand → model → year + paint) with live theme preview, SOS contacts. */
+/**
+ * First run: stub login, permissions, bike (brand → model → year + paint) with live theme preview,
+ * SOS contacts. With [editBike] it is only the bike steps, opened from Settings: back on the first
+ * step puts the old bike back, and finishing the colour step returns to Settings.
+ */
 @Composable
-fun Onboarding(onDone: () -> Unit) {
+fun Onboarding(editBike: Boolean = false, onCancel: () -> Unit = {}, onDone: () -> Unit) {
     val g = LocalContext.current.graph
     val c = LocalHud.current
     val profile by g.profile.profile.collectAsState()
-    var step by remember { mutableStateOf(Step.WELCOME) }
+    val steps = if (editBike) listOf(Step.BRAND, Step.MODEL, Step.PAINT) else Step.entries
+    var step by remember { mutableStateOf(steps.first()) }
     var query by remember { mutableStateOf("") }
+    val original = remember { profile }
 
     fun next() {
-        step = Step.entries.getOrNull(step.ordinal + 1) ?: run {
+        step = steps.getOrNull(steps.indexOf(step) + 1) ?: run {
             g.profile.update { it.copy(onboarded = true) }
             onDone()
             step
         }
     }
-    fun back() { step = Step.entries.getOrElse(step.ordinal - 1) { Step.WELCOME } }
+    fun back() {
+        val i = steps.indexOf(step)
+        if (i == 0) {
+            if (editBike) {
+                g.profile.update {
+                    it.copy(
+                        brandId = original.brandId, model = original.model, year = original.year, paintName = original.paintName,
+                        paintHex = original.paintHex, useHeritageAccent = original.useHeritageAccent,
+                    )
+                }
+                onCancel()
+            }
+        } else step = steps[i - 1]
+    }
+    BackHandler(enabled = editBike || step != steps.first()) { back() }
 
     Row(Modifier.fillMaxSize().background(c.background).padding(20.dp), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
         // Left: the current step.
         Column(Modifier.weight(1.25f).fillMaxHeight()) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                if (step != Step.WELCOME) {
+                if (editBike || step != steps.first()) {
                     Box(Modifier.size(48.dp).clip(CircleShape).clickable { back() }, contentAlignment = Alignment.Center) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = c.text)
                     }
@@ -102,7 +127,7 @@ fun Onboarding(onDone: () -> Unit) {
                     color = c.text, style = LocalType.current.headlineXl,
                 )
                 Spacer(Modifier.weight(1f))
-                StepDots(step.ordinal, Step.entries.size)
+                StepDots(steps.indexOf(step), steps.size)
             }
             Spacer(Modifier.height(12.dp))
             Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -129,7 +154,7 @@ fun Onboarding(onDone: () -> Unit) {
                     Step.WELCOME -> PrimaryButton("Continue", icon = Icons.AutoMirrored.Filled.ArrowForward) { next() }
                     Step.PERMISSIONS -> PrimaryButton("Continue", icon = Icons.AutoMirrored.Filled.ArrowForward) { next() }
                     Step.BRAND, Step.MODEL -> Text("Tap to choose", color = c.textMuted)
-                    Step.PAINT -> PrimaryButton("Continue", enabled = profile.paintHex != null && profile.year != null, icon = Icons.AutoMirrored.Filled.ArrowForward) { next() }
+                    Step.PAINT -> PrimaryButton(if (editBike) "Save bike" else "Continue", enabled = profile.paintHex != null && profile.year != null, icon = Icons.AutoMirrored.Filled.ArrowForward) { next() }
                     Step.SOS -> {
                         PrimaryButton("Start riding", icon = Icons.Filled.Check) { next() }
                         if (profile.sosContacts.isEmpty()) GhostButton("Skip for now") { next() }
@@ -231,10 +256,6 @@ private fun PaintPicker() {
     val brand = Catalog.brand(profile.brandId) ?: return
     val now = Year.now().value
     val years = (now downTo maxOf(model.firstYear, now - 25)).toList()
-    val custom = listOf(
-        Paint("Custom black", 0xFF101114), Paint("Custom white", 0xFFF2F2F2), Paint("Custom grey", 0xFF7A7D82),
-        Paint("Custom red", 0xFFB3121F), Paint("Custom blue", 0xFF1F4E9C), Paint("Custom green", 0xFF2E6B3C), Paint("Custom yellow", 0xFFE8B923),
-    )
     Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         SectionLabel("Model year")
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -242,7 +263,8 @@ private fun PaintPicker() {
                 val sel = profile.year == y
                 Text(
                     "$y", color = if (sel) c.onAccent else c.text, fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.clip(RoundedCornerShape(14.dp)).background(if (sel) c.accent else c.glass)
+                    modifier = Modifier.clip(RoundedCornerShape(14.dp)).background(if (sel) c.accent else c.surfaceHigh)
+                        .border(1.dp, if (sel) c.accent else c.glassBorder, RoundedCornerShape(14.dp))
                         .clickable { g.profile.update { it.copy(year = y) } }.padding(horizontal = 16.dp, vertical = 12.dp),
                 )
             }
@@ -250,31 +272,57 @@ private fun PaintPicker() {
         SectionLabel("Factory colours")
         PaintRow(model.paints, profile.paintHex, profile.paintName) { p -> g.profile.update { it.copy(paintHex = p.hex, paintName = p.name) } }
         SectionLabel("Or a custom colour")
-        PaintRow(custom, profile.paintHex, profile.paintName) { p -> g.profile.update { it.copy(paintHex = p.hex, paintName = p.name) } }
+        PaintRow(CUSTOM_PAINTS, profile.paintHex, profile.paintName) { p -> g.profile.update { it.copy(paintHex = p.hex, paintName = p.name) } }
+        val hex = profile.paintHex
+        if (hex != null) {
+            Text(
+                if (profile.useHeritageAccent && brand.heritageAccent != null) "The HUD uses the ${brand.name} heritage colour."
+                else if (isChromatic(hex)) "The HUD takes its accent from this colour."
+                else "Black, white, grey and silver bikes use the ${brand.name} colour as the accent.",
+                color = c.textMuted, style = LocalType.current.bodySm,
+            )
+        }
         if (brand.heritageAccent != null) {
             ToggleRow(
                 "Use ${brand.name} heritage accent", profile.useHeritageAccent,
-                sub = "Switch between the corporate and the racing colour",
+                sub = "Use the racing colour instead of the bike's paint",
             ) { v -> g.profile.update { it.copy(useHeritageAccent = v) } }
         }
     }
 }
 
+private val CUSTOM_PAINTS = listOf(
+    Paint("Custom black", 0xFF101114), Paint("Custom white", 0xFFF2F2F2), Paint("Custom grey", 0xFF7A7D82),
+    Paint("Custom red", 0xFFD0101E), Paint("Custom orange", 0xFFFF6A00), Paint("Custom yellow", 0xFFFFC300),
+    Paint("Custom lime", 0xFF8CD600), Paint("Custom green", 0xFF15A34A), Paint("Custom teal", 0xFF00A99D),
+    Paint("Custom cyan", 0xFF00B4E6), Paint("Custom blue", 0xFF1F5FD6), Paint("Custom purple", 0xFF7B3FE4),
+    Paint("Custom pink", 0xFFE6337A), Paint("Custom gold", 0xFFC9A227),
+)
+
+/** Swatches that wrap onto more lines instead of scrolling sideways, so every one stays visible. */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun PaintRow(paints: List<Paint>, selectedHex: Long?, selectedName: String?, onPick: (Paint) -> Unit) {
     val c = LocalHud.current
-    LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-        items(paints, key = { it.name }) { p ->
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        paints.forEach { p ->
             val sel = selectedHex == p.hex && selectedName == p.name
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(84.dp).clickable { onPick(p) }) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.width(76.dp).clip(RoundedCornerShape(12.dp)).clickable { onPick(p) }.padding(vertical = 4.dp),
+            ) {
                 Box(
-                    Modifier.size(56.dp).clip(CircleShape).background(Color(p.hex))
-                        .border(if (sel) 3.dp else 1.dp, if (sel) c.accent else c.glassBorder, CircleShape),
+                    Modifier.size(48.dp).clip(CircleShape).background(Color(p.hex))
+                        .border(if (sel) 3.dp else 1.dp, if (sel) c.text else c.glassBorder, CircleShape),
                     contentAlignment = Alignment.Center,
                 ) {
                     if (sel) Icon(Icons.Filled.Check, null, tint = if (Color(p.hex).luminance() > 0.5f) Color.Black else Color.White)
                 }
-                Text(p.name, color = c.textMuted, style = LocalType.current.bodySm, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
+                Text(
+                    p.name.removePrefix("Custom ").replaceFirstChar { it.uppercase() }, color = if (sel) c.text else c.textMuted,
+                    style = LocalType.current.bodySm, maxLines = 2, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
             }
         }
     }

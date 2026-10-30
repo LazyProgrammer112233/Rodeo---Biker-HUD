@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
@@ -27,8 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.rodeo.hud.core.GestureSource
-import com.rodeo.hud.core.HandGesture
+import com.rodeo.hud.core.ControlSource
+import com.rodeo.hud.core.MusicAction
 import com.rodeo.hud.graph
 import com.rodeo.hud.nav.MapPane
 import com.rodeo.hud.ride.formatDuration
@@ -120,7 +121,7 @@ fun HudScreen(actions: HudActions, showEndSlider: Boolean, dark: Boolean) {
         packActive = pack.active,
         listening = voice.awake,
         wakeArmed = voice.listening,
-        gesturesOn = profile.gestureControl,
+        tapsOn = profile.tapControl,
         showEndSlider = showEndSlider,
         lockInput = speed > 10f,
     )
@@ -148,7 +149,7 @@ fun HudScreen(actions: HudActions, showEndSlider: Boolean, dark: Boolean) {
             override fun wifi() {
                 runCatching { ctx.startActivity(Intent(Settings.Panel.ACTION_WIFI).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
             }
-            override fun toggleGestures() = g.profile.update { it.copy(gestureControl = !it.gestureControl) }
+            override fun toggleTaps() = g.profile.update { it.copy(tapControl = !it.tapControl) }
         }
     }
 
@@ -202,31 +203,31 @@ private fun MusicAccessDialog(onOpen: () -> Unit, onAppInfo: () -> Unit, onDismi
     )
 }
 
-/** Big, brief confirmation when a camera gesture is recognised. */
+/** Big, brief confirmation of a tap, volume key or wave (or a hint when it was nearly right). */
 @Composable
 private fun GestureFlash(modifier: Modifier) {
     val g = LocalContext.current.graph
-    val last by g.gestures.last.collectAsState()
+    val last by g.controls.last.collectAsState()
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(last) {
         if (last == null) return@LaunchedEffect
         visible = true
-        delay(1_200)
+        delay(1_400)
         visible = false
     }
-    val (icon, label) = when (last?.gesture) {
-        HandGesture.SWIPE_RIGHT -> Icons.Filled.SkipNext to "Next song"
-        HandGesture.SWIPE_LEFT -> Icons.Filled.SkipPrevious to "Previous song"
-        HandGesture.PALM_COVER -> Icons.Filled.PlayArrow to "Play / pause"
-        null -> null to ""
-    }
     val ev = last
-    val how = when {
-        ev == null || ev.source != GestureSource.WAVE -> ""
-        ev.waves == 1 -> "Wave · "
-        else -> "${ev.waves} waves · "
+    val icon = when (ev?.action) {
+        MusicAction.NEXT -> Icons.Filled.SkipNext
+        MusicAction.PREVIOUS -> Icons.Filled.SkipPrevious
+        MusicAction.PLAY_PAUSE -> Icons.Filled.PlayArrow
+        null -> if (ev?.source == ControlSource.TAP) Icons.Filled.TouchApp else null
     }
-    ActionToast(visible, icon, how + label, modifier)
+    val label = when {
+        ev == null -> ""
+        ev.action == null -> ev.detail
+        else -> ev.detail + " · " + com.rodeo.hud.core.MusicControls.label(ev.action)
+    }
+    ActionToast(visible, icon, label, modifier)
 }
 
 /** "IST" rather than "GMT+05:30" where the phone has a short name for the zone. */
