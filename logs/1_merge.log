@@ -10,34 +10,31 @@ Daemon will be stopped at the end of the build
 > Task :app:mapDebugSourceSetPaths
 > Task :app:generateDebugResources
 > Task :app:packageDebugResources
-> Task :app:createDebugCompatibleScreenManifests
 > Task :app:mergeDebugResources
+> Task :app:createDebugCompatibleScreenManifests
 > Task :app:extractDeepLinksDebug
 > Task :app:parseDebugLocalResources
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
+> Task :app:processDebugManifestForPackage
 > Task :app:javaPreCompileDebug
 > Task :app:mergeDebugShaders
 > Task :app:compileDebugShaders NO-SOURCE
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:mergeDebugAssets
+> Task :app:processDebugResources
 > Task :app:compressDebugAssets
-> Task :app:processDebugManifestForPackage
+> Task :app:l8DexDesugarLibDebug
+> Task :app:mergeDebugJniLibFolders
 > Task :app:checkDebugDuplicateClasses
 > Task :app:mergeLibDexDebug
-> Task :app:mergeDebugJniLibFolders
-> Task :app:processDebugResources
 > Task :app:mergeDebugNativeLibs
-> Task :app:l8DexDesugarLibDebug
-
-> Task :app:stripDebugDebugSymbols
-Unable to strip the following libraries, packaging them as they are: libandroidx.graphics.path.so, libonnxruntime.so, libsherpa-onnx-jni.so.
-
-> Task :app:validateSigningDebug
-> Task :app:writeDebugAppMetadata
-> Task :app:writeDebugSigningConfigVersions
 > Task :app:desugarDebugFileDependencies
+> Task :app:validateSigningDebug
+> Task :app:compileDebugKotlin
 > Task :app:mergeExtDexDebug
+WARNING: /home/runner/.gradle/caches/8.11.1/transforms/3c9c30055b7645ce50f0106b59864045/transformed/play-services-location-21.3.0-runtime.jar: D8: The companion object Companion could not be found in class com.google.android.gms.internal.location.zze
+
 > Task :app:compileDebugKotlin
 w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/MainActivity.kt:251:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Please add the '@Deprecated' annotation or suppress the diagnostic.
 w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/MainActivity.kt:252:15 'fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray): Unit' is deprecated. This method has been deprecated in favor of using the Activity Result API
@@ -58,14 +55,20 @@ w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/jav
 > Task :app:dexBuilderDebug
 > Task :app:mergeDebugGlobalSynthetics
 > Task :app:processDebugJavaRes
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
 > Task :app:mergeProjectDexDebug
+
+> Task :app:stripDebugDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libandroidx.graphics.path.so, libonnxruntime.so, libsherpa-onnx-jni.so.
+
 > Task :app:mergeDebugJavaResource
 > Task :app:packageDebug
 > Task :app:createDebugApkListingFileRedirect
 > Task :app:assembleDebug
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_5-1793385989170.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_5-1793386778933.json
 
-BUILD SUCCESSFUL in 1m 17s
+BUILD SUCCESSFUL in 2m 1s
 38 actionable tasks: 38 executed
-SIGNING Signer #1 certificate SHA-256 digest: 46dbcf9791444b63ff66343e2fb1e6d3bf7949b54d8516afd1780e3d97e66b17
-SIGNING Signer #1 certificate SHA-1 digest: f49e583d4122897516da34a1ea86df7485561d7a
+SIGNING Signer #1 certificate SHA-256 digest: a3f580b4238d5c87d16d1edfb880bdfc6957b4ef940ff71ad2275201f3edb988
+SIGNING Signer #1 certificate SHA-1 digest: 14af25c3365a381054f534aac7615db7308cccfb
