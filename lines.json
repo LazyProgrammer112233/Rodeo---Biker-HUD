@@ -1,0 +1,5118 @@
+{
+ "rate": 16000,
+ "wakes": [
+  "Hey Rodeo",
+  "Hey Doku",
+  "Okay Rodeo"
+ ],
+ "lines": [
+  [
+   "sos",
+   "SOS",
+   "emergency"
+  ],
+  [
+   "sos",
+   "SOS",
+   "emergency emergency"
+  ],
+  [
+   "sos",
+   "SOS",
+   "call an ambulance"
+  ],
+  [
+   "sos",
+   "SOS",
+   "I have had an accident"
+  ],
+  [
+   "sos",
+   "SOS",
+   "help me"
+  ],
+  [
+   "sos",
+   "SOS",
+   "send SOS"
+  ],
+  [
+   "cmd",
+   "NEXT",
+   "next song"
+  ],
+  [
+   "cmd",
+   "NEXT",
+   "play the next song"
+  ],
+  [
+   "cmd",
+   "NEXT",
+   "skip this song"
+  ],
+  [
+   "cmd",
+   "PREVIOUS",
+   "previous song"
+  ],
+  [
+   "cmd",
+   "PREVIOUS",
+   "go back to the last song"
+  ],
+  [
+   "cmd",
+   "PAUSE",
+   "pause the music"
+  ],
+  [
+   "cmd",
+   "PAUSE",
+   "stop the music"
+  ],
+  [
+   "cmd",
+   "PLAY",
+   "play music"
+  ],
+  [
+   "cmd",
+   "PLAY",
+   "resume the song"
+  ],
+  [
+   "cmd",
+   "VOLUME_UP",
+   "volume up"
+  ],
+  [
+   "cmd",
+   "VOLUME_UP",
+   "turn the volume up"
+  ],
+  [
+   "cmd",
+   "VOLUME_DOWN",
+   "volume down"
+  ],
+  [
+   "cmd",
+   "VOLUME_DOWN",
+   "make it quieter"
+  ],
+  [
+   "cmd",
+   "NAVIGATE_HOME",
+   "take me home"
+  ],
+  [
+   "cmd",
+   "NAVIGATE_TO",
+   "navigate to Nandi Hills"
+  ],
+  [
+   "cmd",
+   "NAVIGATE_TO",
+   "take me to MG Road"
+  ],
+  [
+   "cmd",
+   "NAVIGATE_TO",
+   "navigate to the nearest petrol pump"
+  ],
+  [
+   "cmd",
+   "NAVIGATE_TO",
+   "directions to Lalbagh"
+  ],
+  [
+   "cmd",
+   "STOP_NAVIGATION",
+   "stop navigation"
+  ],
+  [
+   "cmd",
+   "SPEED",
+   "what is my speed"
+  ],
+  [
+   "cmd",
+   "ETA",
+   "how far is it"
+  ],
+  [
+   "cmd",
+   "TIME",
+   "what time is it"
+  ],
+  [
+   "cmd",
+   "START_RIDE",
+   "start the ride"
+  ],
+  [
+   "cmd",
+   "END_RIDE",
+   "end the ride"
+  ]
+ ],
+ "chatter": [
+  "so I told him to take a look at the engine",
+  "the doctor said it is fine",
+  "turn left after the signal and then go straight",
+  "hey there, how are you doing",
+  "okay, let's stop at the petrol pump",
+  "did you see that road",
+  "hello, can you hear me",
+  "the radio is playing old songs",
+  "that was an emergency exit sign",
+  "hey, do you know the way",
+  "I need some help with the bike",
+  "we will reach Mysore by lunch",
+  "hey, that rodeo show was good",
+  "the next song on the radio is nice",
+  "okay, I will call you back",
+  "hey brother, ride slowly",
+  "the road ahead is under construction",
+  "let us go to the rally on Sunday",
+  "my phone battery is low",
+  "the volume of traffic is high today"
+ ],
+ "repeatSos": [
+  "emergency emergency",
+  "emergency, emergency, emergency",
+  "help help help",
+  "accident accident"
+ ],
+ "voices": {
+  "vctk-p248-indian": {
+   "Hey Doku": [
+    "vctk-p248-indian_000_85.wav",
+    "vctk-p248-indian_000_100.wav",
+    "vctk-p248-indian_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "vctk-p248-indian_001_85.wav",
+    "vctk-p248-indian_001_100.wav",
+    "vctk-p248-indian_001_114.wav"
+   ],
+   "I have had an accident": [
+    "vctk-p248-indian_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "vctk-p248-indian_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "vctk-p248-indian_004_85.wav",
+    "vctk-p248-indian_004_100.wav",
+    "vctk-p248-indian_004_114.wav"
+   ],
+   "accident accident": [
+    "vctk-p248-indian_005_100.wav"
+   ],
+   "call an ambulance": [
+    "vctk-p248-indian_006_100.wav"
+   ],
+   "did you see that road": [
+    "vctk-p248-indian_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "vctk-p248-indian_008_100.wav"
+   ],
+   "emergency": [
+    "vctk-p248-indian_009_100.wav"
+   ],
+   "emergency emergency": [
+    "vctk-p248-indian_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "vctk-p248-indian_011_100.wav"
+   ],
+   "end the ride": [
+    "vctk-p248-indian_012_100.wav"
+   ],
+   "go back to the last song": [
+    "vctk-p248-indian_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "vctk-p248-indian_014_100.wav"
+   ],
+   "help help help": [
+    "vctk-p248-indian_015_100.wav"
+   ],
+   "help me": [
+    "vctk-p248-indian_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "vctk-p248-indian_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "vctk-p248-indian_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "vctk-p248-indian_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "vctk-p248-indian_020_100.wav"
+   ],
+   "how far is it": [
+    "vctk-p248-indian_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "vctk-p248-indian_022_100.wav"
+   ],
+   "make it quieter": [
+    "vctk-p248-indian_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "vctk-p248-indian_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "vctk-p248-indian_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "vctk-p248-indian_026_100.wav"
+   ],
+   "next song": [
+    "vctk-p248-indian_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "vctk-p248-indian_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "vctk-p248-indian_029_100.wav"
+   ],
+   "pause the music": [
+    "vctk-p248-indian_030_100.wav"
+   ],
+   "play music": [
+    "vctk-p248-indian_031_100.wav"
+   ],
+   "play the next song": [
+    "vctk-p248-indian_032_100.wav"
+   ],
+   "previous song": [
+    "vctk-p248-indian_033_100.wav"
+   ],
+   "resume the song": [
+    "vctk-p248-indian_034_100.wav"
+   ],
+   "send SOS": [
+    "vctk-p248-indian_035_100.wav"
+   ],
+   "skip this song": [
+    "vctk-p248-indian_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "vctk-p248-indian_037_100.wav"
+   ],
+   "start the ride": [
+    "vctk-p248-indian_038_100.wav"
+   ],
+   "stop navigation": [
+    "vctk-p248-indian_039_100.wav"
+   ],
+   "stop the music": [
+    "vctk-p248-indian_040_100.wav"
+   ],
+   "take me home": [
+    "vctk-p248-indian_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "vctk-p248-indian_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "vctk-p248-indian_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "vctk-p248-indian_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "vctk-p248-indian_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "vctk-p248-indian_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "vctk-p248-indian_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "vctk-p248-indian_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "vctk-p248-indian_049_100.wav"
+   ],
+   "turn the volume up": [
+    "vctk-p248-indian_050_100.wav"
+   ],
+   "volume down": [
+    "vctk-p248-indian_051_100.wav"
+   ],
+   "volume up": [
+    "vctk-p248-indian_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "vctk-p248-indian_053_100.wav"
+   ],
+   "what is my speed": [
+    "vctk-p248-indian_054_100.wav"
+   ],
+   "what time is it": [
+    "vctk-p248-indian_055_100.wav"
+   ]
+  },
+  "vctk-p251-indian": {
+   "Hey Doku": [
+    "vctk-p251-indian_000_85.wav",
+    "vctk-p251-indian_000_100.wav",
+    "vctk-p251-indian_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "vctk-p251-indian_001_85.wav",
+    "vctk-p251-indian_001_100.wav",
+    "vctk-p251-indian_001_114.wav"
+   ],
+   "I have had an accident": [
+    "vctk-p251-indian_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "vctk-p251-indian_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "vctk-p251-indian_004_85.wav",
+    "vctk-p251-indian_004_100.wav",
+    "vctk-p251-indian_004_114.wav"
+   ],
+   "accident accident": [
+    "vctk-p251-indian_005_100.wav"
+   ],
+   "call an ambulance": [
+    "vctk-p251-indian_006_100.wav"
+   ],
+   "did you see that road": [
+    "vctk-p251-indian_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "vctk-p251-indian_008_100.wav"
+   ],
+   "emergency": [
+    "vctk-p251-indian_009_100.wav"
+   ],
+   "emergency emergency": [
+    "vctk-p251-indian_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "vctk-p251-indian_011_100.wav"
+   ],
+   "end the ride": [
+    "vctk-p251-indian_012_100.wav"
+   ],
+   "go back to the last song": [
+    "vctk-p251-indian_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "vctk-p251-indian_014_100.wav"
+   ],
+   "help help help": [
+    "vctk-p251-indian_015_100.wav"
+   ],
+   "help me": [
+    "vctk-p251-indian_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "vctk-p251-indian_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "vctk-p251-indian_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "vctk-p251-indian_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "vctk-p251-indian_020_100.wav"
+   ],
+   "how far is it": [
+    "vctk-p251-indian_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "vctk-p251-indian_022_100.wav"
+   ],
+   "make it quieter": [
+    "vctk-p251-indian_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "vctk-p251-indian_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "vctk-p251-indian_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "vctk-p251-indian_026_100.wav"
+   ],
+   "next song": [
+    "vctk-p251-indian_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "vctk-p251-indian_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "vctk-p251-indian_029_100.wav"
+   ],
+   "pause the music": [
+    "vctk-p251-indian_030_100.wav"
+   ],
+   "play music": [
+    "vctk-p251-indian_031_100.wav"
+   ],
+   "play the next song": [
+    "vctk-p251-indian_032_100.wav"
+   ],
+   "previous song": [
+    "vctk-p251-indian_033_100.wav"
+   ],
+   "resume the song": [
+    "vctk-p251-indian_034_100.wav"
+   ],
+   "send SOS": [
+    "vctk-p251-indian_035_100.wav"
+   ],
+   "skip this song": [
+    "vctk-p251-indian_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "vctk-p251-indian_037_100.wav"
+   ],
+   "start the ride": [
+    "vctk-p251-indian_038_100.wav"
+   ],
+   "stop navigation": [
+    "vctk-p251-indian_039_100.wav"
+   ],
+   "stop the music": [
+    "vctk-p251-indian_040_100.wav"
+   ],
+   "take me home": [
+    "vctk-p251-indian_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "vctk-p251-indian_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "vctk-p251-indian_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "vctk-p251-indian_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "vctk-p251-indian_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "vctk-p251-indian_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "vctk-p251-indian_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "vctk-p251-indian_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "vctk-p251-indian_049_100.wav"
+   ],
+   "turn the volume up": [
+    "vctk-p251-indian_050_100.wav"
+   ],
+   "volume down": [
+    "vctk-p251-indian_051_100.wav"
+   ],
+   "volume up": [
+    "vctk-p251-indian_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "vctk-p251-indian_053_100.wav"
+   ],
+   "what is my speed": [
+    "vctk-p251-indian_054_100.wav"
+   ],
+   "what time is it": [
+    "vctk-p251-indian_055_100.wav"
+   ]
+  },
+  "vctk-p376-indian": {
+   "Hey Doku": [
+    "vctk-p376-indian_000_85.wav",
+    "vctk-p376-indian_000_100.wav",
+    "vctk-p376-indian_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "vctk-p376-indian_001_85.wav",
+    "vctk-p376-indian_001_100.wav",
+    "vctk-p376-indian_001_114.wav"
+   ],
+   "I have had an accident": [
+    "vctk-p376-indian_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "vctk-p376-indian_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "vctk-p376-indian_004_85.wav",
+    "vctk-p376-indian_004_100.wav",
+    "vctk-p376-indian_004_114.wav"
+   ],
+   "accident accident": [
+    "vctk-p376-indian_005_100.wav"
+   ],
+   "call an ambulance": [
+    "vctk-p376-indian_006_100.wav"
+   ],
+   "did you see that road": [
+    "vctk-p376-indian_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "vctk-p376-indian_008_100.wav"
+   ],
+   "emergency": [
+    "vctk-p376-indian_009_100.wav"
+   ],
+   "emergency emergency": [
+    "vctk-p376-indian_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "vctk-p376-indian_011_100.wav"
+   ],
+   "end the ride": [
+    "vctk-p376-indian_012_100.wav"
+   ],
+   "go back to the last song": [
+    "vctk-p376-indian_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "vctk-p376-indian_014_100.wav"
+   ],
+   "help help help": [
+    "vctk-p376-indian_015_100.wav"
+   ],
+   "help me": [
+    "vctk-p376-indian_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "vctk-p376-indian_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "vctk-p376-indian_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "vctk-p376-indian_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "vctk-p376-indian_020_100.wav"
+   ],
+   "how far is it": [
+    "vctk-p376-indian_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "vctk-p376-indian_022_100.wav"
+   ],
+   "make it quieter": [
+    "vctk-p376-indian_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "vctk-p376-indian_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "vctk-p376-indian_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "vctk-p376-indian_026_100.wav"
+   ],
+   "next song": [
+    "vctk-p376-indian_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "vctk-p376-indian_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "vctk-p376-indian_029_100.wav"
+   ],
+   "pause the music": [
+    "vctk-p376-indian_030_100.wav"
+   ],
+   "play music": [
+    "vctk-p376-indian_031_100.wav"
+   ],
+   "play the next song": [
+    "vctk-p376-indian_032_100.wav"
+   ],
+   "previous song": [
+    "vctk-p376-indian_033_100.wav"
+   ],
+   "resume the song": [
+    "vctk-p376-indian_034_100.wav"
+   ],
+   "send SOS": [
+    "vctk-p376-indian_035_100.wav"
+   ],
+   "skip this song": [
+    "vctk-p376-indian_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "vctk-p376-indian_037_100.wav"
+   ],
+   "start the ride": [
+    "vctk-p376-indian_038_100.wav"
+   ],
+   "stop navigation": [
+    "vctk-p376-indian_039_100.wav"
+   ],
+   "stop the music": [
+    "vctk-p376-indian_040_100.wav"
+   ],
+   "take me home": [
+    "vctk-p376-indian_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "vctk-p376-indian_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "vctk-p376-indian_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "vctk-p376-indian_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "vctk-p376-indian_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "vctk-p376-indian_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "vctk-p376-indian_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "vctk-p376-indian_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "vctk-p376-indian_049_100.wav"
+   ],
+   "turn the volume up": [
+    "vctk-p376-indian_050_100.wav"
+   ],
+   "volume down": [
+    "vctk-p376-indian_051_100.wav"
+   ],
+   "volume up": [
+    "vctk-p376-indian_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "vctk-p376-indian_053_100.wav"
+   ],
+   "what is my speed": [
+    "vctk-p376-indian_054_100.wav"
+   ],
+   "what time is it": [
+    "vctk-p376-indian_055_100.wav"
+   ]
+  },
+  "vctk-p225-uk": {
+   "Hey Doku": [
+    "vctk-p225-uk_000_85.wav",
+    "vctk-p225-uk_000_100.wav",
+    "vctk-p225-uk_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "vctk-p225-uk_001_85.wav",
+    "vctk-p225-uk_001_100.wav",
+    "vctk-p225-uk_001_114.wav"
+   ],
+   "I have had an accident": [
+    "vctk-p225-uk_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "vctk-p225-uk_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "vctk-p225-uk_004_85.wav",
+    "vctk-p225-uk_004_100.wav",
+    "vctk-p225-uk_004_114.wav"
+   ],
+   "accident accident": [
+    "vctk-p225-uk_005_100.wav"
+   ],
+   "call an ambulance": [
+    "vctk-p225-uk_006_100.wav"
+   ],
+   "did you see that road": [
+    "vctk-p225-uk_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "vctk-p225-uk_008_100.wav"
+   ],
+   "emergency": [
+    "vctk-p225-uk_009_100.wav"
+   ],
+   "emergency emergency": [
+    "vctk-p225-uk_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "vctk-p225-uk_011_100.wav"
+   ],
+   "end the ride": [
+    "vctk-p225-uk_012_100.wav"
+   ],
+   "go back to the last song": [
+    "vctk-p225-uk_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "vctk-p225-uk_014_100.wav"
+   ],
+   "help help help": [
+    "vctk-p225-uk_015_100.wav"
+   ],
+   "help me": [
+    "vctk-p225-uk_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "vctk-p225-uk_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "vctk-p225-uk_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "vctk-p225-uk_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "vctk-p225-uk_020_100.wav"
+   ],
+   "how far is it": [
+    "vctk-p225-uk_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "vctk-p225-uk_022_100.wav"
+   ],
+   "make it quieter": [
+    "vctk-p225-uk_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "vctk-p225-uk_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "vctk-p225-uk_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "vctk-p225-uk_026_100.wav"
+   ],
+   "next song": [
+    "vctk-p225-uk_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "vctk-p225-uk_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "vctk-p225-uk_029_100.wav"
+   ],
+   "pause the music": [
+    "vctk-p225-uk_030_100.wav"
+   ],
+   "play music": [
+    "vctk-p225-uk_031_100.wav"
+   ],
+   "play the next song": [
+    "vctk-p225-uk_032_100.wav"
+   ],
+   "previous song": [
+    "vctk-p225-uk_033_100.wav"
+   ],
+   "resume the song": [
+    "vctk-p225-uk_034_100.wav"
+   ],
+   "send SOS": [
+    "vctk-p225-uk_035_100.wav"
+   ],
+   "skip this song": [
+    "vctk-p225-uk_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "vctk-p225-uk_037_100.wav"
+   ],
+   "start the ride": [
+    "vctk-p225-uk_038_100.wav"
+   ],
+   "stop navigation": [
+    "vctk-p225-uk_039_100.wav"
+   ],
+   "stop the music": [
+    "vctk-p225-uk_040_100.wav"
+   ],
+   "take me home": [
+    "vctk-p225-uk_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "vctk-p225-uk_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "vctk-p225-uk_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "vctk-p225-uk_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "vctk-p225-uk_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "vctk-p225-uk_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "vctk-p225-uk_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "vctk-p225-uk_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "vctk-p225-uk_049_100.wav"
+   ],
+   "turn the volume up": [
+    "vctk-p225-uk_050_100.wav"
+   ],
+   "volume down": [
+    "vctk-p225-uk_051_100.wav"
+   ],
+   "volume up": [
+    "vctk-p225-uk_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "vctk-p225-uk_053_100.wav"
+   ],
+   "what is my speed": [
+    "vctk-p225-uk_054_100.wav"
+   ],
+   "what time is it": [
+    "vctk-p225-uk_055_100.wav"
+   ]
+  },
+  "vctk-p226-uk": {
+   "Hey Doku": [
+    "vctk-p226-uk_000_85.wav",
+    "vctk-p226-uk_000_100.wav",
+    "vctk-p226-uk_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "vctk-p226-uk_001_85.wav",
+    "vctk-p226-uk_001_100.wav",
+    "vctk-p226-uk_001_114.wav"
+   ],
+   "I have had an accident": [
+    "vctk-p226-uk_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "vctk-p226-uk_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "vctk-p226-uk_004_85.wav",
+    "vctk-p226-uk_004_100.wav",
+    "vctk-p226-uk_004_114.wav"
+   ],
+   "accident accident": [
+    "vctk-p226-uk_005_100.wav"
+   ],
+   "call an ambulance": [
+    "vctk-p226-uk_006_100.wav"
+   ],
+   "did you see that road": [
+    "vctk-p226-uk_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "vctk-p226-uk_008_100.wav"
+   ],
+   "emergency": [
+    "vctk-p226-uk_009_100.wav"
+   ],
+   "emergency emergency": [
+    "vctk-p226-uk_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "vctk-p226-uk_011_100.wav"
+   ],
+   "end the ride": [
+    "vctk-p226-uk_012_100.wav"
+   ],
+   "go back to the last song": [
+    "vctk-p226-uk_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "vctk-p226-uk_014_100.wav"
+   ],
+   "help help help": [
+    "vctk-p226-uk_015_100.wav"
+   ],
+   "help me": [
+    "vctk-p226-uk_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "vctk-p226-uk_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "vctk-p226-uk_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "vctk-p226-uk_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "vctk-p226-uk_020_100.wav"
+   ],
+   "how far is it": [
+    "vctk-p226-uk_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "vctk-p226-uk_022_100.wav"
+   ],
+   "make it quieter": [
+    "vctk-p226-uk_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "vctk-p226-uk_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "vctk-p226-uk_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "vctk-p226-uk_026_100.wav"
+   ],
+   "next song": [
+    "vctk-p226-uk_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "vctk-p226-uk_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "vctk-p226-uk_029_100.wav"
+   ],
+   "pause the music": [
+    "vctk-p226-uk_030_100.wav"
+   ],
+   "play music": [
+    "vctk-p226-uk_031_100.wav"
+   ],
+   "play the next song": [
+    "vctk-p226-uk_032_100.wav"
+   ],
+   "previous song": [
+    "vctk-p226-uk_033_100.wav"
+   ],
+   "resume the song": [
+    "vctk-p226-uk_034_100.wav"
+   ],
+   "send SOS": [
+    "vctk-p226-uk_035_100.wav"
+   ],
+   "skip this song": [
+    "vctk-p226-uk_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "vctk-p226-uk_037_100.wav"
+   ],
+   "start the ride": [
+    "vctk-p226-uk_038_100.wav"
+   ],
+   "stop navigation": [
+    "vctk-p226-uk_039_100.wav"
+   ],
+   "stop the music": [
+    "vctk-p226-uk_040_100.wav"
+   ],
+   "take me home": [
+    "vctk-p226-uk_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "vctk-p226-uk_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "vctk-p226-uk_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "vctk-p226-uk_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "vctk-p226-uk_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "vctk-p226-uk_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "vctk-p226-uk_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "vctk-p226-uk_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "vctk-p226-uk_049_100.wav"
+   ],
+   "turn the volume up": [
+    "vctk-p226-uk_050_100.wav"
+   ],
+   "volume down": [
+    "vctk-p226-uk_051_100.wav"
+   ],
+   "volume up": [
+    "vctk-p226-uk_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "vctk-p226-uk_053_100.wav"
+   ],
+   "what is my speed": [
+    "vctk-p226-uk_054_100.wav"
+   ],
+   "what time is it": [
+    "vctk-p226-uk_055_100.wav"
+   ]
+  },
+  "vctk-p231-uk": {
+   "Hey Doku": [
+    "vctk-p231-uk_000_85.wav",
+    "vctk-p231-uk_000_100.wav",
+    "vctk-p231-uk_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "vctk-p231-uk_001_85.wav",
+    "vctk-p231-uk_001_100.wav",
+    "vctk-p231-uk_001_114.wav"
+   ],
+   "I have had an accident": [
+    "vctk-p231-uk_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "vctk-p231-uk_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "vctk-p231-uk_004_85.wav",
+    "vctk-p231-uk_004_100.wav",
+    "vctk-p231-uk_004_114.wav"
+   ],
+   "accident accident": [
+    "vctk-p231-uk_005_100.wav"
+   ],
+   "call an ambulance": [
+    "vctk-p231-uk_006_100.wav"
+   ],
+   "did you see that road": [
+    "vctk-p231-uk_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "vctk-p231-uk_008_100.wav"
+   ],
+   "emergency": [
+    "vctk-p231-uk_009_100.wav"
+   ],
+   "emergency emergency": [
+    "vctk-p231-uk_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "vctk-p231-uk_011_100.wav"
+   ],
+   "end the ride": [
+    "vctk-p231-uk_012_100.wav"
+   ],
+   "go back to the last song": [
+    "vctk-p231-uk_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "vctk-p231-uk_014_100.wav"
+   ],
+   "help help help": [
+    "vctk-p231-uk_015_100.wav"
+   ],
+   "help me": [
+    "vctk-p231-uk_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "vctk-p231-uk_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "vctk-p231-uk_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "vctk-p231-uk_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "vctk-p231-uk_020_100.wav"
+   ],
+   "how far is it": [
+    "vctk-p231-uk_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "vctk-p231-uk_022_100.wav"
+   ],
+   "make it quieter": [
+    "vctk-p231-uk_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "vctk-p231-uk_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "vctk-p231-uk_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "vctk-p231-uk_026_100.wav"
+   ],
+   "next song": [
+    "vctk-p231-uk_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "vctk-p231-uk_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "vctk-p231-uk_029_100.wav"
+   ],
+   "pause the music": [
+    "vctk-p231-uk_030_100.wav"
+   ],
+   "play music": [
+    "vctk-p231-uk_031_100.wav"
+   ],
+   "play the next song": [
+    "vctk-p231-uk_032_100.wav"
+   ],
+   "previous song": [
+    "vctk-p231-uk_033_100.wav"
+   ],
+   "resume the song": [
+    "vctk-p231-uk_034_100.wav"
+   ],
+   "send SOS": [
+    "vctk-p231-uk_035_100.wav"
+   ],
+   "skip this song": [
+    "vctk-p231-uk_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "vctk-p231-uk_037_100.wav"
+   ],
+   "start the ride": [
+    "vctk-p231-uk_038_100.wav"
+   ],
+   "stop navigation": [
+    "vctk-p231-uk_039_100.wav"
+   ],
+   "stop the music": [
+    "vctk-p231-uk_040_100.wav"
+   ],
+   "take me home": [
+    "vctk-p231-uk_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "vctk-p231-uk_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "vctk-p231-uk_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "vctk-p231-uk_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "vctk-p231-uk_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "vctk-p231-uk_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "vctk-p231-uk_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "vctk-p231-uk_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "vctk-p231-uk_049_100.wav"
+   ],
+   "turn the volume up": [
+    "vctk-p231-uk_050_100.wav"
+   ],
+   "volume down": [
+    "vctk-p231-uk_051_100.wav"
+   ],
+   "volume up": [
+    "vctk-p231-uk_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "vctk-p231-uk_053_100.wav"
+   ],
+   "what is my speed": [
+    "vctk-p231-uk_054_100.wav"
+   ],
+   "what time is it": [
+    "vctk-p231-uk_055_100.wav"
+   ]
+  },
+  "vctk-p237-uk": {
+   "Hey Doku": [
+    "vctk-p237-uk_000_85.wav",
+    "vctk-p237-uk_000_100.wav",
+    "vctk-p237-uk_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "vctk-p237-uk_001_85.wav",
+    "vctk-p237-uk_001_100.wav",
+    "vctk-p237-uk_001_114.wav"
+   ],
+   "I have had an accident": [
+    "vctk-p237-uk_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "vctk-p237-uk_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "vctk-p237-uk_004_85.wav",
+    "vctk-p237-uk_004_100.wav",
+    "vctk-p237-uk_004_114.wav"
+   ],
+   "accident accident": [
+    "vctk-p237-uk_005_100.wav"
+   ],
+   "call an ambulance": [
+    "vctk-p237-uk_006_100.wav"
+   ],
+   "did you see that road": [
+    "vctk-p237-uk_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "vctk-p237-uk_008_100.wav"
+   ],
+   "emergency": [
+    "vctk-p237-uk_009_100.wav"
+   ],
+   "emergency emergency": [
+    "vctk-p237-uk_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "vctk-p237-uk_011_100.wav"
+   ],
+   "end the ride": [
+    "vctk-p237-uk_012_100.wav"
+   ],
+   "go back to the last song": [
+    "vctk-p237-uk_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "vctk-p237-uk_014_100.wav"
+   ],
+   "help help help": [
+    "vctk-p237-uk_015_100.wav"
+   ],
+   "help me": [
+    "vctk-p237-uk_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "vctk-p237-uk_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "vctk-p237-uk_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "vctk-p237-uk_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "vctk-p237-uk_020_100.wav"
+   ],
+   "how far is it": [
+    "vctk-p237-uk_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "vctk-p237-uk_022_100.wav"
+   ],
+   "make it quieter": [
+    "vctk-p237-uk_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "vctk-p237-uk_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "vctk-p237-uk_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "vctk-p237-uk_026_100.wav"
+   ],
+   "next song": [
+    "vctk-p237-uk_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "vctk-p237-uk_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "vctk-p237-uk_029_100.wav"
+   ],
+   "pause the music": [
+    "vctk-p237-uk_030_100.wav"
+   ],
+   "play music": [
+    "vctk-p237-uk_031_100.wav"
+   ],
+   "play the next song": [
+    "vctk-p237-uk_032_100.wav"
+   ],
+   "previous song": [
+    "vctk-p237-uk_033_100.wav"
+   ],
+   "resume the song": [
+    "vctk-p237-uk_034_100.wav"
+   ],
+   "send SOS": [
+    "vctk-p237-uk_035_100.wav"
+   ],
+   "skip this song": [
+    "vctk-p237-uk_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "vctk-p237-uk_037_100.wav"
+   ],
+   "start the ride": [
+    "vctk-p237-uk_038_100.wav"
+   ],
+   "stop navigation": [
+    "vctk-p237-uk_039_100.wav"
+   ],
+   "stop the music": [
+    "vctk-p237-uk_040_100.wav"
+   ],
+   "take me home": [
+    "vctk-p237-uk_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "vctk-p237-uk_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "vctk-p237-uk_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "vctk-p237-uk_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "vctk-p237-uk_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "vctk-p237-uk_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "vctk-p237-uk_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "vctk-p237-uk_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "vctk-p237-uk_049_100.wav"
+   ],
+   "turn the volume up": [
+    "vctk-p237-uk_050_100.wav"
+   ],
+   "volume down": [
+    "vctk-p237-uk_051_100.wav"
+   ],
+   "volume up": [
+    "vctk-p237-uk_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "vctk-p237-uk_053_100.wav"
+   ],
+   "what is my speed": [
+    "vctk-p237-uk_054_100.wav"
+   ],
+   "what time is it": [
+    "vctk-p237-uk_055_100.wav"
+   ]
+  },
+  "vctk-p245-uk": {
+   "Hey Doku": [
+    "vctk-p245-uk_000_85.wav",
+    "vctk-p245-uk_000_100.wav",
+    "vctk-p245-uk_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "vctk-p245-uk_001_85.wav",
+    "vctk-p245-uk_001_100.wav",
+    "vctk-p245-uk_001_114.wav"
+   ],
+   "I have had an accident": [
+    "vctk-p245-uk_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "vctk-p245-uk_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "vctk-p245-uk_004_85.wav",
+    "vctk-p245-uk_004_100.wav",
+    "vctk-p245-uk_004_114.wav"
+   ],
+   "accident accident": [
+    "vctk-p245-uk_005_100.wav"
+   ],
+   "call an ambulance": [
+    "vctk-p245-uk_006_100.wav"
+   ],
+   "did you see that road": [
+    "vctk-p245-uk_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "vctk-p245-uk_008_100.wav"
+   ],
+   "emergency": [
+    "vctk-p245-uk_009_100.wav"
+   ],
+   "emergency emergency": [
+    "vctk-p245-uk_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "vctk-p245-uk_011_100.wav"
+   ],
+   "end the ride": [
+    "vctk-p245-uk_012_100.wav"
+   ],
+   "go back to the last song": [
+    "vctk-p245-uk_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "vctk-p245-uk_014_100.wav"
+   ],
+   "help help help": [
+    "vctk-p245-uk_015_100.wav"
+   ],
+   "help me": [
+    "vctk-p245-uk_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "vctk-p245-uk_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "vctk-p245-uk_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "vctk-p245-uk_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "vctk-p245-uk_020_100.wav"
+   ],
+   "how far is it": [
+    "vctk-p245-uk_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "vctk-p245-uk_022_100.wav"
+   ],
+   "make it quieter": [
+    "vctk-p245-uk_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "vctk-p245-uk_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "vctk-p245-uk_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "vctk-p245-uk_026_100.wav"
+   ],
+   "next song": [
+    "vctk-p245-uk_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "vctk-p245-uk_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "vctk-p245-uk_029_100.wav"
+   ],
+   "pause the music": [
+    "vctk-p245-uk_030_100.wav"
+   ],
+   "play music": [
+    "vctk-p245-uk_031_100.wav"
+   ],
+   "play the next song": [
+    "vctk-p245-uk_032_100.wav"
+   ],
+   "previous song": [
+    "vctk-p245-uk_033_100.wav"
+   ],
+   "resume the song": [
+    "vctk-p245-uk_034_100.wav"
+   ],
+   "send SOS": [
+    "vctk-p245-uk_035_100.wav"
+   ],
+   "skip this song": [
+    "vctk-p245-uk_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "vctk-p245-uk_037_100.wav"
+   ],
+   "start the ride": [
+    "vctk-p245-uk_038_100.wav"
+   ],
+   "stop navigation": [
+    "vctk-p245-uk_039_100.wav"
+   ],
+   "stop the music": [
+    "vctk-p245-uk_040_100.wav"
+   ],
+   "take me home": [
+    "vctk-p245-uk_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "vctk-p245-uk_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "vctk-p245-uk_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "vctk-p245-uk_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "vctk-p245-uk_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "vctk-p245-uk_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "vctk-p245-uk_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "vctk-p245-uk_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "vctk-p245-uk_049_100.wav"
+   ],
+   "turn the volume up": [
+    "vctk-p245-uk_050_100.wav"
+   ],
+   "volume down": [
+    "vctk-p245-uk_051_100.wav"
+   ],
+   "volume up": [
+    "vctk-p245-uk_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "vctk-p245-uk_053_100.wav"
+   ],
+   "what is my speed": [
+    "vctk-p245-uk_054_100.wav"
+   ],
+   "what time is it": [
+    "vctk-p245-uk_055_100.wav"
+   ]
+  },
+  "vctk-p254-uk": {
+   "Hey Doku": [
+    "vctk-p254-uk_000_85.wav",
+    "vctk-p254-uk_000_100.wav",
+    "vctk-p254-uk_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "vctk-p254-uk_001_85.wav",
+    "vctk-p254-uk_001_100.wav",
+    "vctk-p254-uk_001_114.wav"
+   ],
+   "I have had an accident": [
+    "vctk-p254-uk_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "vctk-p254-uk_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "vctk-p254-uk_004_85.wav",
+    "vctk-p254-uk_004_100.wav",
+    "vctk-p254-uk_004_114.wav"
+   ],
+   "accident accident": [
+    "vctk-p254-uk_005_100.wav"
+   ],
+   "call an ambulance": [
+    "vctk-p254-uk_006_100.wav"
+   ],
+   "did you see that road": [
+    "vctk-p254-uk_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "vctk-p254-uk_008_100.wav"
+   ],
+   "emergency": [
+    "vctk-p254-uk_009_100.wav"
+   ],
+   "emergency emergency": [
+    "vctk-p254-uk_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "vctk-p254-uk_011_100.wav"
+   ],
+   "end the ride": [
+    "vctk-p254-uk_012_100.wav"
+   ],
+   "go back to the last song": [
+    "vctk-p254-uk_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "vctk-p254-uk_014_100.wav"
+   ],
+   "help help help": [
+    "vctk-p254-uk_015_100.wav"
+   ],
+   "help me": [
+    "vctk-p254-uk_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "vctk-p254-uk_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "vctk-p254-uk_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "vctk-p254-uk_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "vctk-p254-uk_020_100.wav"
+   ],
+   "how far is it": [
+    "vctk-p254-uk_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "vctk-p254-uk_022_100.wav"
+   ],
+   "make it quieter": [
+    "vctk-p254-uk_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "vctk-p254-uk_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "vctk-p254-uk_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "vctk-p254-uk_026_100.wav"
+   ],
+   "next song": [
+    "vctk-p254-uk_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "vctk-p254-uk_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "vctk-p254-uk_029_100.wav"
+   ],
+   "pause the music": [
+    "vctk-p254-uk_030_100.wav"
+   ],
+   "play music": [
+    "vctk-p254-uk_031_100.wav"
+   ],
+   "play the next song": [
+    "vctk-p254-uk_032_100.wav"
+   ],
+   "previous song": [
+    "vctk-p254-uk_033_100.wav"
+   ],
+   "resume the song": [
+    "vctk-p254-uk_034_100.wav"
+   ],
+   "send SOS": [
+    "vctk-p254-uk_035_100.wav"
+   ],
+   "skip this song": [
+    "vctk-p254-uk_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "vctk-p254-uk_037_100.wav"
+   ],
+   "start the ride": [
+    "vctk-p254-uk_038_100.wav"
+   ],
+   "stop navigation": [
+    "vctk-p254-uk_039_100.wav"
+   ],
+   "stop the music": [
+    "vctk-p254-uk_040_100.wav"
+   ],
+   "take me home": [
+    "vctk-p254-uk_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "vctk-p254-uk_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "vctk-p254-uk_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "vctk-p254-uk_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "vctk-p254-uk_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "vctk-p254-uk_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "vctk-p254-uk_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "vctk-p254-uk_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "vctk-p254-uk_049_100.wav"
+   ],
+   "turn the volume up": [
+    "vctk-p254-uk_050_100.wav"
+   ],
+   "volume down": [
+    "vctk-p254-uk_051_100.wav"
+   ],
+   "volume up": [
+    "vctk-p254-uk_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "vctk-p254-uk_053_100.wav"
+   ],
+   "what is my speed": [
+    "vctk-p254-uk_054_100.wav"
+   ],
+   "what time is it": [
+    "vctk-p254-uk_055_100.wav"
+   ]
+  },
+  "vctk-p260-uk": {
+   "Hey Doku": [
+    "vctk-p260-uk_000_85.wav",
+    "vctk-p260-uk_000_100.wav",
+    "vctk-p260-uk_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "vctk-p260-uk_001_85.wav",
+    "vctk-p260-uk_001_100.wav",
+    "vctk-p260-uk_001_114.wav"
+   ],
+   "I have had an accident": [
+    "vctk-p260-uk_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "vctk-p260-uk_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "vctk-p260-uk_004_85.wav",
+    "vctk-p260-uk_004_100.wav",
+    "vctk-p260-uk_004_114.wav"
+   ],
+   "accident accident": [
+    "vctk-p260-uk_005_100.wav"
+   ],
+   "call an ambulance": [
+    "vctk-p260-uk_006_100.wav"
+   ],
+   "did you see that road": [
+    "vctk-p260-uk_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "vctk-p260-uk_008_100.wav"
+   ],
+   "emergency": [
+    "vctk-p260-uk_009_100.wav"
+   ],
+   "emergency emergency": [
+    "vctk-p260-uk_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "vctk-p260-uk_011_100.wav"
+   ],
+   "end the ride": [
+    "vctk-p260-uk_012_100.wav"
+   ],
+   "go back to the last song": [
+    "vctk-p260-uk_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "vctk-p260-uk_014_100.wav"
+   ],
+   "help help help": [
+    "vctk-p260-uk_015_100.wav"
+   ],
+   "help me": [
+    "vctk-p260-uk_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "vctk-p260-uk_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "vctk-p260-uk_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "vctk-p260-uk_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "vctk-p260-uk_020_100.wav"
+   ],
+   "how far is it": [
+    "vctk-p260-uk_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "vctk-p260-uk_022_100.wav"
+   ],
+   "make it quieter": [
+    "vctk-p260-uk_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "vctk-p260-uk_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "vctk-p260-uk_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "vctk-p260-uk_026_100.wav"
+   ],
+   "next song": [
+    "vctk-p260-uk_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "vctk-p260-uk_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "vctk-p260-uk_029_100.wav"
+   ],
+   "pause the music": [
+    "vctk-p260-uk_030_100.wav"
+   ],
+   "play music": [
+    "vctk-p260-uk_031_100.wav"
+   ],
+   "play the next song": [
+    "vctk-p260-uk_032_100.wav"
+   ],
+   "previous song": [
+    "vctk-p260-uk_033_100.wav"
+   ],
+   "resume the song": [
+    "vctk-p260-uk_034_100.wav"
+   ],
+   "send SOS": [
+    "vctk-p260-uk_035_100.wav"
+   ],
+   "skip this song": [
+    "vctk-p260-uk_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "vctk-p260-uk_037_100.wav"
+   ],
+   "start the ride": [
+    "vctk-p260-uk_038_100.wav"
+   ],
+   "stop navigation": [
+    "vctk-p260-uk_039_100.wav"
+   ],
+   "stop the music": [
+    "vctk-p260-uk_040_100.wav"
+   ],
+   "take me home": [
+    "vctk-p260-uk_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "vctk-p260-uk_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "vctk-p260-uk_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "vctk-p260-uk_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "vctk-p260-uk_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "vctk-p260-uk_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "vctk-p260-uk_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "vctk-p260-uk_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "vctk-p260-uk_049_100.wav"
+   ],
+   "turn the volume up": [
+    "vctk-p260-uk_050_100.wav"
+   ],
+   "volume down": [
+    "vctk-p260-uk_051_100.wav"
+   ],
+   "volume up": [
+    "vctk-p260-uk_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "vctk-p260-uk_053_100.wav"
+   ],
+   "what is my speed": [
+    "vctk-p260-uk_054_100.wav"
+   ],
+   "what time is it": [
+    "vctk-p260-uk_055_100.wav"
+   ]
+  },
+  "vctk-p270-uk": {
+   "Hey Doku": [
+    "vctk-p270-uk_000_85.wav",
+    "vctk-p270-uk_000_100.wav",
+    "vctk-p270-uk_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "vctk-p270-uk_001_85.wav",
+    "vctk-p270-uk_001_100.wav",
+    "vctk-p270-uk_001_114.wav"
+   ],
+   "I have had an accident": [
+    "vctk-p270-uk_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "vctk-p270-uk_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "vctk-p270-uk_004_85.wav",
+    "vctk-p270-uk_004_100.wav",
+    "vctk-p270-uk_004_114.wav"
+   ],
+   "accident accident": [
+    "vctk-p270-uk_005_100.wav"
+   ],
+   "call an ambulance": [
+    "vctk-p270-uk_006_100.wav"
+   ],
+   "did you see that road": [
+    "vctk-p270-uk_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "vctk-p270-uk_008_100.wav"
+   ],
+   "emergency": [
+    "vctk-p270-uk_009_100.wav"
+   ],
+   "emergency emergency": [
+    "vctk-p270-uk_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "vctk-p270-uk_011_100.wav"
+   ],
+   "end the ride": [
+    "vctk-p270-uk_012_100.wav"
+   ],
+   "go back to the last song": [
+    "vctk-p270-uk_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "vctk-p270-uk_014_100.wav"
+   ],
+   "help help help": [
+    "vctk-p270-uk_015_100.wav"
+   ],
+   "help me": [
+    "vctk-p270-uk_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "vctk-p270-uk_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "vctk-p270-uk_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "vctk-p270-uk_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "vctk-p270-uk_020_100.wav"
+   ],
+   "how far is it": [
+    "vctk-p270-uk_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "vctk-p270-uk_022_100.wav"
+   ],
+   "make it quieter": [
+    "vctk-p270-uk_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "vctk-p270-uk_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "vctk-p270-uk_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "vctk-p270-uk_026_100.wav"
+   ],
+   "next song": [
+    "vctk-p270-uk_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "vctk-p270-uk_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "vctk-p270-uk_029_100.wav"
+   ],
+   "pause the music": [
+    "vctk-p270-uk_030_100.wav"
+   ],
+   "play music": [
+    "vctk-p270-uk_031_100.wav"
+   ],
+   "play the next song": [
+    "vctk-p270-uk_032_100.wav"
+   ],
+   "previous song": [
+    "vctk-p270-uk_033_100.wav"
+   ],
+   "resume the song": [
+    "vctk-p270-uk_034_100.wav"
+   ],
+   "send SOS": [
+    "vctk-p270-uk_035_100.wav"
+   ],
+   "skip this song": [
+    "vctk-p270-uk_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "vctk-p270-uk_037_100.wav"
+   ],
+   "start the ride": [
+    "vctk-p270-uk_038_100.wav"
+   ],
+   "stop navigation": [
+    "vctk-p270-uk_039_100.wav"
+   ],
+   "stop the music": [
+    "vctk-p270-uk_040_100.wav"
+   ],
+   "take me home": [
+    "vctk-p270-uk_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "vctk-p270-uk_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "vctk-p270-uk_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "vctk-p270-uk_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "vctk-p270-uk_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "vctk-p270-uk_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "vctk-p270-uk_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "vctk-p270-uk_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "vctk-p270-uk_049_100.wav"
+   ],
+   "turn the volume up": [
+    "vctk-p270-uk_050_100.wav"
+   ],
+   "volume down": [
+    "vctk-p270-uk_051_100.wav"
+   ],
+   "volume up": [
+    "vctk-p270-uk_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "vctk-p270-uk_053_100.wav"
+   ],
+   "what is my speed": [
+    "vctk-p270-uk_054_100.wav"
+   ],
+   "what time is it": [
+    "vctk-p270-uk_055_100.wav"
+   ]
+  },
+  "vctk-p283-uk": {
+   "Hey Doku": [
+    "vctk-p283-uk_000_85.wav",
+    "vctk-p283-uk_000_100.wav",
+    "vctk-p283-uk_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "vctk-p283-uk_001_85.wav",
+    "vctk-p283-uk_001_100.wav",
+    "vctk-p283-uk_001_114.wav"
+   ],
+   "I have had an accident": [
+    "vctk-p283-uk_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "vctk-p283-uk_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "vctk-p283-uk_004_85.wav",
+    "vctk-p283-uk_004_100.wav",
+    "vctk-p283-uk_004_114.wav"
+   ],
+   "accident accident": [
+    "vctk-p283-uk_005_100.wav"
+   ],
+   "call an ambulance": [
+    "vctk-p283-uk_006_100.wav"
+   ],
+   "did you see that road": [
+    "vctk-p283-uk_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "vctk-p283-uk_008_100.wav"
+   ],
+   "emergency": [
+    "vctk-p283-uk_009_100.wav"
+   ],
+   "emergency emergency": [
+    "vctk-p283-uk_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "vctk-p283-uk_011_100.wav"
+   ],
+   "end the ride": [
+    "vctk-p283-uk_012_100.wav"
+   ],
+   "go back to the last song": [
+    "vctk-p283-uk_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "vctk-p283-uk_014_100.wav"
+   ],
+   "help help help": [
+    "vctk-p283-uk_015_100.wav"
+   ],
+   "help me": [
+    "vctk-p283-uk_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "vctk-p283-uk_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "vctk-p283-uk_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "vctk-p283-uk_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "vctk-p283-uk_020_100.wav"
+   ],
+   "how far is it": [
+    "vctk-p283-uk_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "vctk-p283-uk_022_100.wav"
+   ],
+   "make it quieter": [
+    "vctk-p283-uk_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "vctk-p283-uk_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "vctk-p283-uk_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "vctk-p283-uk_026_100.wav"
+   ],
+   "next song": [
+    "vctk-p283-uk_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "vctk-p283-uk_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "vctk-p283-uk_029_100.wav"
+   ],
+   "pause the music": [
+    "vctk-p283-uk_030_100.wav"
+   ],
+   "play music": [
+    "vctk-p283-uk_031_100.wav"
+   ],
+   "play the next song": [
+    "vctk-p283-uk_032_100.wav"
+   ],
+   "previous song": [
+    "vctk-p283-uk_033_100.wav"
+   ],
+   "resume the song": [
+    "vctk-p283-uk_034_100.wav"
+   ],
+   "send SOS": [
+    "vctk-p283-uk_035_100.wav"
+   ],
+   "skip this song": [
+    "vctk-p283-uk_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "vctk-p283-uk_037_100.wav"
+   ],
+   "start the ride": [
+    "vctk-p283-uk_038_100.wav"
+   ],
+   "stop navigation": [
+    "vctk-p283-uk_039_100.wav"
+   ],
+   "stop the music": [
+    "vctk-p283-uk_040_100.wav"
+   ],
+   "take me home": [
+    "vctk-p283-uk_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "vctk-p283-uk_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "vctk-p283-uk_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "vctk-p283-uk_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "vctk-p283-uk_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "vctk-p283-uk_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "vctk-p283-uk_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "vctk-p283-uk_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "vctk-p283-uk_049_100.wav"
+   ],
+   "turn the volume up": [
+    "vctk-p283-uk_050_100.wav"
+   ],
+   "volume down": [
+    "vctk-p283-uk_051_100.wav"
+   ],
+   "volume up": [
+    "vctk-p283-uk_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "vctk-p283-uk_053_100.wav"
+   ],
+   "what is my speed": [
+    "vctk-p283-uk_054_100.wav"
+   ],
+   "what time is it": [
+    "vctk-p283-uk_055_100.wav"
+   ]
+  },
+  "vctk-p302-uk": {
+   "Hey Doku": [
+    "vctk-p302-uk_000_85.wav",
+    "vctk-p302-uk_000_100.wav",
+    "vctk-p302-uk_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "vctk-p302-uk_001_85.wav",
+    "vctk-p302-uk_001_100.wav",
+    "vctk-p302-uk_001_114.wav"
+   ],
+   "I have had an accident": [
+    "vctk-p302-uk_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "vctk-p302-uk_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "vctk-p302-uk_004_85.wav",
+    "vctk-p302-uk_004_100.wav",
+    "vctk-p302-uk_004_114.wav"
+   ],
+   "accident accident": [
+    "vctk-p302-uk_005_100.wav"
+   ],
+   "call an ambulance": [
+    "vctk-p302-uk_006_100.wav"
+   ],
+   "did you see that road": [
+    "vctk-p302-uk_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "vctk-p302-uk_008_100.wav"
+   ],
+   "emergency": [
+    "vctk-p302-uk_009_100.wav"
+   ],
+   "emergency emergency": [
+    "vctk-p302-uk_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "vctk-p302-uk_011_100.wav"
+   ],
+   "end the ride": [
+    "vctk-p302-uk_012_100.wav"
+   ],
+   "go back to the last song": [
+    "vctk-p302-uk_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "vctk-p302-uk_014_100.wav"
+   ],
+   "help help help": [
+    "vctk-p302-uk_015_100.wav"
+   ],
+   "help me": [
+    "vctk-p302-uk_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "vctk-p302-uk_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "vctk-p302-uk_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "vctk-p302-uk_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "vctk-p302-uk_020_100.wav"
+   ],
+   "how far is it": [
+    "vctk-p302-uk_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "vctk-p302-uk_022_100.wav"
+   ],
+   "make it quieter": [
+    "vctk-p302-uk_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "vctk-p302-uk_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "vctk-p302-uk_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "vctk-p302-uk_026_100.wav"
+   ],
+   "next song": [
+    "vctk-p302-uk_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "vctk-p302-uk_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "vctk-p302-uk_029_100.wav"
+   ],
+   "pause the music": [
+    "vctk-p302-uk_030_100.wav"
+   ],
+   "play music": [
+    "vctk-p302-uk_031_100.wav"
+   ],
+   "play the next song": [
+    "vctk-p302-uk_032_100.wav"
+   ],
+   "previous song": [
+    "vctk-p302-uk_033_100.wav"
+   ],
+   "resume the song": [
+    "vctk-p302-uk_034_100.wav"
+   ],
+   "send SOS": [
+    "vctk-p302-uk_035_100.wav"
+   ],
+   "skip this song": [
+    "vctk-p302-uk_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "vctk-p302-uk_037_100.wav"
+   ],
+   "start the ride": [
+    "vctk-p302-uk_038_100.wav"
+   ],
+   "stop navigation": [
+    "vctk-p302-uk_039_100.wav"
+   ],
+   "stop the music": [
+    "vctk-p302-uk_040_100.wav"
+   ],
+   "take me home": [
+    "vctk-p302-uk_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "vctk-p302-uk_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "vctk-p302-uk_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "vctk-p302-uk_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "vctk-p302-uk_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "vctk-p302-uk_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "vctk-p302-uk_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "vctk-p302-uk_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "vctk-p302-uk_049_100.wav"
+   ],
+   "turn the volume up": [
+    "vctk-p302-uk_050_100.wav"
+   ],
+   "volume down": [
+    "vctk-p302-uk_051_100.wav"
+   ],
+   "volume up": [
+    "vctk-p302-uk_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "vctk-p302-uk_053_100.wav"
+   ],
+   "what is my speed": [
+    "vctk-p302-uk_054_100.wav"
+   ],
+   "what time is it": [
+    "vctk-p302-uk_055_100.wav"
+   ]
+  },
+  "libritts-3922-us": {
+   "Hey Doku": [
+    "libritts-3922-us_000_85.wav",
+    "libritts-3922-us_000_100.wav",
+    "libritts-3922-us_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "libritts-3922-us_001_85.wav",
+    "libritts-3922-us_001_100.wav",
+    "libritts-3922-us_001_114.wav"
+   ],
+   "I have had an accident": [
+    "libritts-3922-us_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "libritts-3922-us_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "libritts-3922-us_004_85.wav",
+    "libritts-3922-us_004_100.wav",
+    "libritts-3922-us_004_114.wav"
+   ],
+   "accident accident": [
+    "libritts-3922-us_005_100.wav"
+   ],
+   "call an ambulance": [
+    "libritts-3922-us_006_100.wav"
+   ],
+   "did you see that road": [
+    "libritts-3922-us_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "libritts-3922-us_008_100.wav"
+   ],
+   "emergency": [
+    "libritts-3922-us_009_100.wav"
+   ],
+   "emergency emergency": [
+    "libritts-3922-us_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "libritts-3922-us_011_100.wav"
+   ],
+   "end the ride": [
+    "libritts-3922-us_012_100.wav"
+   ],
+   "go back to the last song": [
+    "libritts-3922-us_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "libritts-3922-us_014_100.wav"
+   ],
+   "help help help": [
+    "libritts-3922-us_015_100.wav"
+   ],
+   "help me": [
+    "libritts-3922-us_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "libritts-3922-us_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "libritts-3922-us_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "libritts-3922-us_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "libritts-3922-us_020_100.wav"
+   ],
+   "how far is it": [
+    "libritts-3922-us_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "libritts-3922-us_022_100.wav"
+   ],
+   "make it quieter": [
+    "libritts-3922-us_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "libritts-3922-us_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "libritts-3922-us_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "libritts-3922-us_026_100.wav"
+   ],
+   "next song": [
+    "libritts-3922-us_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "libritts-3922-us_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "libritts-3922-us_029_100.wav"
+   ],
+   "pause the music": [
+    "libritts-3922-us_030_100.wav"
+   ],
+   "play music": [
+    "libritts-3922-us_031_100.wav"
+   ],
+   "play the next song": [
+    "libritts-3922-us_032_100.wav"
+   ],
+   "previous song": [
+    "libritts-3922-us_033_100.wav"
+   ],
+   "resume the song": [
+    "libritts-3922-us_034_100.wav"
+   ],
+   "send SOS": [
+    "libritts-3922-us_035_100.wav"
+   ],
+   "skip this song": [
+    "libritts-3922-us_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "libritts-3922-us_037_100.wav"
+   ],
+   "start the ride": [
+    "libritts-3922-us_038_100.wav"
+   ],
+   "stop navigation": [
+    "libritts-3922-us_039_100.wav"
+   ],
+   "stop the music": [
+    "libritts-3922-us_040_100.wav"
+   ],
+   "take me home": [
+    "libritts-3922-us_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "libritts-3922-us_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "libritts-3922-us_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "libritts-3922-us_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "libritts-3922-us_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "libritts-3922-us_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "libritts-3922-us_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "libritts-3922-us_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "libritts-3922-us_049_100.wav"
+   ],
+   "turn the volume up": [
+    "libritts-3922-us_050_100.wav"
+   ],
+   "volume down": [
+    "libritts-3922-us_051_100.wav"
+   ],
+   "volume up": [
+    "libritts-3922-us_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "libritts-3922-us_053_100.wav"
+   ],
+   "what is my speed": [
+    "libritts-3922-us_054_100.wav"
+   ],
+   "what time is it": [
+    "libritts-3922-us_055_100.wav"
+   ]
+  },
+  "libritts-6694-us": {
+   "Hey Doku": [
+    "libritts-6694-us_000_85.wav",
+    "libritts-6694-us_000_100.wav",
+    "libritts-6694-us_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "libritts-6694-us_001_85.wav",
+    "libritts-6694-us_001_100.wav",
+    "libritts-6694-us_001_114.wav"
+   ],
+   "I have had an accident": [
+    "libritts-6694-us_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "libritts-6694-us_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "libritts-6694-us_004_85.wav",
+    "libritts-6694-us_004_100.wav",
+    "libritts-6694-us_004_114.wav"
+   ],
+   "accident accident": [
+    "libritts-6694-us_005_100.wav"
+   ],
+   "call an ambulance": [
+    "libritts-6694-us_006_100.wav"
+   ],
+   "did you see that road": [
+    "libritts-6694-us_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "libritts-6694-us_008_100.wav"
+   ],
+   "emergency": [
+    "libritts-6694-us_009_100.wav"
+   ],
+   "emergency emergency": [
+    "libritts-6694-us_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "libritts-6694-us_011_100.wav"
+   ],
+   "end the ride": [
+    "libritts-6694-us_012_100.wav"
+   ],
+   "go back to the last song": [
+    "libritts-6694-us_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "libritts-6694-us_014_100.wav"
+   ],
+   "help help help": [
+    "libritts-6694-us_015_100.wav"
+   ],
+   "help me": [
+    "libritts-6694-us_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "libritts-6694-us_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "libritts-6694-us_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "libritts-6694-us_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "libritts-6694-us_020_100.wav"
+   ],
+   "how far is it": [
+    "libritts-6694-us_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "libritts-6694-us_022_100.wav"
+   ],
+   "make it quieter": [
+    "libritts-6694-us_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "libritts-6694-us_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "libritts-6694-us_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "libritts-6694-us_026_100.wav"
+   ],
+   "next song": [
+    "libritts-6694-us_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "libritts-6694-us_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "libritts-6694-us_029_100.wav"
+   ],
+   "pause the music": [
+    "libritts-6694-us_030_100.wav"
+   ],
+   "play music": [
+    "libritts-6694-us_031_100.wav"
+   ],
+   "play the next song": [
+    "libritts-6694-us_032_100.wav"
+   ],
+   "previous song": [
+    "libritts-6694-us_033_100.wav"
+   ],
+   "resume the song": [
+    "libritts-6694-us_034_100.wav"
+   ],
+   "send SOS": [
+    "libritts-6694-us_035_100.wav"
+   ],
+   "skip this song": [
+    "libritts-6694-us_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "libritts-6694-us_037_100.wav"
+   ],
+   "start the ride": [
+    "libritts-6694-us_038_100.wav"
+   ],
+   "stop navigation": [
+    "libritts-6694-us_039_100.wav"
+   ],
+   "stop the music": [
+    "libritts-6694-us_040_100.wav"
+   ],
+   "take me home": [
+    "libritts-6694-us_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "libritts-6694-us_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "libritts-6694-us_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "libritts-6694-us_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "libritts-6694-us_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "libritts-6694-us_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "libritts-6694-us_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "libritts-6694-us_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "libritts-6694-us_049_100.wav"
+   ],
+   "turn the volume up": [
+    "libritts-6694-us_050_100.wav"
+   ],
+   "volume down": [
+    "libritts-6694-us_051_100.wav"
+   ],
+   "volume up": [
+    "libritts-6694-us_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "libritts-6694-us_053_100.wav"
+   ],
+   "what is my speed": [
+    "libritts-6694-us_054_100.wav"
+   ],
+   "what time is it": [
+    "libritts-6694-us_055_100.wav"
+   ]
+  },
+  "libritts-1509-us": {
+   "Hey Doku": [
+    "libritts-1509-us_000_85.wav",
+    "libritts-1509-us_000_100.wav",
+    "libritts-1509-us_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "libritts-1509-us_001_85.wav",
+    "libritts-1509-us_001_100.wav",
+    "libritts-1509-us_001_114.wav"
+   ],
+   "I have had an accident": [
+    "libritts-1509-us_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "libritts-1509-us_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "libritts-1509-us_004_85.wav",
+    "libritts-1509-us_004_100.wav",
+    "libritts-1509-us_004_114.wav"
+   ],
+   "accident accident": [
+    "libritts-1509-us_005_100.wav"
+   ],
+   "call an ambulance": [
+    "libritts-1509-us_006_100.wav"
+   ],
+   "did you see that road": [
+    "libritts-1509-us_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "libritts-1509-us_008_100.wav"
+   ],
+   "emergency": [
+    "libritts-1509-us_009_100.wav"
+   ],
+   "emergency emergency": [
+    "libritts-1509-us_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "libritts-1509-us_011_100.wav"
+   ],
+   "end the ride": [
+    "libritts-1509-us_012_100.wav"
+   ],
+   "go back to the last song": [
+    "libritts-1509-us_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "libritts-1509-us_014_100.wav"
+   ],
+   "help help help": [
+    "libritts-1509-us_015_100.wav"
+   ],
+   "help me": [
+    "libritts-1509-us_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "libritts-1509-us_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "libritts-1509-us_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "libritts-1509-us_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "libritts-1509-us_020_100.wav"
+   ],
+   "how far is it": [
+    "libritts-1509-us_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "libritts-1509-us_022_100.wav"
+   ],
+   "make it quieter": [
+    "libritts-1509-us_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "libritts-1509-us_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "libritts-1509-us_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "libritts-1509-us_026_100.wav"
+   ],
+   "next song": [
+    "libritts-1509-us_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "libritts-1509-us_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "libritts-1509-us_029_100.wav"
+   ],
+   "pause the music": [
+    "libritts-1509-us_030_100.wav"
+   ],
+   "play music": [
+    "libritts-1509-us_031_100.wav"
+   ],
+   "play the next song": [
+    "libritts-1509-us_032_100.wav"
+   ],
+   "previous song": [
+    "libritts-1509-us_033_100.wav"
+   ],
+   "resume the song": [
+    "libritts-1509-us_034_100.wav"
+   ],
+   "send SOS": [
+    "libritts-1509-us_035_100.wav"
+   ],
+   "skip this song": [
+    "libritts-1509-us_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "libritts-1509-us_037_100.wav"
+   ],
+   "start the ride": [
+    "libritts-1509-us_038_100.wav"
+   ],
+   "stop navigation": [
+    "libritts-1509-us_039_100.wav"
+   ],
+   "stop the music": [
+    "libritts-1509-us_040_100.wav"
+   ],
+   "take me home": [
+    "libritts-1509-us_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "libritts-1509-us_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "libritts-1509-us_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "libritts-1509-us_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "libritts-1509-us_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "libritts-1509-us_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "libritts-1509-us_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "libritts-1509-us_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "libritts-1509-us_049_100.wav"
+   ],
+   "turn the volume up": [
+    "libritts-1509-us_050_100.wav"
+   ],
+   "volume down": [
+    "libritts-1509-us_051_100.wav"
+   ],
+   "volume up": [
+    "libritts-1509-us_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "libritts-1509-us_053_100.wav"
+   ],
+   "what is my speed": [
+    "libritts-1509-us_054_100.wav"
+   ],
+   "what time is it": [
+    "libritts-1509-us_055_100.wav"
+   ]
+  },
+  "libritts-3032-us": {
+   "Hey Doku": [
+    "libritts-3032-us_000_85.wav",
+    "libritts-3032-us_000_100.wav",
+    "libritts-3032-us_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "libritts-3032-us_001_85.wav",
+    "libritts-3032-us_001_100.wav",
+    "libritts-3032-us_001_114.wav"
+   ],
+   "I have had an accident": [
+    "libritts-3032-us_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "libritts-3032-us_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "libritts-3032-us_004_85.wav",
+    "libritts-3032-us_004_100.wav",
+    "libritts-3032-us_004_114.wav"
+   ],
+   "accident accident": [
+    "libritts-3032-us_005_100.wav"
+   ],
+   "call an ambulance": [
+    "libritts-3032-us_006_100.wav"
+   ],
+   "did you see that road": [
+    "libritts-3032-us_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "libritts-3032-us_008_100.wav"
+   ],
+   "emergency": [
+    "libritts-3032-us_009_100.wav"
+   ],
+   "emergency emergency": [
+    "libritts-3032-us_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "libritts-3032-us_011_100.wav"
+   ],
+   "end the ride": [
+    "libritts-3032-us_012_100.wav"
+   ],
+   "go back to the last song": [
+    "libritts-3032-us_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "libritts-3032-us_014_100.wav"
+   ],
+   "help help help": [
+    "libritts-3032-us_015_100.wav"
+   ],
+   "help me": [
+    "libritts-3032-us_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "libritts-3032-us_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "libritts-3032-us_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "libritts-3032-us_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "libritts-3032-us_020_100.wav"
+   ],
+   "how far is it": [
+    "libritts-3032-us_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "libritts-3032-us_022_100.wav"
+   ],
+   "make it quieter": [
+    "libritts-3032-us_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "libritts-3032-us_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "libritts-3032-us_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "libritts-3032-us_026_100.wav"
+   ],
+   "next song": [
+    "libritts-3032-us_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "libritts-3032-us_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "libritts-3032-us_029_100.wav"
+   ],
+   "pause the music": [
+    "libritts-3032-us_030_100.wav"
+   ],
+   "play music": [
+    "libritts-3032-us_031_100.wav"
+   ],
+   "play the next song": [
+    "libritts-3032-us_032_100.wav"
+   ],
+   "previous song": [
+    "libritts-3032-us_033_100.wav"
+   ],
+   "resume the song": [
+    "libritts-3032-us_034_100.wav"
+   ],
+   "send SOS": [
+    "libritts-3032-us_035_100.wav"
+   ],
+   "skip this song": [
+    "libritts-3032-us_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "libritts-3032-us_037_100.wav"
+   ],
+   "start the ride": [
+    "libritts-3032-us_038_100.wav"
+   ],
+   "stop navigation": [
+    "libritts-3032-us_039_100.wav"
+   ],
+   "stop the music": [
+    "libritts-3032-us_040_100.wav"
+   ],
+   "take me home": [
+    "libritts-3032-us_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "libritts-3032-us_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "libritts-3032-us_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "libritts-3032-us_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "libritts-3032-us_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "libritts-3032-us_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "libritts-3032-us_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "libritts-3032-us_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "libritts-3032-us_049_100.wav"
+   ],
+   "turn the volume up": [
+    "libritts-3032-us_050_100.wav"
+   ],
+   "volume down": [
+    "libritts-3032-us_051_100.wav"
+   ],
+   "volume up": [
+    "libritts-3032-us_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "libritts-3032-us_053_100.wav"
+   ],
+   "what is my speed": [
+    "libritts-3032-us_054_100.wav"
+   ],
+   "what time is it": [
+    "libritts-3032-us_055_100.wav"
+   ]
+  },
+  "libritts-5519-us": {
+   "Hey Doku": [
+    "libritts-5519-us_000_85.wav",
+    "libritts-5519-us_000_100.wav",
+    "libritts-5519-us_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "libritts-5519-us_001_85.wav",
+    "libritts-5519-us_001_100.wav",
+    "libritts-5519-us_001_114.wav"
+   ],
+   "I have had an accident": [
+    "libritts-5519-us_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "libritts-5519-us_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "libritts-5519-us_004_85.wav",
+    "libritts-5519-us_004_100.wav",
+    "libritts-5519-us_004_114.wav"
+   ],
+   "accident accident": [
+    "libritts-5519-us_005_100.wav"
+   ],
+   "call an ambulance": [
+    "libritts-5519-us_006_100.wav"
+   ],
+   "did you see that road": [
+    "libritts-5519-us_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "libritts-5519-us_008_100.wav"
+   ],
+   "emergency": [
+    "libritts-5519-us_009_100.wav"
+   ],
+   "emergency emergency": [
+    "libritts-5519-us_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "libritts-5519-us_011_100.wav"
+   ],
+   "end the ride": [
+    "libritts-5519-us_012_100.wav"
+   ],
+   "go back to the last song": [
+    "libritts-5519-us_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "libritts-5519-us_014_100.wav"
+   ],
+   "help help help": [
+    "libritts-5519-us_015_100.wav"
+   ],
+   "help me": [
+    "libritts-5519-us_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "libritts-5519-us_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "libritts-5519-us_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "libritts-5519-us_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "libritts-5519-us_020_100.wav"
+   ],
+   "how far is it": [
+    "libritts-5519-us_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "libritts-5519-us_022_100.wav"
+   ],
+   "make it quieter": [
+    "libritts-5519-us_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "libritts-5519-us_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "libritts-5519-us_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "libritts-5519-us_026_100.wav"
+   ],
+   "next song": [
+    "libritts-5519-us_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "libritts-5519-us_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "libritts-5519-us_029_100.wav"
+   ],
+   "pause the music": [
+    "libritts-5519-us_030_100.wav"
+   ],
+   "play music": [
+    "libritts-5519-us_031_100.wav"
+   ],
+   "play the next song": [
+    "libritts-5519-us_032_100.wav"
+   ],
+   "previous song": [
+    "libritts-5519-us_033_100.wav"
+   ],
+   "resume the song": [
+    "libritts-5519-us_034_100.wav"
+   ],
+   "send SOS": [
+    "libritts-5519-us_035_100.wav"
+   ],
+   "skip this song": [
+    "libritts-5519-us_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "libritts-5519-us_037_100.wav"
+   ],
+   "start the ride": [
+    "libritts-5519-us_038_100.wav"
+   ],
+   "stop navigation": [
+    "libritts-5519-us_039_100.wav"
+   ],
+   "stop the music": [
+    "libritts-5519-us_040_100.wav"
+   ],
+   "take me home": [
+    "libritts-5519-us_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "libritts-5519-us_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "libritts-5519-us_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "libritts-5519-us_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "libritts-5519-us_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "libritts-5519-us_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "libritts-5519-us_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "libritts-5519-us_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "libritts-5519-us_049_100.wav"
+   ],
+   "turn the volume up": [
+    "libritts-5519-us_050_100.wav"
+   ],
+   "volume down": [
+    "libritts-5519-us_051_100.wav"
+   ],
+   "volume up": [
+    "libritts-5519-us_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "libritts-5519-us_053_100.wav"
+   ],
+   "what is my speed": [
+    "libritts-5519-us_054_100.wav"
+   ],
+   "what time is it": [
+    "libritts-5519-us_055_100.wav"
+   ]
+  },
+  "libritts-3905-us": {
+   "Hey Doku": [
+    "libritts-3905-us_000_85.wav",
+    "libritts-3905-us_000_100.wav",
+    "libritts-3905-us_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "libritts-3905-us_001_85.wav",
+    "libritts-3905-us_001_100.wav",
+    "libritts-3905-us_001_114.wav"
+   ],
+   "I have had an accident": [
+    "libritts-3905-us_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "libritts-3905-us_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "libritts-3905-us_004_85.wav",
+    "libritts-3905-us_004_100.wav",
+    "libritts-3905-us_004_114.wav"
+   ],
+   "accident accident": [
+    "libritts-3905-us_005_100.wav"
+   ],
+   "call an ambulance": [
+    "libritts-3905-us_006_100.wav"
+   ],
+   "did you see that road": [
+    "libritts-3905-us_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "libritts-3905-us_008_100.wav"
+   ],
+   "emergency": [
+    "libritts-3905-us_009_100.wav"
+   ],
+   "emergency emergency": [
+    "libritts-3905-us_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "libritts-3905-us_011_100.wav"
+   ],
+   "end the ride": [
+    "libritts-3905-us_012_100.wav"
+   ],
+   "go back to the last song": [
+    "libritts-3905-us_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "libritts-3905-us_014_100.wav"
+   ],
+   "help help help": [
+    "libritts-3905-us_015_100.wav"
+   ],
+   "help me": [
+    "libritts-3905-us_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "libritts-3905-us_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "libritts-3905-us_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "libritts-3905-us_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "libritts-3905-us_020_100.wav"
+   ],
+   "how far is it": [
+    "libritts-3905-us_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "libritts-3905-us_022_100.wav"
+   ],
+   "make it quieter": [
+    "libritts-3905-us_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "libritts-3905-us_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "libritts-3905-us_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "libritts-3905-us_026_100.wav"
+   ],
+   "next song": [
+    "libritts-3905-us_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "libritts-3905-us_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "libritts-3905-us_029_100.wav"
+   ],
+   "pause the music": [
+    "libritts-3905-us_030_100.wav"
+   ],
+   "play music": [
+    "libritts-3905-us_031_100.wav"
+   ],
+   "play the next song": [
+    "libritts-3905-us_032_100.wav"
+   ],
+   "previous song": [
+    "libritts-3905-us_033_100.wav"
+   ],
+   "resume the song": [
+    "libritts-3905-us_034_100.wav"
+   ],
+   "send SOS": [
+    "libritts-3905-us_035_100.wav"
+   ],
+   "skip this song": [
+    "libritts-3905-us_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "libritts-3905-us_037_100.wav"
+   ],
+   "start the ride": [
+    "libritts-3905-us_038_100.wav"
+   ],
+   "stop navigation": [
+    "libritts-3905-us_039_100.wav"
+   ],
+   "stop the music": [
+    "libritts-3905-us_040_100.wav"
+   ],
+   "take me home": [
+    "libritts-3905-us_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "libritts-3905-us_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "libritts-3905-us_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "libritts-3905-us_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "libritts-3905-us_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "libritts-3905-us_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "libritts-3905-us_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "libritts-3905-us_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "libritts-3905-us_049_100.wav"
+   ],
+   "turn the volume up": [
+    "libritts-3905-us_050_100.wav"
+   ],
+   "volume down": [
+    "libritts-3905-us_051_100.wav"
+   ],
+   "volume up": [
+    "libritts-3905-us_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "libritts-3905-us_053_100.wav"
+   ],
+   "what is my speed": [
+    "libritts-3905-us_054_100.wav"
+   ],
+   "what time is it": [
+    "libritts-3905-us_055_100.wav"
+   ]
+  },
+  "libritts-3221-us": {
+   "Hey Doku": [
+    "libritts-3221-us_000_85.wav",
+    "libritts-3221-us_000_100.wav",
+    "libritts-3221-us_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "libritts-3221-us_001_85.wav",
+    "libritts-3221-us_001_100.wav",
+    "libritts-3221-us_001_114.wav"
+   ],
+   "I have had an accident": [
+    "libritts-3221-us_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "libritts-3221-us_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "libritts-3221-us_004_85.wav",
+    "libritts-3221-us_004_100.wav",
+    "libritts-3221-us_004_114.wav"
+   ],
+   "accident accident": [
+    "libritts-3221-us_005_100.wav"
+   ],
+   "call an ambulance": [
+    "libritts-3221-us_006_100.wav"
+   ],
+   "did you see that road": [
+    "libritts-3221-us_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "libritts-3221-us_008_100.wav"
+   ],
+   "emergency": [
+    "libritts-3221-us_009_100.wav"
+   ],
+   "emergency emergency": [
+    "libritts-3221-us_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "libritts-3221-us_011_100.wav"
+   ],
+   "end the ride": [
+    "libritts-3221-us_012_100.wav"
+   ],
+   "go back to the last song": [
+    "libritts-3221-us_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "libritts-3221-us_014_100.wav"
+   ],
+   "help help help": [
+    "libritts-3221-us_015_100.wav"
+   ],
+   "help me": [
+    "libritts-3221-us_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "libritts-3221-us_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "libritts-3221-us_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "libritts-3221-us_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "libritts-3221-us_020_100.wav"
+   ],
+   "how far is it": [
+    "libritts-3221-us_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "libritts-3221-us_022_100.wav"
+   ],
+   "make it quieter": [
+    "libritts-3221-us_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "libritts-3221-us_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "libritts-3221-us_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "libritts-3221-us_026_100.wav"
+   ],
+   "next song": [
+    "libritts-3221-us_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "libritts-3221-us_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "libritts-3221-us_029_100.wav"
+   ],
+   "pause the music": [
+    "libritts-3221-us_030_100.wav"
+   ],
+   "play music": [
+    "libritts-3221-us_031_100.wav"
+   ],
+   "play the next song": [
+    "libritts-3221-us_032_100.wav"
+   ],
+   "previous song": [
+    "libritts-3221-us_033_100.wav"
+   ],
+   "resume the song": [
+    "libritts-3221-us_034_100.wav"
+   ],
+   "send SOS": [
+    "libritts-3221-us_035_100.wav"
+   ],
+   "skip this song": [
+    "libritts-3221-us_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "libritts-3221-us_037_100.wav"
+   ],
+   "start the ride": [
+    "libritts-3221-us_038_100.wav"
+   ],
+   "stop navigation": [
+    "libritts-3221-us_039_100.wav"
+   ],
+   "stop the music": [
+    "libritts-3221-us_040_100.wav"
+   ],
+   "take me home": [
+    "libritts-3221-us_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "libritts-3221-us_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "libritts-3221-us_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "libritts-3221-us_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "libritts-3221-us_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "libritts-3221-us_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "libritts-3221-us_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "libritts-3221-us_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "libritts-3221-us_049_100.wav"
+   ],
+   "turn the volume up": [
+    "libritts-3221-us_050_100.wav"
+   ],
+   "volume down": [
+    "libritts-3221-us_051_100.wav"
+   ],
+   "volume up": [
+    "libritts-3221-us_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "libritts-3221-us_053_100.wav"
+   ],
+   "what is my speed": [
+    "libritts-3221-us_054_100.wav"
+   ],
+   "what time is it": [
+    "libritts-3221-us_055_100.wav"
+   ]
+  },
+  "libritts-5115-us": {
+   "Hey Doku": [
+    "libritts-5115-us_000_85.wav",
+    "libritts-5115-us_000_100.wav",
+    "libritts-5115-us_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "libritts-5115-us_001_85.wav",
+    "libritts-5115-us_001_100.wav",
+    "libritts-5115-us_001_114.wav"
+   ],
+   "I have had an accident": [
+    "libritts-5115-us_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "libritts-5115-us_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "libritts-5115-us_004_85.wav",
+    "libritts-5115-us_004_100.wav",
+    "libritts-5115-us_004_114.wav"
+   ],
+   "accident accident": [
+    "libritts-5115-us_005_100.wav"
+   ],
+   "call an ambulance": [
+    "libritts-5115-us_006_100.wav"
+   ],
+   "did you see that road": [
+    "libritts-5115-us_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "libritts-5115-us_008_100.wav"
+   ],
+   "emergency": [
+    "libritts-5115-us_009_100.wav"
+   ],
+   "emergency emergency": [
+    "libritts-5115-us_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "libritts-5115-us_011_100.wav"
+   ],
+   "end the ride": [
+    "libritts-5115-us_012_100.wav"
+   ],
+   "go back to the last song": [
+    "libritts-5115-us_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "libritts-5115-us_014_100.wav"
+   ],
+   "help help help": [
+    "libritts-5115-us_015_100.wav"
+   ],
+   "help me": [
+    "libritts-5115-us_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "libritts-5115-us_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "libritts-5115-us_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "libritts-5115-us_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "libritts-5115-us_020_100.wav"
+   ],
+   "how far is it": [
+    "libritts-5115-us_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "libritts-5115-us_022_100.wav"
+   ],
+   "make it quieter": [
+    "libritts-5115-us_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "libritts-5115-us_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "libritts-5115-us_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "libritts-5115-us_026_100.wav"
+   ],
+   "next song": [
+    "libritts-5115-us_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "libritts-5115-us_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "libritts-5115-us_029_100.wav"
+   ],
+   "pause the music": [
+    "libritts-5115-us_030_100.wav"
+   ],
+   "play music": [
+    "libritts-5115-us_031_100.wav"
+   ],
+   "play the next song": [
+    "libritts-5115-us_032_100.wav"
+   ],
+   "previous song": [
+    "libritts-5115-us_033_100.wav"
+   ],
+   "resume the song": [
+    "libritts-5115-us_034_100.wav"
+   ],
+   "send SOS": [
+    "libritts-5115-us_035_100.wav"
+   ],
+   "skip this song": [
+    "libritts-5115-us_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "libritts-5115-us_037_100.wav"
+   ],
+   "start the ride": [
+    "libritts-5115-us_038_100.wav"
+   ],
+   "stop navigation": [
+    "libritts-5115-us_039_100.wav"
+   ],
+   "stop the music": [
+    "libritts-5115-us_040_100.wav"
+   ],
+   "take me home": [
+    "libritts-5115-us_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "libritts-5115-us_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "libritts-5115-us_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "libritts-5115-us_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "libritts-5115-us_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "libritts-5115-us_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "libritts-5115-us_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "libritts-5115-us_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "libritts-5115-us_049_100.wav"
+   ],
+   "turn the volume up": [
+    "libritts-5115-us_050_100.wav"
+   ],
+   "volume down": [
+    "libritts-5115-us_051_100.wav"
+   ],
+   "volume up": [
+    "libritts-5115-us_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "libritts-5115-us_053_100.wav"
+   ],
+   "what is my speed": [
+    "libritts-5115-us_054_100.wav"
+   ],
+   "what time is it": [
+    "libritts-5115-us_055_100.wav"
+   ]
+  },
+  "libritts-1160-us": {
+   "Hey Doku": [
+    "libritts-1160-us_000_85.wav",
+    "libritts-1160-us_000_100.wav",
+    "libritts-1160-us_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "libritts-1160-us_001_85.wav",
+    "libritts-1160-us_001_100.wav",
+    "libritts-1160-us_001_114.wav"
+   ],
+   "I have had an accident": [
+    "libritts-1160-us_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "libritts-1160-us_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "libritts-1160-us_004_85.wav",
+    "libritts-1160-us_004_100.wav",
+    "libritts-1160-us_004_114.wav"
+   ],
+   "accident accident": [
+    "libritts-1160-us_005_100.wav"
+   ],
+   "call an ambulance": [
+    "libritts-1160-us_006_100.wav"
+   ],
+   "did you see that road": [
+    "libritts-1160-us_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "libritts-1160-us_008_100.wav"
+   ],
+   "emergency": [
+    "libritts-1160-us_009_100.wav"
+   ],
+   "emergency emergency": [
+    "libritts-1160-us_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "libritts-1160-us_011_100.wav"
+   ],
+   "end the ride": [
+    "libritts-1160-us_012_100.wav"
+   ],
+   "go back to the last song": [
+    "libritts-1160-us_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "libritts-1160-us_014_100.wav"
+   ],
+   "help help help": [
+    "libritts-1160-us_015_100.wav"
+   ],
+   "help me": [
+    "libritts-1160-us_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "libritts-1160-us_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "libritts-1160-us_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "libritts-1160-us_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "libritts-1160-us_020_100.wav"
+   ],
+   "how far is it": [
+    "libritts-1160-us_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "libritts-1160-us_022_100.wav"
+   ],
+   "make it quieter": [
+    "libritts-1160-us_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "libritts-1160-us_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "libritts-1160-us_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "libritts-1160-us_026_100.wav"
+   ],
+   "next song": [
+    "libritts-1160-us_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "libritts-1160-us_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "libritts-1160-us_029_100.wav"
+   ],
+   "pause the music": [
+    "libritts-1160-us_030_100.wav"
+   ],
+   "play music": [
+    "libritts-1160-us_031_100.wav"
+   ],
+   "play the next song": [
+    "libritts-1160-us_032_100.wav"
+   ],
+   "previous song": [
+    "libritts-1160-us_033_100.wav"
+   ],
+   "resume the song": [
+    "libritts-1160-us_034_100.wav"
+   ],
+   "send SOS": [
+    "libritts-1160-us_035_100.wav"
+   ],
+   "skip this song": [
+    "libritts-1160-us_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "libritts-1160-us_037_100.wav"
+   ],
+   "start the ride": [
+    "libritts-1160-us_038_100.wav"
+   ],
+   "stop navigation": [
+    "libritts-1160-us_039_100.wav"
+   ],
+   "stop the music": [
+    "libritts-1160-us_040_100.wav"
+   ],
+   "take me home": [
+    "libritts-1160-us_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "libritts-1160-us_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "libritts-1160-us_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "libritts-1160-us_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "libritts-1160-us_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "libritts-1160-us_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "libritts-1160-us_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "libritts-1160-us_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "libritts-1160-us_049_100.wav"
+   ],
+   "turn the volume up": [
+    "libritts-1160-us_050_100.wav"
+   ],
+   "volume down": [
+    "libritts-1160-us_051_100.wav"
+   ],
+   "volume up": [
+    "libritts-1160-us_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "libritts-1160-us_053_100.wav"
+   ],
+   "what is my speed": [
+    "libritts-1160-us_054_100.wav"
+   ],
+   "what time is it": [
+    "libritts-1160-us_055_100.wav"
+   ]
+  },
+  "libritts-3790-us": {
+   "Hey Doku": [
+    "libritts-3790-us_000_85.wav",
+    "libritts-3790-us_000_100.wav",
+    "libritts-3790-us_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "libritts-3790-us_001_85.wav",
+    "libritts-3790-us_001_100.wav",
+    "libritts-3790-us_001_114.wav"
+   ],
+   "I have had an accident": [
+    "libritts-3790-us_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "libritts-3790-us_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "libritts-3790-us_004_85.wav",
+    "libritts-3790-us_004_100.wav",
+    "libritts-3790-us_004_114.wav"
+   ],
+   "accident accident": [
+    "libritts-3790-us_005_100.wav"
+   ],
+   "call an ambulance": [
+    "libritts-3790-us_006_100.wav"
+   ],
+   "did you see that road": [
+    "libritts-3790-us_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "libritts-3790-us_008_100.wav"
+   ],
+   "emergency": [
+    "libritts-3790-us_009_100.wav"
+   ],
+   "emergency emergency": [
+    "libritts-3790-us_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "libritts-3790-us_011_100.wav"
+   ],
+   "end the ride": [
+    "libritts-3790-us_012_100.wav"
+   ],
+   "go back to the last song": [
+    "libritts-3790-us_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "libritts-3790-us_014_100.wav"
+   ],
+   "help help help": [
+    "libritts-3790-us_015_100.wav"
+   ],
+   "help me": [
+    "libritts-3790-us_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "libritts-3790-us_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "libritts-3790-us_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "libritts-3790-us_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "libritts-3790-us_020_100.wav"
+   ],
+   "how far is it": [
+    "libritts-3790-us_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "libritts-3790-us_022_100.wav"
+   ],
+   "make it quieter": [
+    "libritts-3790-us_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "libritts-3790-us_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "libritts-3790-us_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "libritts-3790-us_026_100.wav"
+   ],
+   "next song": [
+    "libritts-3790-us_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "libritts-3790-us_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "libritts-3790-us_029_100.wav"
+   ],
+   "pause the music": [
+    "libritts-3790-us_030_100.wav"
+   ],
+   "play music": [
+    "libritts-3790-us_031_100.wav"
+   ],
+   "play the next song": [
+    "libritts-3790-us_032_100.wav"
+   ],
+   "previous song": [
+    "libritts-3790-us_033_100.wav"
+   ],
+   "resume the song": [
+    "libritts-3790-us_034_100.wav"
+   ],
+   "send SOS": [
+    "libritts-3790-us_035_100.wav"
+   ],
+   "skip this song": [
+    "libritts-3790-us_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "libritts-3790-us_037_100.wav"
+   ],
+   "start the ride": [
+    "libritts-3790-us_038_100.wav"
+   ],
+   "stop navigation": [
+    "libritts-3790-us_039_100.wav"
+   ],
+   "stop the music": [
+    "libritts-3790-us_040_100.wav"
+   ],
+   "take me home": [
+    "libritts-3790-us_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "libritts-3790-us_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "libritts-3790-us_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "libritts-3790-us_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "libritts-3790-us_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "libritts-3790-us_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "libritts-3790-us_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "libritts-3790-us_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "libritts-3790-us_049_100.wav"
+   ],
+   "turn the volume up": [
+    "libritts-3790-us_050_100.wav"
+   ],
+   "volume down": [
+    "libritts-3790-us_051_100.wav"
+   ],
+   "volume up": [
+    "libritts-3790-us_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "libritts-3790-us_053_100.wav"
+   ],
+   "what is my speed": [
+    "libritts-3790-us_054_100.wav"
+   ],
+   "what time is it": [
+    "libritts-3790-us_055_100.wav"
+   ]
+  },
+  "lessac": {
+   "Hey Doku": [
+    "lessac_000_85.wav",
+    "lessac_000_100.wav",
+    "lessac_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "lessac_001_85.wav",
+    "lessac_001_100.wav",
+    "lessac_001_114.wav"
+   ],
+   "I have had an accident": [
+    "lessac_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "lessac_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "lessac_004_85.wav",
+    "lessac_004_100.wav",
+    "lessac_004_114.wav"
+   ],
+   "accident accident": [
+    "lessac_005_100.wav"
+   ],
+   "call an ambulance": [
+    "lessac_006_100.wav"
+   ],
+   "did you see that road": [
+    "lessac_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "lessac_008_100.wav"
+   ],
+   "emergency": [
+    "lessac_009_100.wav"
+   ],
+   "emergency emergency": [
+    "lessac_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "lessac_011_100.wav"
+   ],
+   "end the ride": [
+    "lessac_012_100.wav"
+   ],
+   "go back to the last song": [
+    "lessac_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "lessac_014_100.wav"
+   ],
+   "help help help": [
+    "lessac_015_100.wav"
+   ],
+   "help me": [
+    "lessac_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "lessac_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "lessac_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "lessac_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "lessac_020_100.wav"
+   ],
+   "how far is it": [
+    "lessac_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "lessac_022_100.wav"
+   ],
+   "make it quieter": [
+    "lessac_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "lessac_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "lessac_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "lessac_026_100.wav"
+   ],
+   "next song": [
+    "lessac_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "lessac_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "lessac_029_100.wav"
+   ],
+   "pause the music": [
+    "lessac_030_100.wav"
+   ],
+   "play music": [
+    "lessac_031_100.wav"
+   ],
+   "play the next song": [
+    "lessac_032_100.wav"
+   ],
+   "previous song": [
+    "lessac_033_100.wav"
+   ],
+   "resume the song": [
+    "lessac_034_100.wav"
+   ],
+   "send SOS": [
+    "lessac_035_100.wav"
+   ],
+   "skip this song": [
+    "lessac_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "lessac_037_100.wav"
+   ],
+   "start the ride": [
+    "lessac_038_100.wav"
+   ],
+   "stop navigation": [
+    "lessac_039_100.wav"
+   ],
+   "stop the music": [
+    "lessac_040_100.wav"
+   ],
+   "take me home": [
+    "lessac_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "lessac_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "lessac_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "lessac_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "lessac_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "lessac_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "lessac_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "lessac_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "lessac_049_100.wav"
+   ],
+   "turn the volume up": [
+    "lessac_050_100.wav"
+   ],
+   "volume down": [
+    "lessac_051_100.wav"
+   ],
+   "volume up": [
+    "lessac_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "lessac_053_100.wav"
+   ],
+   "what is my speed": [
+    "lessac_054_100.wav"
+   ],
+   "what time is it": [
+    "lessac_055_100.wav"
+   ]
+  },
+  "alan": {
+   "Hey Doku": [
+    "alan_000_85.wav",
+    "alan_000_100.wav",
+    "alan_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "alan_001_85.wav",
+    "alan_001_100.wav",
+    "alan_001_114.wav"
+   ],
+   "I have had an accident": [
+    "alan_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "alan_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "alan_004_85.wav",
+    "alan_004_100.wav",
+    "alan_004_114.wav"
+   ],
+   "accident accident": [
+    "alan_005_100.wav"
+   ],
+   "call an ambulance": [
+    "alan_006_100.wav"
+   ],
+   "did you see that road": [
+    "alan_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "alan_008_100.wav"
+   ],
+   "emergency": [
+    "alan_009_100.wav"
+   ],
+   "emergency emergency": [
+    "alan_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "alan_011_100.wav"
+   ],
+   "end the ride": [
+    "alan_012_100.wav"
+   ],
+   "go back to the last song": [
+    "alan_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "alan_014_100.wav"
+   ],
+   "help help help": [
+    "alan_015_100.wav"
+   ],
+   "help me": [
+    "alan_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "alan_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "alan_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "alan_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "alan_020_100.wav"
+   ],
+   "how far is it": [
+    "alan_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "alan_022_100.wav"
+   ],
+   "make it quieter": [
+    "alan_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "alan_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "alan_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "alan_026_100.wav"
+   ],
+   "next song": [
+    "alan_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "alan_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "alan_029_100.wav"
+   ],
+   "pause the music": [
+    "alan_030_100.wav"
+   ],
+   "play music": [
+    "alan_031_100.wav"
+   ],
+   "play the next song": [
+    "alan_032_100.wav"
+   ],
+   "previous song": [
+    "alan_033_100.wav"
+   ],
+   "resume the song": [
+    "alan_034_100.wav"
+   ],
+   "send SOS": [
+    "alan_035_100.wav"
+   ],
+   "skip this song": [
+    "alan_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "alan_037_100.wav"
+   ],
+   "start the ride": [
+    "alan_038_100.wav"
+   ],
+   "stop navigation": [
+    "alan_039_100.wav"
+   ],
+   "stop the music": [
+    "alan_040_100.wav"
+   ],
+   "take me home": [
+    "alan_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "alan_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "alan_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "alan_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "alan_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "alan_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "alan_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "alan_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "alan_049_100.wav"
+   ],
+   "turn the volume up": [
+    "alan_050_100.wav"
+   ],
+   "volume down": [
+    "alan_051_100.wav"
+   ],
+   "volume up": [
+    "alan_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "alan_053_100.wav"
+   ],
+   "what is my speed": [
+    "alan_054_100.wav"
+   ],
+   "what time is it": [
+    "alan_055_100.wav"
+   ]
+  },
+  "espeak-en-us": {
+   "Hey Doku": [
+    "espeak-en-us_000_85.wav",
+    "espeak-en-us_000_100.wav",
+    "espeak-en-us_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "espeak-en-us_001_85.wav",
+    "espeak-en-us_001_100.wav",
+    "espeak-en-us_001_114.wav"
+   ],
+   "I have had an accident": [
+    "espeak-en-us_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "espeak-en-us_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "espeak-en-us_004_85.wav",
+    "espeak-en-us_004_100.wav",
+    "espeak-en-us_004_114.wav"
+   ],
+   "accident accident": [
+    "espeak-en-us_005_100.wav"
+   ],
+   "call an ambulance": [
+    "espeak-en-us_006_100.wav"
+   ],
+   "did you see that road": [
+    "espeak-en-us_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "espeak-en-us_008_100.wav"
+   ],
+   "emergency": [
+    "espeak-en-us_009_100.wav"
+   ],
+   "emergency emergency": [
+    "espeak-en-us_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "espeak-en-us_011_100.wav"
+   ],
+   "end the ride": [
+    "espeak-en-us_012_100.wav"
+   ],
+   "go back to the last song": [
+    "espeak-en-us_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "espeak-en-us_014_100.wav"
+   ],
+   "help help help": [
+    "espeak-en-us_015_100.wav"
+   ],
+   "help me": [
+    "espeak-en-us_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "espeak-en-us_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "espeak-en-us_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "espeak-en-us_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "espeak-en-us_020_100.wav"
+   ],
+   "how far is it": [
+    "espeak-en-us_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "espeak-en-us_022_100.wav"
+   ],
+   "make it quieter": [
+    "espeak-en-us_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "espeak-en-us_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "espeak-en-us_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "espeak-en-us_026_100.wav"
+   ],
+   "next song": [
+    "espeak-en-us_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "espeak-en-us_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "espeak-en-us_029_100.wav"
+   ],
+   "pause the music": [
+    "espeak-en-us_030_100.wav"
+   ],
+   "play music": [
+    "espeak-en-us_031_100.wav"
+   ],
+   "play the next song": [
+    "espeak-en-us_032_100.wav"
+   ],
+   "previous song": [
+    "espeak-en-us_033_100.wav"
+   ],
+   "resume the song": [
+    "espeak-en-us_034_100.wav"
+   ],
+   "send SOS": [
+    "espeak-en-us_035_100.wav"
+   ],
+   "skip this song": [
+    "espeak-en-us_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "espeak-en-us_037_100.wav"
+   ],
+   "start the ride": [
+    "espeak-en-us_038_100.wav"
+   ],
+   "stop navigation": [
+    "espeak-en-us_039_100.wav"
+   ],
+   "stop the music": [
+    "espeak-en-us_040_100.wav"
+   ],
+   "take me home": [
+    "espeak-en-us_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "espeak-en-us_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "espeak-en-us_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "espeak-en-us_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "espeak-en-us_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "espeak-en-us_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "espeak-en-us_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "espeak-en-us_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "espeak-en-us_049_100.wav"
+   ],
+   "turn the volume up": [
+    "espeak-en-us_050_100.wav"
+   ],
+   "volume down": [
+    "espeak-en-us_051_100.wav"
+   ],
+   "volume up": [
+    "espeak-en-us_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "espeak-en-us_053_100.wav"
+   ],
+   "what is my speed": [
+    "espeak-en-us_054_100.wav"
+   ],
+   "what time is it": [
+    "espeak-en-us_055_100.wav"
+   ]
+  },
+  "espeak-en-gb-x-rp": {
+   "Hey Doku": [
+    "espeak-en-gb-x-rp_000_85.wav",
+    "espeak-en-gb-x-rp_000_100.wav",
+    "espeak-en-gb-x-rp_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "espeak-en-gb-x-rp_001_85.wav",
+    "espeak-en-gb-x-rp_001_100.wav",
+    "espeak-en-gb-x-rp_001_114.wav"
+   ],
+   "I have had an accident": [
+    "espeak-en-gb-x-rp_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "espeak-en-gb-x-rp_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "espeak-en-gb-x-rp_004_85.wav",
+    "espeak-en-gb-x-rp_004_100.wav",
+    "espeak-en-gb-x-rp_004_114.wav"
+   ],
+   "accident accident": [
+    "espeak-en-gb-x-rp_005_100.wav"
+   ],
+   "call an ambulance": [
+    "espeak-en-gb-x-rp_006_100.wav"
+   ],
+   "did you see that road": [
+    "espeak-en-gb-x-rp_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "espeak-en-gb-x-rp_008_100.wav"
+   ],
+   "emergency": [
+    "espeak-en-gb-x-rp_009_100.wav"
+   ],
+   "emergency emergency": [
+    "espeak-en-gb-x-rp_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "espeak-en-gb-x-rp_011_100.wav"
+   ],
+   "end the ride": [
+    "espeak-en-gb-x-rp_012_100.wav"
+   ],
+   "go back to the last song": [
+    "espeak-en-gb-x-rp_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "espeak-en-gb-x-rp_014_100.wav"
+   ],
+   "help help help": [
+    "espeak-en-gb-x-rp_015_100.wav"
+   ],
+   "help me": [
+    "espeak-en-gb-x-rp_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "espeak-en-gb-x-rp_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "espeak-en-gb-x-rp_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "espeak-en-gb-x-rp_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "espeak-en-gb-x-rp_020_100.wav"
+   ],
+   "how far is it": [
+    "espeak-en-gb-x-rp_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "espeak-en-gb-x-rp_022_100.wav"
+   ],
+   "make it quieter": [
+    "espeak-en-gb-x-rp_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "espeak-en-gb-x-rp_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "espeak-en-gb-x-rp_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "espeak-en-gb-x-rp_026_100.wav"
+   ],
+   "next song": [
+    "espeak-en-gb-x-rp_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "espeak-en-gb-x-rp_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "espeak-en-gb-x-rp_029_100.wav"
+   ],
+   "pause the music": [
+    "espeak-en-gb-x-rp_030_100.wav"
+   ],
+   "play music": [
+    "espeak-en-gb-x-rp_031_100.wav"
+   ],
+   "play the next song": [
+    "espeak-en-gb-x-rp_032_100.wav"
+   ],
+   "previous song": [
+    "espeak-en-gb-x-rp_033_100.wav"
+   ],
+   "resume the song": [
+    "espeak-en-gb-x-rp_034_100.wav"
+   ],
+   "send SOS": [
+    "espeak-en-gb-x-rp_035_100.wav"
+   ],
+   "skip this song": [
+    "espeak-en-gb-x-rp_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "espeak-en-gb-x-rp_037_100.wav"
+   ],
+   "start the ride": [
+    "espeak-en-gb-x-rp_038_100.wav"
+   ],
+   "stop navigation": [
+    "espeak-en-gb-x-rp_039_100.wav"
+   ],
+   "stop the music": [
+    "espeak-en-gb-x-rp_040_100.wav"
+   ],
+   "take me home": [
+    "espeak-en-gb-x-rp_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "espeak-en-gb-x-rp_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "espeak-en-gb-x-rp_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "espeak-en-gb-x-rp_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "espeak-en-gb-x-rp_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "espeak-en-gb-x-rp_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "espeak-en-gb-x-rp_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "espeak-en-gb-x-rp_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "espeak-en-gb-x-rp_049_100.wav"
+   ],
+   "turn the volume up": [
+    "espeak-en-gb-x-rp_050_100.wav"
+   ],
+   "volume down": [
+    "espeak-en-gb-x-rp_051_100.wav"
+   ],
+   "volume up": [
+    "espeak-en-gb-x-rp_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "espeak-en-gb-x-rp_053_100.wav"
+   ],
+   "what is my speed": [
+    "espeak-en-gb-x-rp_054_100.wav"
+   ],
+   "what time is it": [
+    "espeak-en-gb-x-rp_055_100.wav"
+   ]
+  },
+  "espeak-en-us+f3": {
+   "Hey Doku": [
+    "espeak-en-us+f3_000_85.wav",
+    "espeak-en-us+f3_000_100.wav",
+    "espeak-en-us+f3_000_114.wav"
+   ],
+   "Hey Rodeo": [
+    "espeak-en-us+f3_001_85.wav",
+    "espeak-en-us+f3_001_100.wav",
+    "espeak-en-us+f3_001_114.wav"
+   ],
+   "I have had an accident": [
+    "espeak-en-us+f3_002_100.wav"
+   ],
+   "I need some help with the bike": [
+    "espeak-en-us+f3_003_100.wav"
+   ],
+   "Okay Rodeo": [
+    "espeak-en-us+f3_004_85.wav",
+    "espeak-en-us+f3_004_100.wav",
+    "espeak-en-us+f3_004_114.wav"
+   ],
+   "accident accident": [
+    "espeak-en-us+f3_005_100.wav"
+   ],
+   "call an ambulance": [
+    "espeak-en-us+f3_006_100.wav"
+   ],
+   "did you see that road": [
+    "espeak-en-us+f3_007_100.wav"
+   ],
+   "directions to Lalbagh": [
+    "espeak-en-us+f3_008_100.wav"
+   ],
+   "emergency": [
+    "espeak-en-us+f3_009_100.wav"
+   ],
+   "emergency emergency": [
+    "espeak-en-us+f3_010_100.wav"
+   ],
+   "emergency, emergency, emergency": [
+    "espeak-en-us+f3_011_100.wav"
+   ],
+   "end the ride": [
+    "espeak-en-us+f3_012_100.wav"
+   ],
+   "go back to the last song": [
+    "espeak-en-us+f3_013_100.wav"
+   ],
+   "hello, can you hear me": [
+    "espeak-en-us+f3_014_100.wav"
+   ],
+   "help help help": [
+    "espeak-en-us+f3_015_100.wav"
+   ],
+   "help me": [
+    "espeak-en-us+f3_016_100.wav"
+   ],
+   "hey brother, ride slowly": [
+    "espeak-en-us+f3_017_100.wav"
+   ],
+   "hey there, how are you doing": [
+    "espeak-en-us+f3_018_100.wav"
+   ],
+   "hey, do you know the way": [
+    "espeak-en-us+f3_019_100.wav"
+   ],
+   "hey, that rodeo show was good": [
+    "espeak-en-us+f3_020_100.wav"
+   ],
+   "how far is it": [
+    "espeak-en-us+f3_021_100.wav"
+   ],
+   "let us go to the rally on Sunday": [
+    "espeak-en-us+f3_022_100.wav"
+   ],
+   "make it quieter": [
+    "espeak-en-us+f3_023_100.wav"
+   ],
+   "my phone battery is low": [
+    "espeak-en-us+f3_024_100.wav"
+   ],
+   "navigate to Nandi Hills": [
+    "espeak-en-us+f3_025_100.wav"
+   ],
+   "navigate to the nearest petrol pump": [
+    "espeak-en-us+f3_026_100.wav"
+   ],
+   "next song": [
+    "espeak-en-us+f3_027_100.wav"
+   ],
+   "okay, I will call you back": [
+    "espeak-en-us+f3_028_100.wav"
+   ],
+   "okay, let's stop at the petrol pump": [
+    "espeak-en-us+f3_029_100.wav"
+   ],
+   "pause the music": [
+    "espeak-en-us+f3_030_100.wav"
+   ],
+   "play music": [
+    "espeak-en-us+f3_031_100.wav"
+   ],
+   "play the next song": [
+    "espeak-en-us+f3_032_100.wav"
+   ],
+   "previous song": [
+    "espeak-en-us+f3_033_100.wav"
+   ],
+   "resume the song": [
+    "espeak-en-us+f3_034_100.wav"
+   ],
+   "send SOS": [
+    "espeak-en-us+f3_035_100.wav"
+   ],
+   "skip this song": [
+    "espeak-en-us+f3_036_100.wav"
+   ],
+   "so I told him to take a look at the engine": [
+    "espeak-en-us+f3_037_100.wav"
+   ],
+   "start the ride": [
+    "espeak-en-us+f3_038_100.wav"
+   ],
+   "stop navigation": [
+    "espeak-en-us+f3_039_100.wav"
+   ],
+   "stop the music": [
+    "espeak-en-us+f3_040_100.wav"
+   ],
+   "take me home": [
+    "espeak-en-us+f3_041_100.wav"
+   ],
+   "take me to MG Road": [
+    "espeak-en-us+f3_042_100.wav"
+   ],
+   "that was an emergency exit sign": [
+    "espeak-en-us+f3_043_100.wav"
+   ],
+   "the doctor said it is fine": [
+    "espeak-en-us+f3_044_100.wav"
+   ],
+   "the next song on the radio is nice": [
+    "espeak-en-us+f3_045_100.wav"
+   ],
+   "the radio is playing old songs": [
+    "espeak-en-us+f3_046_100.wav"
+   ],
+   "the road ahead is under construction": [
+    "espeak-en-us+f3_047_100.wav"
+   ],
+   "the volume of traffic is high today": [
+    "espeak-en-us+f3_048_100.wav"
+   ],
+   "turn left after the signal and then go straight": [
+    "espeak-en-us+f3_049_100.wav"
+   ],
+   "turn the volume up": [
+    "espeak-en-us+f3_050_100.wav"
+   ],
+   "volume down": [
+    "espeak-en-us+f3_051_100.wav"
+   ],
+   "volume up": [
+    "espeak-en-us+f3_052_100.wav"
+   ],
+   "we will reach Mysore by lunch": [
+    "espeak-en-us+f3_053_100.wav"
+   ],
+   "what is my speed": [
+    "espeak-en-us+f3_054_100.wav"
+   ],
+   "what time is it": [
+    "espeak-en-us+f3_055_100.wav"
+   ]
+  }
+ }
+}
