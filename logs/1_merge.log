@@ -10,16 +10,16 @@ Daemon will be stopped at the end of the build
 > Task :app:mapDebugSourceSetPaths
 > Task :app:generateDebugResources
 > Task :app:packageDebugResources
+> Task :app:mergeDebugResources
 > Task :app:createDebugCompatibleScreenManifests
 > Task :app:extractDeepLinksDebug
 > Task :app:parseDebugLocalResources
-> Task :app:mergeDebugResources
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
+> Task :app:processDebugManifestForPackage
 > Task :app:javaPreCompileDebug
 > Task :app:mergeDebugShaders
 > Task :app:compileDebugShaders NO-SOURCE
-> Task :app:processDebugManifestForPackage
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:mergeDebugAssets
 > Task :app:processDebugResources
@@ -29,16 +29,7 @@ Daemon will be stopped at the end of the build
 > Task :app:checkDebugDuplicateClasses
 > Task :app:mergeDebugNativeLibs
 > Task :app:l8DexDesugarLibDebug
-
 > Task :app:compileDebugKotlin
-e: The daemon has terminated unexpectedly on startup attempt #1 with error code: 0. The daemon process output:
-    1. Kotlin compile daemon is ready
-e: The daemon has terminated unexpectedly on startup attempt #2 with error code: 0. The daemon process output:
-    1. Kotlin compile daemon is ready
-Problems may have occurred during auto-selection of GC. The preferred GC is Parallel GC.
-If the problems persist, try adding the JVM option to the Kotlin daemon JVM arguments: -XX:-UseParallelGC.
-GC auto-selection logic is disabled temporary for the next daemon startup.
-
 > Task :app:mergeExtDexDebug
 > Task :app:mergeLibDexDebug
 
@@ -74,9 +65,9 @@ w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/jav
 > Task :app:packageDebug
 > Task :app:createDebugApkListingFileRedirect
 > Task :app:assembleDebug
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_5-1793357534146.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_5-1793357923994.json
 
-BUILD SUCCESSFUL in 1m 50s
+BUILD SUCCESSFUL in 1m 58s
 38 actionable tasks: 38 executed
-SIGNING Signer #1 certificate SHA-256 digest: 42272e1e9a861dda6044006b975a2b7a3595ffbdc6f6dcaf80cb5a6b8e38edcd
-SIGNING Signer #1 certificate SHA-1 digest: 2f08a9883e6c508165e8ec720a76e4bc72312d4c
+SIGNING Signer #1 certificate SHA-256 digest: 4e8c8f0cd83df9590a82f92256c2fafb986b240d8310ccd6679cf52cb6c64461
+SIGNING Signer #1 certificate SHA-1 digest: 76956766d22a6b3ce01e6a4253b535ac62e45143
