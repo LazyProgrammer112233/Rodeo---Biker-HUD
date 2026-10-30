@@ -26,8 +26,8 @@ Daemon will be stopped at the end of the build
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:javaPreCompileDebugUnitTest
 > Task :app:mergeDebugAssets UP-TO-DATE
-> Task :app:bundleDebugClassesToRuntimeJar
 > Task :app:bundleDebugClassesToCompileJar
+> Task :app:bundleDebugClassesToRuntimeJar
 > Task :app:packageDebugUnitTestForUnitTest
 > Task :app:generateDebugUnitTestConfig
 > Task :app:processDebugJavaRes UP-TO-DATE
@@ -35,14 +35,14 @@ Daemon will be stopped at the end of the build
 > Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
 > Task :app:processDebugUnitTestJavaRes
 > Task :app:testDebugUnitTest
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_7-1793361081016.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_7-1793386104975.json
 
-BUILD SUCCESSFUL in 1m 5s
+BUILD SUCCESSFUL in 1m 18s
 28 actionable tasks: 8 executed, 20 up-to-date
-testsuite name="com.rodeo.hud.logic.GestureLogicTest" tests="13" skipped="0" failures="0"
+testsuite name="com.rodeo.hud.logic.GestureLogicTest" tests="6" skipped="0" failures="0"
 testsuite name="com.rodeo.hud.logic.NavLogicTest" tests="9" skipped="0" failures="0"
 testsuite name="com.rodeo.hud.logic.NavReplayTest" tests="1" skipped="0" failures="0"
 testsuite name="com.rodeo.hud.logic.PlacesTest" tests="6" skipped="0" failures="0"
 testsuite name="com.rodeo.hud.logic.VoiceLogicTest" tests="21" skipped="0" failures="0"
-testsuite name="com.rodeo.hud.shots.HudShots" tests="12" skipped="0" failures="0"
-testsuite name="com.rodeo.hud.shots.ScreenShots" tests="7" skipped="0" failures="0"
+testsuite name="com.rodeo.hud.shots.HudShots" tests="13" skipped="0" failures="0"
+testsuite name="com.rodeo.hud.shots.ScreenShots" tests="6" skipped="0" failures="0"
