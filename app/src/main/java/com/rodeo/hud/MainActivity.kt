@@ -229,7 +229,8 @@ class MainActivity : ComponentActivity(), HudActions, AssistantHost {
         lifecycleScope.launch {
             val ride = g.ride.end()
             RideService.stop(this@MainActivity)
-            summary = ride
+            // A ride that never left the parking spot only saves where the bike is; no summary for it.
+            summary = ride?.takeIf { it.distanceM >= 100 }
         }
     }
 

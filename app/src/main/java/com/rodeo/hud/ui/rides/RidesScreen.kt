@@ -1,5 +1,6 @@
 package com.rodeo.hud.ui.rides
 
+import kotlinx.coroutines.delay
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -123,8 +124,11 @@ fun RidesScreen(onBack: () -> Unit, onNavigated: () -> Unit) {
                         }
                     }
                     GhostButton("Share", icon = Icons.Filled.Share) { share(ctx, r) }
-                    GhostButton("Delete", icon = Icons.Filled.Delete) {
-                        scope.launch { g.rides.delete(r.id); selected = null }
+                    // Two taps, so a bump on the road can't delete a ride.
+                    var armed by remember(r.id) { mutableStateOf(false) }
+                    LaunchedEffect(armed) { if (armed) { delay(4000); armed = false } }
+                    GhostButton(if (armed) "Tap again to delete" else "Delete", icon = Icons.Filled.Delete) {
+                        if (armed) scope.launch { g.rides.delete(r.id); selected = null } else armed = true
                     }
                 }
             }
