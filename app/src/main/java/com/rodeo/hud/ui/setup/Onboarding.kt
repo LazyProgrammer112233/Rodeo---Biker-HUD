@@ -1,5 +1,7 @@
 package com.rodeo.hud.ui.setup
 
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
@@ -257,6 +259,20 @@ private fun PaintPicker() {
     val now = Year.now().value
     val years = (now downTo maxOf(model.firstYear, now - 25)).toList()
     Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        SectionLabel("Factory colours")
+        PaintRow(model.paints, profile.paintHex, profile.paintName) { p -> g.profile.update { it.copy(paintHex = p.hex, paintName = p.name) } }
+        SectionLabel("Or a custom colour")
+        // Small dots without names, so the whole custom set fits on screen without scrolling.
+        PaintRow(CUSTOM_PAINTS, profile.paintHex, profile.paintName, compact = true) { p -> g.profile.update { it.copy(paintHex = p.hex, paintName = p.name) } }
+        val hex = profile.paintHex
+        if (hex != null) {
+            Text(
+                if (profile.useHeritageAccent && brand.heritageAccent != null) "The HUD uses the ${brand.name} heritage colour."
+                else if (isChromatic(hex)) "The HUD takes its accent from this colour."
+                else "Black, white, grey and silver bikes use the ${brand.name} colour as the accent.",
+                color = c.textMuted, style = LocalType.current.bodySm,
+            )
+        }
         SectionLabel("Model year")
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             items(years) { y ->
@@ -268,19 +284,6 @@ private fun PaintPicker() {
                         .clickable { g.profile.update { it.copy(year = y) } }.padding(horizontal = 16.dp, vertical = 12.dp),
                 )
             }
-        }
-        SectionLabel("Factory colours")
-        PaintRow(model.paints, profile.paintHex, profile.paintName) { p -> g.profile.update { it.copy(paintHex = p.hex, paintName = p.name) } }
-        SectionLabel("Or a custom colour")
-        PaintRow(CUSTOM_PAINTS, profile.paintHex, profile.paintName) { p -> g.profile.update { it.copy(paintHex = p.hex, paintName = p.name) } }
-        val hex = profile.paintHex
-        if (hex != null) {
-            Text(
-                if (profile.useHeritageAccent && brand.heritageAccent != null) "The HUD uses the ${brand.name} heritage colour."
-                else if (isChromatic(hex)) "The HUD takes its accent from this colour."
-                else "Black, white, grey and silver bikes use the ${brand.name} colour as the accent.",
-                color = c.textMuted, style = LocalType.current.bodySm,
-            )
         }
         if (brand.heritageAccent != null) {
             ToggleRow(
@@ -302,23 +305,24 @@ private val CUSTOM_PAINTS = listOf(
 /** Swatches that wrap onto more lines instead of scrolling sideways, so every one stays visible. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun PaintRow(paints: List<Paint>, selectedHex: Long?, selectedName: String?, onPick: (Paint) -> Unit) {
+private fun PaintRow(paints: List<Paint>, selectedHex: Long?, selectedName: String?, compact: Boolean = false, onPick: (Paint) -> Unit) {
     val c = LocalHud.current
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(if (compact) 6.dp else 10.dp), verticalArrangement = Arrangement.spacedBy(if (compact) 6.dp else 10.dp)) {
         paints.forEach { p ->
             val sel = selectedHex == p.hex && selectedName == p.name
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.width(76.dp).clip(RoundedCornerShape(12.dp)).clickable { onPick(p) }.padding(vertical = 4.dp),
+                modifier = Modifier.width(if (compact) 44.dp else 76.dp).clip(RoundedCornerShape(12.dp)).clickable { onPick(p) }.padding(vertical = 4.dp)
+                    .semantics { contentDescription = p.name },
             ) {
                 Box(
-                    Modifier.size(48.dp).clip(CircleShape).background(Color(p.hex))
+                    Modifier.size(if (compact) 38.dp else 48.dp).clip(CircleShape).background(Color(p.hex))
                         .border(if (sel) 3.dp else 1.dp, if (sel) c.text else c.glassBorder, CircleShape),
                     contentAlignment = Alignment.Center,
                 ) {
                     if (sel) Icon(Icons.Filled.Check, null, tint = if (Color(p.hex).luminance() > 0.5f) Color.Black else Color.White)
                 }
-                Text(
+                if (!compact) Text(
                     p.name.removePrefix("Custom ").replaceFirstChar { it.uppercase() }, color = if (sel) c.text else c.textMuted,
                     style = LocalType.current.bodySm, maxLines = 2, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center,
                     modifier = Modifier.padding(top = 4.dp),
