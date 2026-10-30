@@ -157,7 +157,7 @@ jobs:
           key: piper-voices-v1
 
       - name: Voice evaluation
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && !contains(github.event.head_commit.message, '[no-eval]')
         continue-on-error: true
         timeout-minutes: 50
         run: |
