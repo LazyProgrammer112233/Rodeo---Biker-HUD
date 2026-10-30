@@ -25,32 +25,24 @@ Daemon will be stopped at the end of the build
 > Task :app:compileDebugShaders NO-SOURCE
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:javaPreCompileDebugUnitTest
-> Task :app:bundleDebugClassesToRuntimeJar
 > Task :app:bundleDebugClassesToCompileJar
 > Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:bundleDebugClassesToRuntimeJar
 > Task :app:packageDebugUnitTestForUnitTest
 > Task :app:generateDebugUnitTestConfig
 > Task :app:processDebugJavaRes UP-TO-DATE
-
 > Task :app:compileDebugUnitTestKotlin
-e: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/test/java/com/rodeo/hud/shots/ScreenShots.kt:55:124 No value passed for parameter 'onTapSetup'.
-e: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/test/java/com/rodeo/hud/shots/ScreenShots.kt:60:78 No value passed for parameter 'onTapSetup'.
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processDebugUnitTestJavaRes
+> Task :app:testDebugUnitTest
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_7-1793357663053.json
 
-> Task :app:compileDebugUnitTestKotlin FAILED
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_7-1793358802849.json
-
-FAILURE: Build failed with an exception.
-
-* What went wrong:
-Execution failed for task ':app:compileDebugUnitTestKotlin'.
-> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
-   > Compilation error. See log for more details
-
-* Try:
-> Run with --stacktrace option to get the stack trace.
-> Run with --info or --debug option to get more log output.
-> Run with --scan to get full insights.
-> Get more help at https://help.gradle.org.
-
-BUILD FAILED in 24s
-26 actionable tasks: 6 executed, 20 up-to-date
+BUILD SUCCESSFUL in 1m 15s
+28 actionable tasks: 8 executed, 20 up-to-date
+testsuite name="com.rodeo.hud.logic.GestureLogicTest" tests="12" skipped="0" failures="0"
+testsuite name="com.rodeo.hud.logic.NavLogicTest" tests="9" skipped="0" failures="0"
+testsuite name="com.rodeo.hud.logic.NavReplayTest" tests="1" skipped="0" failures="0"
+testsuite name="com.rodeo.hud.logic.PlacesTest" tests="5" skipped="0" failures="0"
+testsuite name="com.rodeo.hud.logic.VoiceLogicTest" tests="21" skipped="0" failures="0"
+testsuite name="com.rodeo.hud.shots.HudShots" tests="12" skipped="0" failures="0"
+testsuite name="com.rodeo.hud.shots.ScreenShots" tests="6" skipped="0" failures="0"
