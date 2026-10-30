@@ -10,30 +10,3 @@ Daemon will be stopped at the end of the build
 > Task :app:mapDebugSourceSetPaths
 > Task :app:generateDebugResources
 > Task :app:packageDebugResources
-> Task :app:createDebugCompatibleScreenManifests
-> Task :app:mergeDebugResources
-> Task :app:extractDeepLinksDebug
-> Task :app:parseDebugLocalResources
-> Task :app:processDebugMainManifest
-> Task :app:processDebugManifest
-> Task :app:javaPreCompileDebug
-> Task :app:processDebugManifestForPackage
-> Task :app:mergeDebugShaders
-> Task :app:compileDebugShaders NO-SOURCE
-> Task :app:generateDebugAssets UP-TO-DATE
-> Task :app:mergeDebugAssets
-> Task :app:processDebugResources
-> Task :app:compressDebugAssets
-> Task :app:checkDebugDuplicateClasses
-> Task :app:mergeLibDexDebug
-> Task :app:mergeDebugJniLibFolders
-> Task :app:mergeDebugNativeLibs
-
-> Task :app:stripDebugDebugSymbols
-Unable to strip the following libraries, packaging them as they are: libandroidx.graphics.path.so, libonnxruntime.so, libsherpa-onnx-jni.so.
-
-> Task :app:l8DexDesugarLibDebug
-> Task :app:validateSigningDebug
-> Task :app:writeDebugAppMetadata
-> Task :app:writeDebugSigningConfigVersions
-> Task :app:desugarDebugFileDependencies
