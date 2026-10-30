@@ -13,6 +13,10 @@ val secrets = Properties().apply {
 }
 fun secret(name: String): String = System.getenv(name) ?: secrets.getProperty(name) ?: ""
 
+// -Prodeo.e2e builds for the x86_64 emulator used by the on-device tests on CI, with a
+// mock-location permission so the tests can drive GPS. Phone builds are unaffected.
+val e2e = providers.gradleProperty("rodeo.e2e").isPresent
+
 android {
     namespace = "com.rodeo.hud"
     compileSdk = 35
@@ -21,23 +25,40 @@ android {
         applicationId = "com.rodeo.hud"
         minSdk = 29
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0-p1"
+        versionCode = 4
+        versionName = "0.4.0"
 
-        manifestPlaceholders["MAPS_API_KEY"] = secret("MAPS_API_KEY").ifEmpty { "NO_KEY" }
-        buildConfigField("String", "MAPS_API_KEY", "\"${secret("MAPS_API_KEY")}\"")
+        // Phones only: the offline speech and hand models ship native code for ARM.
+        ndk { abiFilters += if (e2e) listOf("x86_64") else listOf("arm64-v8a", "armeabi-v7a") }
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
         buildConfigField("String", "FIREBASE_API_KEY", "\"${secret("FIREBASE_API_KEY")}\"")
         buildConfigField("String", "FIREBASE_APP_ID", "\"${secret("FIREBASE_APP_ID")}\"")
         buildConfigField("String", "FIREBASE_PROJECT_ID", "\"${secret("FIREBASE_PROJECT_ID")}\"")
         buildConfigField("String", "FIREBASE_DB_URL", "\"${secret("FIREBASE_DB_URL")}\"")
     }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("debug")
+    // Optional fixed signing key (CI secrets SIGNING_KEYSTORE_B64 / SIGNING_PASSWORD).
+    val keystore = System.getenv("SIGNING_KEYSTORE")?.let { file(it) }?.takeIf { it.exists() }
+    if (keystore != null) {
+        signingConfigs.create("rodeo") {
+            storeFile = keystore
+            storePassword = secret("SIGNING_PASSWORD")
+            keyAlias = "rodeo"
+            keyPassword = secret("SIGNING_PASSWORD")
         }
     }
+
+    buildTypes {
+        debug {
+            if (keystore != null) signingConfig = signingConfigs.getByName("rodeo")
+        }
+        release {
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName(if (keystore != null) "rodeo" else "debug")
+        }
+    }
+    if (e2e) sourceSets.getByName("debug").manifest.srcFile("src/e2e/AndroidManifest.xml")
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -53,11 +74,20 @@ android {
     packaging {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
-}
-
-// The Navigation SDK bundles its own copy of the Maps SDK.
-configurations.all {
-    exclude(group = "com.google.android.gms", module = "play-services-maps")
+    // The hand model is memory-mapped straight from the APK.
+    androidResources {
+        noCompress += listOf("onnx", "task")
+    }
+    // Screenshot tests (Robolectric + Roborazzi) render the HUD at several screen sizes on CI.
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            all {
+                it.systemProperty("roborazzi.test.record", "true")
+                it.maxHeapSize = "3g"
+            }
+        }
+    }
 }
 
 dependencies {
@@ -79,7 +109,12 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
 
     implementation("com.google.android.gms:play-services-location:21.3.0")
-    implementation("com.google.android.libraries.navigation:navigation:6.0.0")
+    // Keyless map: OpenStreetMap / CARTO tiles; routing from the free OpenStreetMap servers.
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
+
+    // Offline speech for the wake phrase and commands: sherpa-onnx (Apache 2.0), its AAR and the
+    // model are downloaded on CI (tools/ci/assets.sh).
+    implementation(files("libs/sherpa-onnx.aar"))
 
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-database")
@@ -87,4 +122,20 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs_nio:2.1.3")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.json:json:20240303")
+    testImplementation("org.robolectric:robolectric:4.14.1")
+    testImplementation("io.github.takahirom.roborazzi:roborazzi:1.32.2")
+    testImplementation("io.github.takahirom.roborazzi:roborazzi-compose:1.32.2")
+    testImplementation(composeBom)
+    testImplementation("androidx.compose.ui:ui-test-junit4")
+
+    // On-device tests (emulator on CI): search, route, ride, reroute, music card.
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test:runner:1.6.2")
+    androidTestImplementation("androidx.test:rules:1.6.1")
+    androidTestImplementation(composeBom)
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 }

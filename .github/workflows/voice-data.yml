@@ -1,0 +1,52 @@
+name: Voice test speech
+
+# Clean synthetic speech for the voice evaluation. Noise is mixed in by the evaluation, so this
+# only runs when the lines or voices change. The clips are kept as a workflow artifact.
+on:
+  push:
+    branches: [ "p1-*" ]
+    paths: [ "tools/voice-eval/tts.py", ".github/workflows/voice-data.yml" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  speech:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/piper
+          key: piper-voices-v2
+      - name: Voices
+        run: |
+          sudo apt-get install -y -qq espeak-ng ffmpeg > /dev/null 2>&1 || true
+          pip install -q piper-tts numpy
+          mkdir -p ~/.cache/piper
+          H=https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en
+          for v in en_GB/vctk/medium/en_GB-vctk-medium en_US/lessac/medium/en_US-lessac-medium en_GB/alan/medium/en_GB-alan-medium en_US/libritts_r/medium/en_US-libritts_r-medium; do
+            n=$(basename $v)
+            [ -s ~/.cache/piper/$n.onnx ] || curl -sfL --retry 3 -o ~/.cache/piper/$n.onnx $H/$v.onnx
+            [ -s ~/.cache/piper/$n.onnx.json ] || curl -sfL --retry 3 -o ~/.cache/piper/$n.onnx.json $H/$v.onnx.json
+          done
+          ls -la ~/.cache/piper
+      - name: Speech
+        run: |
+          python3 tools/voice-eval/tts.py /tmp/speech ~/.cache/piper
+          ls /tmp/speech | wc -l && du -sh /tmp/speech
+      # Kept on its own branch as FLAC so it can be fetched with git.
+      - name: Publish
+        run: |
+          mkdir -p /tmp/pub && cd /tmp/speech
+          for f in *.wav; do ffmpeg -loglevel error -i "$f" "/tmp/pub/${f%.wav}.flac"; done
+          cp lines.json /tmp/pub/ && du -sh /tmp/pub
+          cd /tmp/pub && git init -q && git checkout -qb voice-speech
+          git config user.name "rodeo-ci" && git config user.email "ci@users.noreply.github.com"
+          git add -A && git commit -qm "Synthetic speech for ${GITHUB_SHA::7}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" voice-speech

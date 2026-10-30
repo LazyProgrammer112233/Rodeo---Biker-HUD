@@ -7,3 +7,9 @@ captures/
 .kotlin/
 *.keystore
 secrets.properties
+app/src/main/res/font/*.ttf
+app/src/main/assets/vosk-model/
+app/src/main/assets/speech/
+app/src/main/assets/gesture_recognizer.task
+app/libs/
+app/src/test/resources/live/
