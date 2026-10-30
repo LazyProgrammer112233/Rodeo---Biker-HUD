@@ -8,6 +8,9 @@ on:
     paths: [ "tools/voice-eval/tts.py", ".github/workflows/voice-data.yml" ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   speech:
     runs-on: ubuntu-24.04
@@ -23,7 +26,7 @@ jobs:
           key: piper-voices-v2
       - name: Voices
         run: |
-          sudo apt-get install -y -qq espeak-ng > /dev/null 2>&1 || true
+          sudo apt-get install -y -qq espeak-ng ffmpeg > /dev/null 2>&1 || true
           pip install -q piper-tts numpy
           mkdir -p ~/.cache/piper
           H=https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en
@@ -37,8 +40,13 @@ jobs:
         run: |
           python3 tools/voice-eval/tts.py /tmp/speech ~/.cache/piper
           ls /tmp/speech | wc -l && du -sh /tmp/speech
-      - uses: actions/upload-artifact@v4
-        with:
-          name: voice-speech
-          path: /tmp/speech
-          retention-days: 30
+      # Kept on its own branch as FLAC so it can be fetched with git.
+      - name: Publish
+        run: |
+          mkdir -p /tmp/pub && cd /tmp/speech
+          for f in *.wav; do ffmpeg -loglevel error -i "$f" "/tmp/pub/${f%.wav}.flac"; done
+          cp lines.json /tmp/pub/ && du -sh /tmp/pub
+          cd /tmp/pub && git init -q && git checkout -qb voice-speech
+          git config user.name "rodeo-ci" && git config user.email "ci@users.noreply.github.com"
+          git add -A && git commit -qm "Synthetic speech for ${GITHUB_SHA::7}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" voice-speech
