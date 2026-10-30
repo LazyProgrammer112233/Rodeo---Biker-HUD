@@ -26,4 +26,6 @@ data class GuidanceUi(
     val voiceOn: Boolean = true,
     /** A short status line such as "Rerouting" or "No route: straight line". */
     val status: String? = null,
+    /** A route shown before the ride starts: Start begins guidance. */
+    val preview: Boolean = false,
 )

@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Navigation
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Search
@@ -101,6 +102,7 @@ interface MapChromeActions {
     fun clearResults()
     fun pick(place: Place, walking: Boolean)
     fun stopGuidance()
+    fun startGuidance() {}
     fun toggleGuidanceVoice()
     fun recenter()
     fun zoomIn()
@@ -275,6 +277,22 @@ fun TurnCard(g: GuidanceUi, actions: MapChromeActions, modifier: Modifier = Modi
             }
         }
         Spacer(Modifier.width(6.sdp()))
+        if (g.preview) {
+            Row(horizontalArrangement = Arrangement.spacedBy(6.sdp()), verticalAlignment = Alignment.CenterVertically) {
+                val go = RoundedCornerShape(14.sdp())
+                Row(
+                    Modifier.height(56.sdp()).clip(go).background(c.accent).clickable(onClick = actions::startGuidance)
+                        .testTag("start-guidance").padding(horizontal = 16.sdp()),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(Icons.Filled.Navigation, null, tint = c.onAccent, modifier = Modifier.size(22.sdp()))
+                    Spacer(Modifier.width(6.sdp()))
+                    Text("START", color = c.onAccent, style = t.headlineSm.copy(fontWeight = FontWeight.Black))
+                }
+                SmallSquare(Icons.Filled.Close, "Cancel", c.text, actions::stopGuidance)
+            }
+            return@Row
+        }
         Column(verticalArrangement = Arrangement.spacedBy(6.sdp())) {
             SmallSquare(if (g.voiceOn) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff, if (g.voiceOn) "Mute voice" else "Unmute voice", if (g.voiceOn) c.ok else c.textMuted, actions::toggleGuidanceVoice)
             SmallSquare(Icons.Filled.Close, "End navigation", c.text, actions::stopGuidance)

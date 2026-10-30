@@ -97,6 +97,9 @@ class DeviceTest {
         assertTrue("no search results", results.isNotEmpty())
         compose.onAllNodes(resultMatcher("Lalbagh"))[0].performClick()
         val route = waitForRoute()
+        sleep(1_000)
+        shot("03a-route-preview")
+        compose.onNode(hasTestTag("start-guidance")).performClick()
         note("route: ${route.provider}, ${"%.1f".format(route.lengthM / 1000)} km, ${Navigator.shortDuration(route.timeS)}, ${route.steps.size} steps")
         route.steps.forEachIndexed { i, s -> note("   step $i ${s.maneuver}: ${s.instruction}") }
         sleep(1_500)
@@ -141,6 +144,7 @@ class DeviceTest {
         shot("07-search-nandi")
         compose.onAllNodes(resultMatcher("Nandi"))[0].performClick()
         val route = waitForRoute()
+        compose.onNode(hasTestTag("start-guidance")).performClick()
         note("route: ${route.provider}, ${"%.1f".format(route.lengthM / 1000)} km, ${Navigator.shortDuration(route.timeS)}, ${route.steps.size} steps")
         assertTrue("Nandi Hills route is only ${route.lengthM} m", route.lengthM > 40_000)
         val ride = resample(route.points, 12.0).take(25)

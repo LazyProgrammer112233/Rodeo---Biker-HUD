@@ -27,6 +27,8 @@ data class NavState(
     /** Why there is no route, e.g. no internet. */
     val error: String? = null,
     val voiceOn: Boolean = true,
+    /** The route is shown for the rider to check; guidance starts when they tap Start. */
+    val preview: Boolean = false,
 ) {
     val active: Boolean get() = destination != null
 }
@@ -54,14 +56,34 @@ class NavController(
         Router.userAgent = "RodeoHUD/${runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull() ?: "1"} (Android)"
     }
 
-    /** Sets the destination and starts guidance. Returns false only if there is nowhere to go. */
-    fun navigateTo(place: Place, walking: Boolean = false): Boolean {
+    /**
+     * Sets the destination and starts guidance, or with [preview] only shows the route until
+     * [startGuidance]. Returns false only if there is nowhere to go.
+     */
+    fun navigateTo(place: Place, walking: Boolean = false, preview: Boolean = false): Boolean {
         navigator = null
         arrivedAt = 0L
-        _state.update { NavState(destination = place, walking = walking, voiceOn = it.voiceOn, routing = true) }
+        _state.update { NavState(destination = place, walking = walking, voiceOn = it.voiceOn, routing = true, preview = preview) }
         speaker.warmUp()
         requestRoute(announce = true)
         return true
+    }
+
+    /** Start guidance on the previewed route. */
+    fun startGuidance() {
+        val s = _state.value
+        if (!s.preview) return
+        _state.update { it.copy(preview = false) }
+        val route = s.route
+        val from = here()
+        if (route == null || from == null) {
+            requestRoute(announce = true)
+            return
+        }
+        val nav = Navigator(route) { text -> speaker.say(text, Speaker.Channel.NAV) }
+        navigator = nav
+        val p = nav.update(from.latitude, from.longitude, from.speed, from.takeIf { it.hasBearing() }?.bearing, from.accuracy, System.currentTimeMillis())
+        _state.update { it.copy(progress = p) }
     }
 
     fun stop() {
@@ -81,7 +103,7 @@ class NavController(
     /** Called for every GPS fix. */
     fun onLocation(loc: Location) {
         val s = _state.value
-        if (s.destination == null) return
+        if (s.destination == null || s.preview) return
         val nav = navigator
         if (nav == null) {
             // No route yet (offline at start): keep trying every 20 s.
@@ -134,6 +156,10 @@ class NavController(
             }
             if (_state.value.destination != dest) return@launch
             result.onSuccess { route ->
+                if (_state.value.preview) {
+                    _state.update { it.copy(route = route, progress = null, routing = false, error = null) }
+                    return@onSuccess
+                }
                 val nav = Navigator(route) { text -> speaker.say(text, Speaker.Channel.NAV) }
                 navigator = nav
                 val p = nav.update(from.latitude, from.longitude, from.speed, from.takeIf { it.hasBearing() }?.bearing, from.accuracy, System.currentTimeMillis())
@@ -150,6 +176,22 @@ class NavController(
         val dest = s.destination ?: return null
         val route = s.route
         val p = s.progress
+        if (s.preview) {
+            return GuidanceUi(
+                maneuver = Maneuver.DEPART,
+                distance = route?.let { Navigator.shortDistance(it.lengthM) } ?: "--",
+                instruction = dest.title,
+                destination = dest.subtitle.ifBlank { "Route preview" },
+                eta = route?.let { Navigator.shortDuration(it.timeS) },
+                voiceOn = s.voiceOn,
+                status = when {
+                    s.routing -> "Finding route"
+                    s.error != null -> s.error
+                    else -> null
+                },
+                preview = true,
+            )
+        }
         if (route == null || p == null) {
             val d = from?.let { Navigator.metres(LatLng(it.latitude, it.longitude), LatLng(dest.lat, dest.lng)) }
             return GuidanceUi(

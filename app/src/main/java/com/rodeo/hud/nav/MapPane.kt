@@ -49,6 +49,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.tileprovider.tilesource.XYTileSource
+import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
@@ -85,6 +86,14 @@ fun MapPane(
     var searchNote by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) { MapTiles.check() }
+    // Route preview: frame the whole route (and the rider) once it arrives.
+    LaunchedEffect(nav.preview, nav.route) {
+        val r = nav.route ?: return@LaunchedEffect
+        if (!nav.preview || r.points.size < 2) return@LaunchedEffect
+        follow = false
+        val pts = r.points.map { GeoPoint(it.lat, it.lng) } + listOfNotNull(loc?.let { GeoPoint(it.latitude, it.longitude) })
+        mapView?.let { v -> v.post { runCatching { v.zoomToBoundingBox(BoundingBox.fromGeoPoints(pts), true, (64 * v.resources.displayMetrics.density).toInt()) } } }
+    }
 
     /** Straight-line distance, marked as such so it isn't mistaken for the road distance. */
     fun kmTo(lat: Double, lng: Double): String? = loc?.let {
@@ -128,10 +137,12 @@ fun MapPane(
             override fun pick(place: Place, walking: Boolean) {
                 results.clear()
                 searchNote = null
-                follow = true
-                g.nav.navigateTo(place, walking)
+                // Show the whole route first; a walk to the parked bike starts straight away.
+                follow = walking
+                g.nav.navigateTo(place, walking, preview = !walking)
             }
-            override fun stopGuidance() = g.nav.stop()
+            override fun startGuidance() { follow = true; g.nav.startGuidance() }
+            override fun stopGuidance() { follow = true; g.nav.stop() }
             override fun toggleGuidanceVoice() = g.nav.toggleVoice()
             override fun recenter() { follow = true }
             override fun zoomIn() { follow = false; mapView?.controller?.zoomIn() }
