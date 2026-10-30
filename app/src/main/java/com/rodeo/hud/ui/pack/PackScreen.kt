@@ -1,5 +1,7 @@
 package com.rodeo.hud.ui.pack
 
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -60,12 +62,16 @@ fun PackScreen(onBack: () -> Unit) {
     var code by remember { mutableStateOf("") }
 
     Row(Modifier.fillMaxSize().background(c.background).padding(16.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-        Column(Modifier.width(360.dp).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.width(360.dp).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(52.dp).clickable(onClick = onBack), contentAlignment = Alignment.Center) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = c.text)
                 }
-                Text("Pack mode", color = c.text, style = LocalType.current.headlineXl)
+                Text("Pack mode", color = c.text, style = LocalType.current.headlineXl, modifier = Modifier.weight(1f))
+                if (pack.active) {
+                    // Leave sits up here so the rider list keeps the height on a landscape phone.
+                    GhostButton("Leave", icon = Icons.AutoMirrored.Filled.ExitToApp) { g.pack.leave() }
+                }
             }
             if (!pack.active) {
                 Text(
@@ -80,29 +86,38 @@ fun PackScreen(onBack: () -> Unit) {
                     GhostButton("Join", icon = Icons.Filled.Groups) { if (code.length == 6) g.pack.join(code) }
                 }
             } else {
-                GlassCard(Modifier.fillMaxWidth(), accentBorder = c.accent) {
-                    SectionLabel(if (pack.demo) "Demo pack" else "Pack code")
-                    Text(pack.code.orEmpty(), color = c.text, style = LocalType.current.display.copy(letterSpacing = 6.sp))
-                    Text("Share this code with your group · spread %.1f km".format(pack.spreadKm), color = c.textMuted, style = LocalType.current.body)
+                GlassCard(Modifier.fillMaxWidth(), accentBorder = c.accent, padding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            SectionLabel(if (pack.demo) "Demo pack" else "Pack code · share it")
+                            Text(pack.code.orEmpty(), color = c.text, style = LocalType.current.headlineXl.copy(letterSpacing = 4.sp), maxLines = 1)
+                        }
+                        Column(horizontalAlignment = Alignment.End) {
+                            SectionLabel("Spread")
+                            Text("%.1f km".format(pack.spreadKm), color = c.accent, style = LocalType.current.headlineMd, maxLines = 1)
+                        }
+                    }
                 }
                 LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     items(pack.members, key = { it.id }) { m ->
                         val d = loc?.let { Geo.distanceM(it.latitude, it.longitude, m.lat, m.lng) }
                         val stopped = m.stillSince != 0L && System.currentTimeMillis() - m.stillSince > 120_000
-                        Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(c.glass).padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(c.glass).padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                             Box(Modifier.size(12.dp).clip(CircleShape).background(if (stopped) c.warning else if (m.isLead) c.accent else c.text))
                             Spacer(Modifier.width(10.dp))
                             Column(Modifier.weight(1f)) {
-                                Text(m.name + if (m.isMe) " (you)" else "" + if (m.isLead) " · lead" else "", color = c.text, fontWeight = FontWeight.Medium)
+                                Text(
+                                    m.name + (if (m.isMe) " (you)" else "") + (if (m.isLead) " · lead" else ""),
+                                    color = c.text, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                                )
                                 Text(
                                     (if (stopped) "Stopped" else "${m.speedKmh.toInt()} km/h") + (d?.takeIf { !m.isMe }?.let { " · %.1f km away".format(it / 1000) } ?: ""),
-                                    color = if (stopped) c.warning else c.textMuted, style = LocalType.current.bodySm,
+                                    color = if (stopped) c.warning else c.textMuted, style = LocalType.current.bodySm, maxLines = 1,
                                 )
                             }
                         }
                     }
                 }
-                GhostButton("Leave pack", Modifier.fillMaxWidth(), icon = Icons.AutoMirrored.Filled.ExitToApp) { g.pack.leave() }
             }
         }
         Box(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(24.dp)).background(c.surface)) {

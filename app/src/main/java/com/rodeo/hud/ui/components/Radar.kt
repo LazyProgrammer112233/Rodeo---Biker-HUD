@@ -88,6 +88,7 @@ fun Radar(
         }
 
         val label = Paint(text).apply { color = c.text.toArgb(); textSize = 12.dp.toPx() }
+        val placed = ArrayList<androidx.compose.ui.geometry.Rect>()
         members.filter { !it.isMe }.forEach { m ->
             val p = project(m.lat, m.lng) ?: return@forEach
             val stopped = m.stillSince != 0L && System.currentTimeMillis() - m.stillSince > 120_000
@@ -98,7 +99,14 @@ fun Radar(
             }
             drawCircle(fill, 8.dp.toPx(), p)
             drawCircle(c.background, 8.dp.toPx(), p, style = Stroke(2.dp.toPx()))
-            drawContext.canvas.nativeCanvas.drawText(m.name, p.x + 11.dp.toPx(), p.y + 4.dp.toPx(), label)
+            // Riders bunched together: move a name down until it clears the ones already drawn.
+            val w = label.measureText(m.name)
+            val h = label.textSize * 1.15f
+            val x = if (p.x + 11.dp.toPx() + w > size.width) p.x - 11.dp.toPx() - w else p.x + 11.dp.toPx()
+            var y = p.y + 4.dp.toPx()
+            while (placed.any { it.overlaps(androidx.compose.ui.geometry.Rect(x, y - h, x + w, y)) }) y += h
+            placed += androidx.compose.ui.geometry.Rect(x, y - h, x + w, y)
+            drawContext.canvas.nativeCanvas.drawText(m.name, x, y, label)
         }
 
         // The rider: an arrow pointing up (heading-up).
