@@ -13,6 +13,8 @@ import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
 import android.net.Uri
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import android.provider.Settings
 import android.view.KeyEvent
@@ -54,6 +56,8 @@ class MusicController(private val context: Context) {
     private val _now = MutableStateFlow(NowPlaying())
     val now: StateFlow<NowPlaying> = _now.asStateFlow()
     private var controller: MediaController? = null
+    private val prefs = context.getSharedPreferences("music", Context.MODE_PRIVATE)
+    private val main = Handler(Looper.getMainLooper())
 
     private val callback = object : MediaController.Callback() {
         override fun onMetadataChanged(metadata: MediaMetadata?) = publish()
@@ -121,6 +125,7 @@ class MusicController(private val context: Context) {
             controller?.unregisterCallback(callback)
             controller = best
             best?.registerCallback(callback)
+            best?.packageName?.let { prefs.edit().putString(KEY_LAST_PLAYER, it).apply() }
         }
         publish()
     }
@@ -167,13 +172,39 @@ class MusicController(private val context: Context) {
         val c = controller
         if (c != null) {
             if (c.playbackState?.state == PlaybackState.STATE_PLAYING) c.transportControls.pause() else c.transportControls.play()
-        } else key(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
+        } else {
+            startPlayer(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
+            return
+        }
         val n = _now.value
         // Freeze or restart the clock at the current position until the player reports back.
         _now.value = n.copy(playing = !n.playing, positionMs = n.positionNow(), positionAt = SystemClock.elapsedRealtime())
     }
 
-    fun play() = controller?.transportControls?.play() ?: key(KeyEvent.KEYCODE_MEDIA_PLAY)
+    fun play() = controller?.transportControls?.play() ?: startPlayer(KeyEvent.KEYCODE_MEDIA_PLAY)
+
+    /**
+     * No player is open: a media key first (most players resume from it). If nothing starts within
+     * a moment, open the last music app the rider used (or the phone's music app) and press play.
+     */
+    private fun startPlayer(code: Int) {
+        key(code)
+        // Without notification access Rodeo can't see whether the key worked, so it stops there.
+        if (!hasAccess()) return
+        main.postDelayed({
+            if (controller != null) return@postDelayed
+            val pm = context.packageManager
+            val launch = prefs.getString(KEY_LAST_PLAYER, null)?.let { pm.getLaunchIntentForPackage(it) }
+                ?: Intent.makeMainSelectorActivity(Intent.ACTION_MAIN, Intent.CATEGORY_APP_MUSIC)
+            runCatching { context.startActivity(launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+            main.postDelayed({
+                val c = controller
+                if (c == null) key(KeyEvent.KEYCODE_MEDIA_PLAY)
+                else if (c.playbackState?.state != PlaybackState.STATE_PLAYING) c.transportControls.play()
+            }, 3_000)
+        }, 1_500)
+    }
+
     fun pause() = controller?.transportControls?.pause() ?: key(KeyEvent.KEYCODE_MEDIA_PAUSE)
     fun next() = controller?.transportControls?.skipToNext() ?: key(KeyEvent.KEYCODE_MEDIA_NEXT)
     fun previous() = controller?.transportControls?.skipToPrevious() ?: key(KeyEvent.KEYCODE_MEDIA_PREVIOUS)
@@ -186,5 +217,6 @@ class MusicController(private val context: Context) {
 
     private companion object {
         const val VOLUME_CHANGED = "android.media.VOLUME_CHANGED_ACTION"
+        const val KEY_LAST_PLAYER = "lastPlayer"
     }
 }
