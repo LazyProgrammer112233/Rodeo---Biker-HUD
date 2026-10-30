@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -54,7 +55,9 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun MusicPad(playing: Boolean, onAction: (MusicAction) -> Unit, onExit: () -> Unit, modifier: Modifier = Modifier) {
-    Box(modifier.fillMaxSize().testTag("music-pad")) {
+    val c = LocalHud.current
+    // A light veil over the HUD says the pad is on; speed and directions stay readable through it.
+    Box(modifier.fillMaxSize().background(c.background.copy(alpha = 0.22f)).testTag("music-pad")) {
         Row(Modifier.fillMaxSize()) {
             PadZone(MusicAction.PREVIOUS, Icons.Filled.SkipPrevious, "Previous", Modifier.weight(1f), onAction)
             PadDivider()
@@ -99,8 +102,8 @@ private fun PadZone(action: MusicAction, icon: ImageVector, label: String, modif
         // A faint label at the bottom so the rider can see the pad is on and what each part does.
         Row(
             Modifier.align(Alignment.BottomCenter).padding(bottom = 14.dp).clip(RoundedCornerShape(50))
-                .background(c.glass).border(1.dp, c.glassBorder, RoundedCornerShape(50))
-                .padding(horizontal = 12.dp, vertical = 6.dp).alpha(0.85f),
+                .background(c.surface.copy(alpha = 0.9f)).border(1.dp, c.accent.copy(alpha = 0.5f), RoundedCornerShape(50))
+                .padding(horizontal = 12.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(icon, null, tint = c.accent, modifier = Modifier.size(18.dp))
@@ -127,7 +130,7 @@ private fun UnlockPill(onExit: () -> Unit, modifier: Modifier) {
     val scope = rememberCoroutineScope()
     val shape = RoundedCornerShape(50)
     Box(
-        modifier.clip(shape).background(c.glass).border(1.dp, c.glassBorder, shape).testTag("pad-unlock")
+        modifier.clip(shape).background(c.surface.copy(alpha = 0.92f)).border(1.dp, c.accent.copy(alpha = 0.5f), shape).testTag("pad-unlock")
             .pointerInput(Unit) {
                 detectTapGestures(onPress = {
                     val job = scope.launch {
@@ -142,13 +145,10 @@ private fun UnlockPill(onExit: () -> Unit, modifier: Modifier) {
                 })
             },
     ) {
-        Box(Modifier.matchParentSizeFraction(progress.value).background(c.accent.copy(alpha = 0.35f)))
-        Row(Modifier.padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+        Row(Modifier.drawBehind { drawRect(c.accent.copy(alpha = 0.4f), size = size.copy(width = size.width * progress.value)) }.padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
             Icon(Icons.Filled.Lock, null, tint = c.accent, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(6.dp))
             Text("MUSIC PAD · HOLD TO UNLOCK", color = c.text, style = LocalType.current.micro)
         }
     }
 }
-
-private fun Modifier.matchParentSizeFraction(f: Float): Modifier = this.fillMaxHeight().fillMaxWidth(f.coerceIn(0f, 1f))
