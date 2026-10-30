@@ -58,7 +58,7 @@ import com.rodeo.hud.ui.setup.SosContactsEditor
 import com.rodeo.hud.ui.setup.ToggleRow
 import com.rodeo.hud.ui.theme.LocalHud
 import com.rodeo.hud.ui.theme.LocalType
-import com.rodeo.hud.voice.VoskEngine
+import com.rodeo.hud.voice.SpeechEngine
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -164,9 +164,9 @@ fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onTapSetup: () 
                 Text(
                     when {
                         !g.assistant.micAllowed -> "Needs microphone permission (see Permissions)"
-                        voice.model == VoskEngine.ModelState.MISSING -> "Offline speech model is missing from this build; using Google voice typing when you tap the mic"
-                        voice.model == VoskEngine.ModelState.LOADING -> "Preparing offline speech (first launch only)…"
-                        voice.model == VoskEngine.ModelState.FAILED -> "Offline speech failed to load; using Google voice typing when you tap the mic"
+                        voice.model == SpeechEngine.ModelState.MISSING -> "Offline speech model is missing from this build; using Google voice typing when you tap the mic"
+                        voice.model == SpeechEngine.ModelState.LOADING -> "Preparing offline speech (first launch only)…"
+                        voice.model == SpeechEngine.ModelState.FAILED -> "Offline speech failed to load; using Google voice typing when you tap the mic"
                         voice.listening -> "Listening for \"${g.assistant.wakePhraseHint(profile)}\" · works offline"
                         else -> "Ready · works offline"
                     } + if (profile.wakeAliases.isNotEmpty()) " · trained" else "",
@@ -239,7 +239,7 @@ fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onTapSetup: () 
             GlassCard(Modifier.fillMaxWidth()) {
                 SectionLabel("Services")
                 Text("Map and turn-by-turn: OpenStreetMap data, free routing servers (Valhalla, OSRM) · no keys, no fees", color = c.text, style = LocalType.current.body)
-                Text("Voice assistant: on the phone, works offline", color = c.text, style = LocalType.current.body)
+                Text("Voice assistant: on the phone, works offline · speech model Kroko ASR by Banafo (CC BY-SA 4.0) on sherpa-onnx (Apache 2.0)", color = c.text, style = LocalType.current.body)
                 Text("SOS: SMS from the default SIM" + if (g.sos.canSendSms) "" else " · SMS permission off", color = c.text, style = LocalType.current.body)
                 Text("Pack mode and pothole sharing: " + if (g.pack.online) "online (Firebase)" else "demo / on-device only", color = c.text, style = LocalType.current.body)
                 Text("Weather: Open-Meteo", color = c.text, style = LocalType.current.body)

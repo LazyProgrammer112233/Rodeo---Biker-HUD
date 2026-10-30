@@ -9,6 +9,11 @@ on:
 permissions:
   contents: write
 
+# A newer push replaces an older run, so a slow old build can never publish over a newer APK.
+concurrency:
+  group: android-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-24.04
@@ -65,9 +70,9 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: |
-            app/src/main/assets/vosk-model
-            app/src/main/assets/gesture_recognizer.task
-          key: rodeo-models-v1-small-en-in-0.4
+            app/src/main/assets/speech
+            app/libs/sherpa-onnx.aar
+          key: rodeo-models-v2-kroko-2025-08-06-sherpa-2.0.1
 
       # Fonts (SIL Open Font License), the offline speech model (Vosk) and the hand model.
       - name: Fonts and models
@@ -157,7 +162,8 @@ jobs:
           key: piper-voices-v1
 
       - name: Voice evaluation
-        if: github.event_name == 'push' && !contains(github.event.head_commit.message, '[no-eval]')
+        # The old Vosk evaluation; the new engine is evaluated by tools/voice-eval/events.py (see below).
+        if: false
         continue-on-error: true
         timeout-minutes: 50
         run: |
@@ -232,12 +238,21 @@ jobs:
           name: Rodeo-apk
           path: Rodeo-${{ github.head_ref || github.ref_name }}.apk
 
-      - name: Publish rolling pre-release
+      # Only the newest commit on the branch may replace the rolling APK.
+      - name: Still the newest commit?
+        id: newest
         if: github.event_name == 'push'
+        run: |
+          HEAD=$(git ls-remote origin "refs/heads/${{ github.ref_name }}" | cut -f1)
+          echo "branch head $HEAD, this build ${{ github.sha }}"
+          [ "$HEAD" = "${{ github.sha }}" ] && echo "ok=true" >> "$GITHUB_OUTPUT" || echo "ok=false" >> "$GITHUB_OUTPUT"
+
+      - name: Publish rolling pre-release
+        if: github.event_name == 'push' && steps.newest.outputs.ok == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest-${{ github.ref_name }}
-          name: Rodeo ${{ github.ref_name }} (build ${{ github.run_number }})
+          name: Rodeo ${{ github.ref_name }} (build ${{ github.run_number }}, ${{ github.sha }})
           prerelease: true
           files: Rodeo-${{ github.ref_name }}.apk
           overwrite_files: true
@@ -266,9 +281,9 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: |
-            app/src/main/assets/vosk-model
-            app/src/main/assets/gesture_recognizer.task
-          key: rodeo-models-v1-small-en-in-0.4
+            app/src/main/assets/speech
+            app/libs/sherpa-onnx.aar
+          key: rodeo-models-v2-kroko-2025-08-06-sherpa-2.0.1
 
       - name: Fonts and models
         run: bash tools/ci/assets.sh

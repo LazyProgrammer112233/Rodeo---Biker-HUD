@@ -25,8 +25,8 @@ android {
         applicationId = "com.rodeo.hud"
         minSdk = 29
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.2.0-p2"
+        versionCode = 3
+        versionName = "0.3.0-p3"
 
         // Phones only: the offline speech and hand models ship native code for ARM.
         ndk { abiFilters += if (e2e) listOf("x86_64") else listOf("arm64-v8a", "armeabi-v7a") }
@@ -76,7 +76,7 @@ android {
     }
     // The hand model is memory-mapped straight from the APK.
     androidResources {
-        noCompress += "task"
+        noCompress += listOf("onnx", "task")
     }
     // Screenshot tests (Robolectric + Roborazzi) render the HUD at several screen sizes on CI.
     testOptions {
@@ -112,8 +112,9 @@ dependencies {
     // Keyless map: OpenStreetMap / CARTO tiles; routing from the free OpenStreetMap servers.
     implementation("org.osmdroid:osmdroid-android:6.1.20")
 
-    // Offline speech for the wake phrase and commands (model downloaded into assets on CI).
-    implementation("com.alphacephei:vosk-android:0.3.75")
+    // Offline speech for the wake phrase and commands: sherpa-onnx (Apache 2.0), its AAR and the
+    // model are downloaded on CI (tools/ci/assets.sh).
+    implementation(files("libs/sherpa-onnx.aar"))
 
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-database")

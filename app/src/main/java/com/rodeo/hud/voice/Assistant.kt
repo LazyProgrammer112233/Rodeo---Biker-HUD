@@ -39,7 +39,7 @@ data class AssistantUi(
     val awake: Boolean = false,
     val heard: String = "",
     val reply: String = "",
-    val model: VoskEngine.ModelState = VoskEngine.ModelState.MISSING,
+    val model: SpeechEngine.ModelState = SpeechEngine.ModelState.MISSING,
     val error: String? = null,
     val training: Training? = null,
 )
@@ -54,12 +54,12 @@ interface AssistantHost {
 }
 
 /**
- * Rodeo's voice assistant. Offline wake phrase and commands ([VoskEngine] + [VoiceBrain]); music
+ * Rodeo's voice assistant. Offline wake phrase and commands ([SpeechEngine] + [VoiceBrain]); music
  * pauses the moment it wakes and comes back when it is done; voice SOS is the lifeline.
  */
 class Assistant(private val context: Context, private val g: AppGraph) : VoiceBrain.Output {
     private val audio = context.getSystemService(AudioManager::class.java)
-    private val engine = VoskEngine(context)
+    private val engine = SpeechEngine(context)
     private val dictation = Dictation(context)
     private val brain = VoiceBrain(WakeMatcher("Hey Rodeo"), this)
     private val _ui = MutableStateFlow(AssistantUi())
@@ -88,7 +88,6 @@ class Assistant(private val context: Context, private val g: AppGraph) : VoiceBr
         g.scope.launch {
             g.profile.profile.map { Triple(it.wakePhrase, it.wakeAliases, it.sosWithoutWake) }.distinctUntilChanged().collect { (phrase, aliases, sos) ->
                 brain.setWake(WakeMatcher(phrase, aliases))
-                engine.setWake(phrase, aliases)
                 brain.repeatedSosEnabled = sos
             }
         }
@@ -232,16 +231,16 @@ class Assistant(private val context: Context, private val g: AppGraph) : VoiceBr
 
     // --- Engine events ---
 
-    private fun onEngine(e: VoskEngine.Event) {
+    private fun onEngine(e: SpeechEngine.Event) {
         val now = System.currentTimeMillis()
         val training = _ui.value.training
         when (e) {
-            is VoskEngine.Event.Partial -> {
+            is SpeechEngine.Event.Partial -> {
                 if (training != null && !training.done) { if (e.source == VoiceBrain.OPEN) _ui.update { it.copy(heard = e.text) }; return }
                 if (expectDestination && e.source == VoiceBrain.OPEN) { _ui.update { it.copy(heard = e.text) }; return }
                 brain.partial(e.text, now, e.source)
             }
-            is VoskEngine.Event.Final -> {
+            is SpeechEngine.Event.Final -> {
                 if (training != null && !training.done) { if (e.source == VoiceBrain.OPEN) onTrainingFinal(e.alternatives); return }
                 if (expectDestination && e.source == VoiceBrain.OPEN) {
                     val place = e.alternatives.firstOrNull() ?: return
@@ -251,11 +250,7 @@ class Assistant(private val context: Context, private val g: AppGraph) : VoiceBr
                 }
                 brain.final(e.alternatives, now, e.source)
             }
-            is VoskEngine.Event.Keywords -> {
-                if ((training != null && !training.done) || expectDestination) return
-                brain.keywords(e.words, now)
-            }
-            is VoskEngine.Event.MicError -> {
+            is SpeechEngine.Event.MicError -> {
                 _ui.update { it.copy(error = e.message) }
                 // Another app may have taken the mic for a moment (a call); try again shortly.
                 if (now - restartAt > 5_000) {
@@ -268,12 +263,9 @@ class Assistant(private val context: Context, private val g: AppGraph) : VoiceBr
 
     // --- VoiceBrain.Output ---
 
-    override fun onReplay(fromSec: Double) = engine.replayCommands(fromSec)
-
     override fun onWake() {
         replyJob?.cancel()
         _ui.update { it.copy(awake = true, heard = "", reply = "") }
-        engine.setCommands(true)
         stopMusicForAssistant()
         g.scope.launch {
             delay(220)
@@ -296,7 +288,6 @@ class Assistant(private val context: Context, private val g: AppGraph) : VoiceBr
     }
 
     override fun onCommand(p: Parsed, heard: String) {
-        engine.setCommands(brain.mode == VoiceBrain.Mode.COUNTDOWN)
         engine.resetOpen()
         val s = g.sos.state.value
         when (p.command) {
@@ -388,20 +379,17 @@ class Assistant(private val context: Context, private val g: AppGraph) : VoiceBr
             is SosState.Countdown -> if (prev !is SosState.Countdown) {
                 brain.setCountdown(true, now)
                 engine.prepare()
-                engine.setCommands(true)
                 if (s.reason == SosReason.CRASH) {
                     say("Possible crash detected. Sending SOS in ${s.secondsLeft} seconds. Say I'm okay to cancel.", Speaker.Channel.ALERT, flush = true)
                 }
             }
             is SosState.Active -> if (prev !is SosState.Active) {
                 brain.setCountdown(false, now)
-                engine.setCommands(false)
                 val n = g.profile.profile.value.sosContacts.size
                 if (!s.dryRun) say("SOS sent to $n contact${if (n == 1) "" else "s"} with your location.", Speaker.Channel.ALERT)
             }
             SosState.Idle -> if (prev !is SosState.Idle) {
                 brain.setCountdown(false, now)
-                engine.setCommands(false)
             }
         }
         sync()

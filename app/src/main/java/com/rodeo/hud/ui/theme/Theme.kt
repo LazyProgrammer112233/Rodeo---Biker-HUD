@@ -189,18 +189,19 @@ fun hudColors(brand: Brand?, paintHex: Long?, dark: Boolean, heritage: Boolean =
     val raw = vivid(Color(accentFor(brand, paintHex, heritage)))
     val paint = Color(paintHex ?: 0xFF6E7176)
     return if (dark) {
-        // Night: graphite plates on a deep void; accent lifted to 4.5:1 on the base if needed.
-        val base = Color(0xFF05060A)
+        // Night: frosted-glass plates (translucent, light rim) over a deep blue-black void with the
+        // accent glowing behind; accent lifted to contrast on the plates if needed.
+        val base = Color(0xFF060810)
         val accent = guard(raw, Color(0xFF191B22), 3.5)
         HudColors(
             dark = true,
             background = base,
-            surfaceLowest = Color(0xFF0C0E14),
-            surface = Color(0xFF191B22),
-            surfaceHigh = Color(0xFF282A30),
-            surfaceHighest = Color(0xFF33343B),
-            glass = Color(0xFF191B22).copy(alpha = 0.92f),
-            glassBorder = Color.White.copy(alpha = 0.07f),
+            surfaceLowest = Color(0xFF0B0E16),
+            surface = Color(0xFF141925).copy(alpha = 0.78f),
+            surfaceHigh = Color.White.copy(alpha = 0.075f),
+            surfaceHighest = Color.White.copy(alpha = 0.13f),
+            glass = Color(0xFF131824).copy(alpha = 0.66f),
+            glassBorder = Color.White.copy(alpha = 0.12f),
             borderWidth = 1.dp,
             text = Color(0xFFFFFFFF),
             textMuted = Color(0xFFB4B9C0),

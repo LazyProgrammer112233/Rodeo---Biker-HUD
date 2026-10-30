@@ -427,7 +427,7 @@ private fun HeroIdle(s: CockpitState, actions: CockpitControls, modifier: Modifi
         Box(Modifier.fillMaxSize()) {
             BrandDecal(Modifier.fillMaxSize(), alpha = 0.3f)
             BoxWithConstraints(Modifier.fillMaxSize().padding(horizontal = 14.sdp(), vertical = 8.sdp())) {
-                val showStats = maxHeight >= 132.sdp()
+                val showStats = maxHeight >= 118.sdp()
                 val showModel = maxHeight >= 84.sdp()
                 val dial = minOf(maxHeight, maxWidth * 0.38f)
                 Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
@@ -458,10 +458,10 @@ private fun HeroIdle(s: CockpitState, actions: CockpitControls, modifier: Modifi
                                     }
                                 }
                             }
-                            if (showStats) Row(horizontalArrangement = Arrangement.spacedBy(6.sdp())) {
-                                StatBox("Last trip", s.lastDistanceKm?.let { "%.1f".format(it) } ?: "--", "km", Modifier.weight(1f), unitInLabel = !roomy)
-                                StatBox("Avg", s.lastAvgKmh?.toString() ?: "--", "km/h", Modifier.weight(1f), unitInLabel = !roomy)
-                                StatBox("Top", s.lastTopKmh?.toString() ?: "--", "km/h", Modifier.weight(1f), valueColor = c.ok, unitInLabel = !roomy)
+                            if (showStats) Row(horizontalArrangement = Arrangement.spacedBy(6.sdp()), verticalAlignment = Alignment.CenterVertically) {
+                                LastRideStat("Last trip", s.lastDistanceKm?.let { "%.1f".format(it) }, "km", Modifier.weight(1f))
+                                LastRideStat("Avg", s.lastAvgKmh?.toString(), "km/h", Modifier.weight(1f))
+                                LastRideStat("Top", s.lastTopKmh?.toString(), "km/h", Modifier.weight(1f), c.ok)
                             }
                         }
                     }
@@ -637,6 +637,27 @@ private fun StatsWell(s: CockpitState, modifier: Modifier, columns: Int) {
         }
         rows.forEach { row ->
             Row(horizontalArrangement = Arrangement.spacedBy(8.sdp())) { row.forEach { TripStat(it, s, Modifier.weight(1f)) } }
+        }
+    }
+}
+
+/** One figure from the last ride on a slim glass pill: label over value, about 34 dp tall so it never clips. */
+@Composable
+private fun LastRideStat(label: String, value: String?, unit: String, modifier: Modifier, valueColor: Color? = null) {
+    val c = LocalHud.current
+    val t = LocalType.current
+    val shape = RoundedCornerShape(10.sdp())
+    Column(
+        modifier.clip(shape).background(if (c.dark) Color.White.copy(alpha = 0.06f) else c.surfaceHigh)
+            .padding(horizontal = 8.sdp(), vertical = 3.sdp()),
+    ) {
+        FitText(label.uppercase(), t.micro, c.textMuted)
+        Row(verticalAlignment = Alignment.Bottom) {
+            FitText(value ?: "—", t.headlineSm, if (value == null) c.textSubtle else valueColor ?: c.text, Modifier.weight(1f, fill = false))
+            if (value != null) {
+                Spacer(Modifier.width(3.sdp()))
+                Text(unit.uppercase(), color = c.accent, style = t.micro, maxLines = 1)
+            }
         }
     }
 }
@@ -835,7 +856,14 @@ fun HorizonBackdrop(modifier: Modifier) {
             y += step
             step *= 1.45f
         }
-        val bloom = Offset(w * 0.25f, h * 0.3f)
-        drawCircle(Brush.radialGradient(listOf(c.accent.copy(alpha = if (c.dark) 0.12f else 0.05f), Color.Transparent), bloom, w * 0.3f), w * 0.3f, bloom)
+        // Coloured light behind the glass: the accent high on the left, a cool counter-glow low on the right.
+        val bloom = Offset(w * 0.22f, h * 0.3f)
+        drawCircle(Brush.radialGradient(listOf(c.accent.copy(alpha = if (c.dark) 0.26f else 0.07f), Color.Transparent), bloom, w * 0.36f), w * 0.36f, bloom)
+        val low = Offset(w * 0.45f, h * 1.05f)
+        drawCircle(Brush.radialGradient(listOf(c.accent.copy(alpha = if (c.dark) 0.14f else 0.04f), Color.Transparent), low, w * 0.3f), w * 0.3f, low)
+        if (c.dark) {
+            val cool = Offset(w * 0.05f, h * 0.95f)
+            drawCircle(Brush.radialGradient(listOf(Color(0xFF3A6BFF).copy(alpha = 0.10f), Color.Transparent), cool, w * 0.25f), w * 0.25f, cool)
+        }
     }
 }

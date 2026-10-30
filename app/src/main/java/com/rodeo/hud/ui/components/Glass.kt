@@ -39,6 +39,8 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -110,7 +112,11 @@ fun FitText(
 
 private fun TextUnit.isSpecified() = this != TextUnit.Unspecified
 
-/** Cockpit plate: solid graphite (night) or white with a dark rule (day), optional accent rim light on top. */
+/**
+ * Frosted-glass plate. Night: a translucent tinted pane with a light top edge and a rim that fades
+ * from bright at the top to faint at the bottom, so the accent glow behind shows through. Day: a
+ * near-opaque white pane with a dark rule, because translucency washes out in direct sun.
+ */
 @Composable
 fun GlassCard(
     modifier: Modifier = Modifier,
@@ -125,11 +131,13 @@ fun GlassCard(
         modifier
             .clip(shape)
             .background(c.glass)
-            .then(
-                if (c.dark) Modifier.background(Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.035f), Color.Transparent)))
-                else Modifier,
+            .then(if (c.dark) Modifier.background(glassSheen()) else Modifier)
+            .border(
+                if (accentBorder != null) BorderStroke(maxOf(c.borderWidth, 1.5.dp), accentBorder)
+                else if (c.dark) BorderStroke(1.dp, glassRim())
+                else BorderStroke(c.borderWidth, c.glassBorder),
+                shape,
             )
-            .border(BorderStroke(if (accentBorder != null) maxOf(c.borderWidth, 1.5.dp) else c.borderWidth, accentBorder ?: c.glassBorder), shape)
             .then(
                 if (rim) Modifier.drawWithContent {
                     drawContent()
@@ -142,6 +150,33 @@ fun GlassCard(
             .padding(padding),
         content = content,
     )
+}
+
+/** Light falling on the top of a glass pane. */
+fun glassSheen(strength: Float = 1f) = Brush.verticalGradient(
+    0f to Color.White.copy(alpha = 0.075f * strength),
+    0.45f to Color.White.copy(alpha = 0.02f * strength),
+    1f to Color.Transparent,
+)
+
+/** A glass pane's edge: bright where light catches the top, nearly gone at the bottom. */
+fun glassRim(alpha: Float = 1f) = Brush.verticalGradient(
+    listOf(Color.White.copy(alpha = 0.30f * alpha), Color.White.copy(alpha = 0.08f * alpha), Color.White.copy(alpha = 0.04f * alpha)),
+)
+
+/** Fill and edge for buttons and tiles: frosted at night, solid in the day. */
+@Composable
+private fun Modifier.glassButton(shape: Shape, active: Boolean = false): Modifier {
+    val c = LocalHud.current
+    return if (c.dark) {
+        this.background(
+            if (active) Brush.verticalGradient(listOf(c.accent.copy(alpha = 0.34f), c.accent.copy(alpha = 0.14f)))
+            else Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.11f), Color.White.copy(alpha = 0.04f))),
+        ).border(BorderStroke(1.dp, if (active) Brush.verticalGradient(listOf(c.accent, c.accent.copy(alpha = 0.5f))) else glassRim()), shape)
+    } else {
+        this.background(if (active) c.accent.copy(alpha = 0.12f) else c.surfaceHigh)
+            .border(c.borderWidth, if (active) c.accent else c.glassBorder, shape)
+    }
 }
 
 /** Glove tile: big icon with a status jewel, label underneath that shrinks rather than clips. */
@@ -167,8 +202,7 @@ fun HudTile(
         modifier
             .defaultMinSize(minSize, minSize)
             .clip(shape)
-            .background(if (active) c.accent.copy(alpha = if (c.dark) 0.16f else 0.12f) else c.surfaceHigh)
-            .border(c.borderWidth, if (active) c.accent else c.glassBorder, shape)
+            .glassButton(shape, active)
             .alpha(if (enabled) 1f else 0.4f)
             .combinedClickable(enabled = enabled, role = Role.Button, onClick = onClick, onLongClick = onLongClick)
             .padding(horizontal = 6.sdp(), vertical = 6.sdp()),
@@ -199,7 +233,11 @@ fun PrimaryButton(text: String, modifier: Modifier = Modifier, enabled: Boolean 
         modifier
             .defaultMinSize(minHeight = 52.sdp())
             .clip(shape)
-            .background(if (enabled) bg else c.textSubtle.copy(alpha = 0.3f))
+            .background(
+                if (enabled) Brush.verticalGradient(listOf(lerp(bg, Color.White, 0.18f), bg, lerp(bg, Color.Black, 0.08f)))
+                else SolidColor(c.textSubtle.copy(alpha = 0.3f)),
+            )
+            .then(if (enabled) Modifier.border(BorderStroke(1.dp, Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.45f), Color.Transparent))), shape) else Modifier)
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .padding(horizontal = 18.sdp(), vertical = 10.sdp()),
         verticalAlignment = Alignment.CenterVertically,
@@ -221,8 +259,7 @@ fun GhostButton(text: String, modifier: Modifier = Modifier, icon: ImageVector? 
         modifier
             .defaultMinSize(minHeight = 48.sdp())
             .clip(shape)
-            .background(c.surfaceHigh)
-            .border(c.borderWidth, c.glassBorder, shape)
+            .glassButton(shape)
             .clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = 16.sdp(), vertical = 8.sdp()),
         verticalAlignment = Alignment.CenterVertically,
