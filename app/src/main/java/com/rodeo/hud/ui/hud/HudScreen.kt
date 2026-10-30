@@ -121,7 +121,7 @@ fun HudScreen(actions: HudActions, showEndSlider: Boolean, dark: Boolean) {
         packActive = pack.active,
         listening = voice.awake,
         wakeArmed = voice.listening,
-        tapsOn = profile.tapControl,
+        musicPadOn = profile.musicPad,
         showEndSlider = showEndSlider,
         lockInput = speed > 10f,
     )
@@ -149,7 +149,7 @@ fun HudScreen(actions: HudActions, showEndSlider: Boolean, dark: Boolean) {
             override fun wifi() {
                 runCatching { ctx.startActivity(Intent(Settings.Panel.ACTION_WIFI).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
             }
-            override fun toggleTaps() = g.profile.update { it.copy(tapControl = !it.tapControl) }
+            override fun toggleMusicPad() = g.profile.update { it.copy(musicPad = !it.musicPad) }
         }
     }
 
@@ -161,6 +161,13 @@ fun HudScreen(actions: HudActions, showEndSlider: Boolean, dark: Boolean) {
         backdrop = { ParticleField(Modifier.fillMaxSize(), speed, lowPower = health.lowPower) },
         overlay = { GestureFlash(Modifier.align(Alignment.TopCenter).padding(top = 18.dp)) },
     )
+    if (profile.musicPad) {
+        MusicPad(
+            playing = music.playing,
+            onAction = { a -> g.controls.act(a, ControlSource.TAP, "Screen tap") },
+            onExit = { g.profile.update { it.copy(musicPad = false) } },
+        )
+    }
     if (explainMusicAccess) {
         MusicAccessDialog(
             onOpen = {
@@ -210,7 +217,8 @@ private fun GestureFlash(modifier: Modifier) {
     val last by g.controls.last.collectAsState()
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(last) {
-        if (last == null) return@LaunchedEffect
+        // Screen taps light up their own zone on the music pad.
+        if (last == null || last?.source == ControlSource.TAP) return@LaunchedEffect
         visible = true
         delay(1_400)
         visible = false

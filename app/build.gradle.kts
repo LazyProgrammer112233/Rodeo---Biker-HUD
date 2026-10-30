@@ -25,8 +25,8 @@ android {
         applicationId = "com.rodeo.hud"
         minSdk = 29
         targetSdk = 35
-        versionCode = 3
-        versionName = "0.3.0-p3"
+        versionCode = 4
+        versionName = "0.4.0"
 
         // Phones only: the offline speech and hand models ship native code for ARM.
         ndk { abiFilters += if (e2e) listOf("x86_64") else listOf("arm64-v8a", "armeabi-v7a") }

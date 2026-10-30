@@ -132,7 +132,7 @@ interface CockpitControls : HudActions {
     fun musicAccess()
     fun bluetooth()
     fun wifi()
-    fun toggleTaps()
+    fun toggleMusicPad()
 }
 
 /** Everything the cockpit shows, as plain values, so the layout can be previewed and screenshot-tested. */
@@ -176,7 +176,7 @@ data class CockpitState(
     val listening: Boolean = false,
     /** The wake phrase is armed (the assistant is listening in the background). */
     val wakeArmed: Boolean = false,
-    val tapsOn: Boolean = false,
+    val musicPadOn: Boolean = false,
     val showEndSlider: Boolean = false,
     val lockInput: Boolean = false,
 )
@@ -810,12 +810,10 @@ private fun TileRow(s: CockpitState, actions: CockpitControls, narrow: Boolean) 
         }
         HudTile(Icons.Filled.Groups, if (s.packActive) "Pack ${s.packCount}" else "Pack", tile.weight(1f), active = s.packActive) { actions.openPack() }
         HudTile(Icons.Filled.Mic, "Voice", tile.weight(1f), active = s.listening, jewel = if (s.listening || s.wakeArmed) c.ok else null) { actions.voice() }
-        if (!s.riding) {
-            HudTile(
-                Icons.Filled.TouchApp, "Taps", tile.weight(1f), active = s.tapsOn,
-                jewel = if (s.tapsOn) c.ok else null,
-            ) { actions.toggleTaps() }
-        }
+        HudTile(
+            Icons.Filled.TouchApp, "Music pad", tile.weight(1f), active = s.musicPadOn,
+            jewel = if (s.musicPadOn) c.ok else null,
+        ) { actions.toggleMusicPad() }
         HoldToTrigger("SOS", "Hold 2 s", c.danger, tile.weight(1.35f)) { actions.sos() }
         if (s.riding) HudTile(Icons.Filled.PowerSettingsNew, "End", tile.weight(1f)) { actions.requestEndRide() }
     }

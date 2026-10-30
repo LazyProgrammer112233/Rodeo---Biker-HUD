@@ -1,6 +1,5 @@
 package com.rodeo.hud.shots
 
-import com.rodeo.hud.ui.settings.TapSetupScreen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
@@ -53,12 +52,12 @@ class ScreenShots {
         }
     }
 
-    @Test fun settings() = shoot("screen-settings") { SettingsScreen(onBack = {}, onChangeBike = {}, onSimulateCrash = {}, onDropTest = {}, onTapSetup = {}) }
+    @Test fun settings() = shoot("screen-settings") { SettingsScreen(onBack = {}, onChangeBike = {}, onSimulateCrash = {}, onDropTest = {}) }
 
     /** The whole of Settings at phone widths, tall enough that nothing is scrolled out of view. */
     @Config(qualifiers = "w1400dp-h2400dp-xhdpi")
     @Test fun settingsFull() = shoot("screen-settings-full", listOf(640 to 2100, 915 to 1900)) {
-        SettingsScreen(onBack = {}, onChangeBike = {}, onSimulateCrash = {}, onDropTest = {}, onTapSetup = {})
+        SettingsScreen(onBack = {}, onChangeBike = {}, onSimulateCrash = {}, onDropTest = {})
     }
 
     @Test fun garage() = shoot("screen-garage") { GarageScreen(onBack = {}) }
@@ -66,8 +65,6 @@ class ScreenShots {
     @Test fun rides() = shoot("screen-rides") { RidesScreen(onBack = {}, onNavigated = {}) }
 
     @Test fun pack() = shoot("screen-pack") { PackScreen(onBack = {}) }
-
-    @Test fun tapSetup() = shoot("screen-taps") { TapSetupScreen(onBack = {}) }
 
     @Test fun onboarding() = shoot("screen-onboarding") { Onboarding(onDone = {}) }
 }

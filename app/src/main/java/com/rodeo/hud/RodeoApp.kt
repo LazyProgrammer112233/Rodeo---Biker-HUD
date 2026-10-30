@@ -15,7 +15,6 @@ import com.rodeo.hud.core.MusicControls
 import com.rodeo.hud.core.RideEngine
 import com.rodeo.hud.core.RideSensors
 import com.rodeo.hud.core.Speaker
-import com.rodeo.hud.core.TapSensor
 import com.rodeo.hud.core.WarningCenter
 import com.rodeo.hud.core.WaveSensor
 import com.rodeo.hud.core.WeatherService
@@ -35,6 +34,9 @@ import com.rodeo.hud.voice.Assistant
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 /** Every long-lived piece of the app, created once. */
@@ -54,7 +56,6 @@ class AppGraph(app: Application) {
     val music = MusicController(app)
     val audioRoutes = AudioRoutes(app)
     val speaker = Speaker(app)
-    val taps = TapSensor(app)
     val waves = WaveSensor(app)
     val pack = PackService(app, scope, warnings) { profile.profile.value.riderName }
     val hazardSync = HazardSync(app, hazards)
@@ -86,6 +87,12 @@ class AppGraph(app: Application) {
             ambient.setLocation(loc.latitude, loc.longitude)
         }
         scope.launch { rides.refresh() }
+        // The music pad follows the ride: on when it starts, off when it ends (if the rider wants that).
+        scope.launch {
+            ride.live.map { it.active }.distinctUntilChanged().drop(1).collect { active ->
+                if (profile.profile.value.musicPadOnRide) profile.update { it.copy(musicPad = active) }
+            }
+        }
     }
 }
 

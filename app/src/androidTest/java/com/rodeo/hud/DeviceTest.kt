@@ -73,7 +73,7 @@ class DeviceTest {
     private val start = LatLng(12.9716, 77.5946)
 
     @Before fun setUp() {
-        g.profile.update { it.copy(onboarded = true, tapControl = false, waveControl = false, themeMode = ThemeMode.LIGHT, model = "390 Duke", year = 2023) }
+        g.profile.update { it.copy(onboarded = true, musicPad = false, musicPadOnRide = false, waveControl = false, themeMode = ThemeMode.LIGHT, model = "390 Duke", year = 2023) }
         mock = runCatching { Tasks.await(fused.setMockMode(true), 15, TimeUnit.SECONDS); true }
             .getOrElse { note("! mock GPS unavailable ($it); injecting positions instead"); false }
         g.speaker.onSay = { ch, text -> synchronized(spoken) { if (spoken.lastOrNull() != text) spoken += text }; Log.i(TAG, "say[$ch] $text") }

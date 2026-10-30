@@ -4,7 +4,7 @@ enum class VoiceCommand {
     SOS, CANCEL,
     NEXT, PREVIOUS, PAUSE, PLAY,
     NAVIGATE_HOME, NAVIGATE_TO, FIND_BIKE, STOP_NAVIGATION, MUTE_GUIDANCE, UNMUTE_GUIDANCE,
-    START_RIDE, END_RIDE, DISMISS,
+    START_RIDE, END_RIDE, DISMISS, MUSIC_PAD_ON, MUSIC_PAD_OFF,
     VOLUME_UP, VOLUME_DOWN,
     SPEED, TIME, BATTERY, ETA,
     UNKNOWN,
@@ -68,6 +68,8 @@ object Commands {
         destination(words)?.let { return it }
 
         val parsed = when {
+            has("music pad off", "unlock screen", "unlock the screen", "pad off", "turn off music pad", "screen unlock") -> Parsed(VoiceCommand.MUSIC_PAD_OFF)
+            has("music pad on", "music pad", "lock screen", "lock the screen", "pad on", "turn on music pad", "screen lock") -> Parsed(VoiceCommand.MUSIC_PAD_ON)
             has("stop navigation", "end navigation", "cancel navigation", "stop navigating", "exit navigation", "stop route",
                 // The recogniser can clip the first consonant when the wake word runs straight into the command.
                 "top navigation", "dop navigation", "stop the navigation", "top the navigation") ->

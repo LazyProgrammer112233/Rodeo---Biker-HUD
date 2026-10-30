@@ -28,12 +28,13 @@ data class Profile(
     val mapOnRight: Boolean = true,
     val sosContacts: List<SosContact> = emptyList(),
     val crashDetection: Boolean = true,
-    /** Taps on the phone's top edge control music (left = previous, middle = play / pause, double right = next). */
-    val tapControl: Boolean = true,
-    /** The rider's own knocks from tap setup ([com.rodeo.hud.core.TapTemplates] JSON), or null before setup. */
-    val tapTemplates: String? = null,
-    /** Knock strength learned in tap setup (m/s²); null uses the default. */
-    val tapMinPeak: Float? = null,
+    /**
+     * Music pad: the whole screen becomes three music buttons (left = previous, middle = play /
+     * pause, right = next) and every other touch is ignored, for a mounted phone on the move.
+     */
+    val musicPad: Boolean = false,
+    /** Switch the music pad on when a ride starts (and off when it ends). */
+    val musicPadOnRide: Boolean = true,
     /** On the HUD, the left volume key = previous song, the right one = next, holding either = play / pause. */
     val volumeKeyMusic: Boolean = true,
     val regNumber: String = "",
@@ -92,9 +93,8 @@ class ProfileStore(context: Context) {
             p.sosContacts.forEach { put(JSONObject().put("name", it.name).put("phone", it.phone)) }
         })
         put("crashDetection", p.crashDetection)
-        put("tapControl", p.tapControl)
-        p.tapTemplates?.let { put("tapTemplates", it) }
-        p.tapMinPeak?.let { put("tapMinPeak", it.toDouble()) }
+        put("musicPad", p.musicPad)
+        put("musicPadOnRide", p.musicPadOnRide)
         put("volumeKeyMusic", p.volumeKeyMusic)
         put("regNumber", p.regNumber)
         put("bloodGroup", p.bloodGroup)
@@ -132,9 +132,8 @@ class ProfileStore(context: Context) {
             mapOnRight = o.optBoolean("mapOnRight", true),
             sosContacts = contacts,
             crashDetection = o.optBoolean("crashDetection", true),
-            tapControl = o.optBoolean("tapControl", true),
-            tapTemplates = o.optStringOrNull("tapTemplates"),
-            tapMinPeak = if (o.has("tapMinPeak")) o.getDouble("tapMinPeak").toFloat() else null,
+            musicPad = o.optBoolean("musicPad", false),
+            musicPadOnRide = o.optBoolean("musicPadOnRide", true),
             volumeKeyMusic = o.optBoolean("volumeKeyMusic", true),
             regNumber = o.optString("regNumber"),
             bloodGroup = o.optString("bloodGroup"),

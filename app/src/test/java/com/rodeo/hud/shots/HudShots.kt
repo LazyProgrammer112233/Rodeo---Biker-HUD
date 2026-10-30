@@ -102,7 +102,7 @@ class HudShots {
             "Hyper-Velocity (VIP Mix)", "Apex Drivers", "Spotify", playing = true, hasAccess = true,
             durationMs = 224_000, position = { 83_000L }, volumePct = 60,
         ),
-        btOn = true, btDevice = "SENA 50S", wifiOn = true, packCount = 4, packActive = true, tapsOn = true,
+        btOn = true, btDevice = "SENA 50S", wifiOn = true, packCount = 4, packActive = true, musicPadOn = true,
     )
 
     private val riding = parked.copy(
@@ -121,6 +121,13 @@ class HudShots {
 
     @Test fun riding() = shoot("hud-riding", frames, looks) {
         CockpitLayout(riding, NoActions, mapOnRight = true, map = { FakeMap(it, MapChromeState(guidance = guidance, lockInput = true, bearingDeg = 38f, speedKmh = 72f)) })
+    }
+
+    @Test fun musicPad() = shoot("hud-music-pad", frames, ktmDark) {
+        androidx.compose.foundation.layout.Box {
+            CockpitLayout(riding.copy(warning = null), NoActions, mapOnRight = true, map = { FakeMap(it, MapChromeState(guidance = guidance, lockInput = true)) })
+            com.rodeo.hud.ui.hud.MusicPad(playing = true, onAction = {}, onExit = {})
+        }
     }
 
     @Test fun ridingEndSlider() = shoot("hud-riding-end", frames, ktmDark) {
@@ -266,7 +273,7 @@ private object NoActions : CockpitControls {
     override fun musicAccess() = Unit
     override fun bluetooth() = Unit
     override fun wifi() = Unit
-    override fun toggleTaps() = Unit
+    override fun toggleMusicPad() = Unit
 }
 
 private object NoMap : MapChromeActions {

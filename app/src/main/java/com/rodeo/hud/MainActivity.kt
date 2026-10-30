@@ -25,8 +25,6 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.rodeo.hud.core.ControlSource
 import com.rodeo.hud.core.MusicAction
-import com.rodeo.hud.core.TapTemplates
-import com.rodeo.hud.core.TapZone
 import com.rodeo.hud.core.Severity
 import com.rodeo.hud.core.Warning
 import com.rodeo.hud.data.Ride
@@ -42,13 +40,12 @@ import com.rodeo.hud.voice.AssistantHost
 import com.rodeo.hud.ui.pack.PackScreen
 import com.rodeo.hud.ui.rides.RidesScreen
 import com.rodeo.hud.ui.settings.SettingsScreen
-import com.rodeo.hud.ui.settings.TapSetupScreen
 import com.rodeo.hud.ui.setup.Onboarding
 import com.rodeo.hud.ui.theme.RodeoTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-enum class Screen { HUD, RIDES, GARAGE, SETTINGS, PACK, BIKE, TAPS }
+enum class Screen { HUD, RIDES, GARAGE, SETTINGS, PACK, BIKE }
 
 private const val ACTION_VOICE_HANDS_FREE = "android.speech.action.VOICE_SEARCH_HANDS_FREE"
 
@@ -67,18 +64,6 @@ class MainActivity : ComponentActivity(), HudActions, AssistantHost {
         WindowInsetsControllerCompat(window, window.decorView).apply {
             hide(WindowInsetsCompat.Type.systemBars())
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        }
-        g.taps.rotation = ::rotation
-        g.taps.onAction = { action, zone, n ->
-            val how = when {
-                n == 2 -> "Double tap ${zone.name.lowercase()}"
-                else -> "Tap ${zone.name.lowercase()}"
-            }
-            g.controls.act(action, ControlSource.TAP, how)
-        }
-        g.taps.onHint = { zone, n ->
-            if (zone == TapZone.RIGHT && n == 1) g.controls.hint(ControlSource.TAP, "Double-tap the right end for next song")
-            else if (n == 2) g.controls.hint(ControlSource.TAP, "Single tap ${zone.name.lowercase()} · double tap is for the right end")
         }
         g.waves.onWaves = { n ->
             if (g.profile.profile.value.waveControl) {
@@ -99,11 +84,7 @@ class MainActivity : ComponentActivity(), HudActions, AssistantHost {
             val loc by g.location.location.collectAsState()
 
             LaunchedEffect(profile.themeMode) { g.ambient.mode = profile.themeMode }
-            LaunchedEffect(profile.tapControl, profile.waveControl, profile.onboarded, screen) { syncGestures() }
-            LaunchedEffect(profile.tapTemplates, profile.tapMinPeak) {
-                g.taps.classifier.templates = TapTemplates.fromJson(profile.tapTemplates)
-                g.taps.minPeak = profile.tapMinPeak
-            }
+            LaunchedEffect(profile.waveControl, profile.onboarded, screen) { syncGestures() }
             LaunchedEffect(Unit) {
                 while (true) {
                     g.ambient.tick()
@@ -120,7 +101,7 @@ class MainActivity : ComponentActivity(), HudActions, AssistantHost {
                     if (!profile.onboarded) {
                         Onboarding(onDone = { ensureLocation() })
                     } else {
-                        BackHandler(enabled = screen != Screen.HUD && screen != Screen.BIKE && screen != Screen.TAPS) { screen = Screen.HUD }
+                        BackHandler(enabled = screen != Screen.HUD && screen != Screen.BIKE) { screen = Screen.HUD }
                         when (screen) {
                             Screen.HUD -> HudScreen(this@MainActivity, showEndSlider, dark)
                             Screen.RIDES -> RidesScreen(onBack = { screen = Screen.HUD }, onNavigated = { screen = Screen.HUD })
@@ -128,12 +109,10 @@ class MainActivity : ComponentActivity(), HudActions, AssistantHost {
                             Screen.SETTINGS -> SettingsScreen(
                                 onBack = { screen = Screen.HUD },
                                 onChangeBike = { screen = Screen.BIKE },
-                                onTapSetup = { screen = Screen.TAPS },
                                 onSimulateCrash = { screen = Screen.HUD; g.ride.simulateCrash() },
                                 onDropTest = { g.ride.startDropTest() },
                             )
                             Screen.PACK -> PackScreen(onBack = { screen = Screen.HUD })
-                            Screen.TAPS -> TapSetupScreen(onBack = { screen = Screen.SETTINGS })
                             Screen.BIKE -> Onboarding(editBike = true, onCancel = { screen = Screen.SETTINGS }, onDone = { screen = Screen.SETTINGS })
                         }
                         summary?.let { RideSummary(it) { summary = null } }
@@ -183,7 +162,6 @@ class MainActivity : ComponentActivity(), HudActions, AssistantHost {
     }
 
     override fun onStop() {
-        g.taps.stop()
         g.waves.stop()
         g.ambient.stop()
         g.music.stop()
@@ -260,12 +238,11 @@ class MainActivity : ComponentActivity(), HudActions, AssistantHost {
     override fun openSettings() { screen = Screen.SETTINGS }
     override fun openPack() { screen = Screen.PACK }
 
-    /** Taps and waves run only while Rodeo is on screen and the rider has them switched on (tap setup needs taps too). */
+    /** Waves run only while Rodeo is on screen and the rider has them switched on. */
     private fun syncGestures() {
         val p = g.profile.profile.value
         val started = lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)
         if (p.onboarded && p.waveControl && started) g.waves.start() else g.waves.stop()
-        if (p.onboarded && started && (p.tapControl || screen == Screen.TAPS)) g.taps.start() else g.taps.stop()
     }
 
     @Suppress("DEPRECATION")

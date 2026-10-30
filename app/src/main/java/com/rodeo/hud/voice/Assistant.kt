@@ -338,6 +338,8 @@ class Assistant(private val context: Context, private val g: AppGraph) : VoiceBr
                     done("Ride saved. ${"%.1f".format(Locale.US, km)} kilometres.", speak = true)
                 }
             }
+            VoiceCommand.MUSIC_PAD_ON -> { g.profile.update { it.copy(musicPad = true) }; done("Music pad on", speak = true) }
+            VoiceCommand.MUSIC_PAD_OFF -> { g.profile.update { it.copy(musicPad = false) }; done("Music pad off", speak = true) }
             VoiceCommand.DISMISS -> { g.warnings.dismissTop(); done("Cleared", speak = false) }
             VoiceCommand.VOLUME_UP -> { volume(AudioManager.ADJUST_RAISE); done("Louder", speak = false) }
             VoiceCommand.VOLUME_DOWN -> { volume(AudioManager.ADJUST_LOWER); done("Quieter", speak = false) }

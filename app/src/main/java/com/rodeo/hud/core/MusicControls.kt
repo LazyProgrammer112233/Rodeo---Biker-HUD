@@ -5,14 +5,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+/** What a music control does. */
+enum class MusicAction { PREVIOUS, PLAY_PAUSE, NEXT }
+
 /** Where a music control came from, for the on-screen confirmation. */
-enum class ControlSource { TAP, KEY, WAVE }
+enum class ControlSource { TAP, KEY, WAVE, VOICE }
 
 /** A music control the rider gave without touching the screen, shown as a big confirmation. */
 data class ControlEvent(val action: MusicAction?, val source: ControlSource, val detail: String, val at: Long)
 
 /**
- * One place for hands-off music control: taps on the frame, the volume keys and waves over the
+ * One place for hands-off music control: screen taps on the music pad, the volume keys and waves over the
  * phone all end up here, so they share the confirmation and can't double up.
  */
 class MusicControls(private val music: MusicController, private val blocked: () -> Boolean) {
@@ -24,7 +27,7 @@ class MusicControls(private val music: MusicController, private val blocked: () 
     fun act(action: MusicAction, source: ControlSource, detail: String): Boolean {
         if (blocked()) return false
         val now = System.currentTimeMillis()
-        if (now - lastAt < 500) return false
+        if (now - lastAt < 350) return false
         lastAt = now
         when (action) {
             MusicAction.PREVIOUS -> music.previous()
