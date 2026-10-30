@@ -1,0 +1,56 @@
+
+== Search, route, ride, arrive
+results: Lalbagh — Rashtriya Vidyalaya Road, V.V Puram, Bengaluru, Karnataka | Lalbagh Rock — Ashoka Pillar, Bengaluru Central City Corporation, Bengaluru, Bangalore North, B | Lalbagh Botanical Gardens — Ashoka Pillar, Bengaluru, Karnataka | Lalbagh Tank — Ashoka Pillar, Bengaluru Central City Corporation, Bengaluru, Bangalore North, B
+route state: error=null
+route: Valhalla, 4.4 km, 17 min, 17 steps
+   step 0 DEPART: Drive east
+   step 1 LEFT: Turn left
+   step 2 LEFT: Turn left onto Vittal Mallya Road
+   step 3 LEFT: Turn left onto Kasturba Road
+   step 4 SHARP_RIGHT: Make a sharp right onto Rajaram Mohan Roy Road
+   step 5 LEFT: Turn left onto Devanga Hostel Road
+   step 6 LEFT: Turn left onto Mission Road/Kalinga Rao Road
+   step 7 SLIGHT_RIGHT: Bear right
+   step 8 SLIGHT_RIGHT: Bear right onto Lalbagh Road
+   step 9 RIGHT: Turn right
+   step 10 SLIGHT_RIGHT: Bear right onto Krumbiegal Road
+   step 11 SLIGHT_LEFT: Bear left
+   step 12 SLIGHT_RIGHT: Bear right onto Krishna Rao Road
+   step 13 SLIGHT_RIGHT: Bear right to stay on Krishna Rao Road
+   step 14 LEFT: Turn left onto Govindappa Road
+   step 15 LEFT: Turn left onto Rashtriya Vidyalaya Road
+   step 16 ARRIVE: Your destination is on the right
+   @0 card: 30 m · Turn left
+   @3 card: 20 m · Turn left onto Vittal Mallya Road
+   @5 card: 80 m · Turn left onto Kasturba Road
+   @12 card: 550 m · Make a sharp right onto Rajaram Mohan Roy Road
+   @58 card: 650 m · Turn left onto Devanga Hostel Road
+   @113 card: 500 m · Turn left onto Mission Road/Kalinga Rao Road
+   @156 card: 50 m · Bear right
+   @160 card: 100 m · Bear right onto Lalbagh Road
+   @168 card: 1.0 km · Turn right
+   @252 card: 50 m · Bear right onto Krumbiegal Road
+   @256 card: 900 m · Bear left
+   @330 card: 30 m · Bear right onto Krishna Rao Road
+   @333 card: 100 m · Bear right to stay on Krishna Rao Road
+   @342 card: 150 m · Turn left onto Govindappa Road
+   @354 card: 150 m · Turn left onto Rashtriya Vidyalaya Road
+   @365 card: Arrived · You have arrived
+spoken: Route ready. 4.4 kilometres, about 17 minutes / In 30 metres, turn left / Turn left. Then turn left onto Vittal Mallya Road. / Turn left onto Vittal Mallya Road. / In 80 metres, turn left onto Kasturba Road / Turn left onto Kasturba Road. / In 550 metres, make a sharp right onto Rajaram Mohan Roy Road / In 200 metres, make a sharp right onto Rajaram Mohan Roy Road / Make a sharp right onto Rajaram Mohan Roy Road. / In 550 metres, turn left onto Devanga Hostel Road / In 150 metres, turn left onto Devanga Hostel Road / Turn left onto Devanga Hostel Road. / In 500 metres, turn left onto Mission Road / In 150 metres, turn left onto Mission Road / Turn left onto Mission Road, Kalinga Rao Road. Then bear right. / Bear right. / In 100 metres, bear right onto Lalbagh Road / Bear right onto Lalbagh Road. / In 550 metres, turn right / In 150 metres, turn right / Turn right. Then bear right onto Krumbiegal Road. / Bear right onto Krumbiegal Road. / In 550 metres, bear left / In 200 metres, bear left / Bear left. Then bear right onto Krishna Rao Road. / Bear right onto Krishna Rao Road. / In 100 metres, bear right to stay on Krishna Rao Road / Bear right to stay on Krishna Rao Road. / In 150 metres, turn left onto Govindappa Road / Turn left onto Govindappa Road. / In 150 metres, turn left onto Rashtriya Vidyalaya Road / Turn left onto Rashtriya Vidyalaya Road. Then your destination will be on the right. / You have arrived
+arrived=true offRouteFixes=0 tiles=OSM tileCache=1716 KB
+
+== Nandi Hills: search ranking and rerouting
+results: Nandi Hills — Nandi Hills, Karnataka, India | Nandi Hills Playground — Nandi Hill Road, Sultanapete, Karnataka | Nandi Hills State Forest — Suddahalli, Chikkaballapura taluk, Chikkaballapura, Karnataka, India | Mulberry Shades Bengaluru Nandi Hills, A Tribute Portfolio Resort — A Tribute Portfolio Resort, Nandhi Hills Road, Mudiganahalli, Devanahalli taluku
+route state: error=null
+route: Valhalla, 60.7 km, 2 h 26 min, 14 steps
+   off@0 offRoute=false routing=false
+   off@5 offRoute=false routing=false
+rerouted=true new route 60.7 km spoken: Route ready. 61 kilometres, about 2 hours 26 minutes / Rerouting / Route ready. 61 kilometres, about 2 hours 27 minutes / Turn left onto Rama Iyengar Road.
+
+== Search with no match
+message shown
+
+== Music card
+access=true
+volume 5 -> 6 of 15
+pause reached the player: true
