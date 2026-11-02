@@ -79,8 +79,9 @@ private val PERMS = listOf(
     Perm("Physical activity", "Auto-pause and crash detection.", listOf(Manifest.permission.ACTIVITY_RECOGNITION)),
     Perm("Microphone", "Voice commands with gloves on.", listOf(Manifest.permission.RECORD_AUDIO)),
     Perm(
-        "Music access",
-        "Song name, length and cover. If Android says \"Restricted setting\": App info, ⋮, Allow restricted settings, then try again.",
+        "Notification access",
+        "Google Maps' turns on the HUD and in your helmet, plus the song name, length and cover. Only Google Maps and music are read; nothing leaves the phone. " +
+            "If Android says \"Restricted setting\": App info, ⋮, Allow restricted settings, then try again.",
         emptyList(), special = "media",
     ),
 )

@@ -103,6 +103,7 @@ fun MapPane(
 
     val home = if (profile.homeLat != null && profile.homeLng != null) Place(profile.homeLabel.ifBlank { "Home" }, "", profile.homeLat!!, profile.homeLng!!) else null
     val parkedPlace = parked?.let { r -> r.parkLat?.let { lat -> r.parkLng?.let { lng -> Place("Parked bike", "", lat, lng) } } }
+    val hasGoogleMaps = remember { g.gmaps.googleMapsInstalled() }
     val chrome = MapChromeState(
         following = follow,
         lockInput = lockInput,
@@ -116,6 +117,7 @@ fun MapPane(
         bearingDeg = loc?.takeIf { it.hasBearing() }?.bearing,
         speedKmh = loc?.takeIf { it.hasSpeed() }?.let { it.speed * 3.6f } ?: 0f,
         attribution = if (tiles == MapTiles.Style.HOT) "© OpenStreetMap contributors, OSM France" else "© OpenStreetMap contributors",
+        googleMaps = hasGoogleMaps,
     )
     val actions = remember {
         object : MapChromeActions {
@@ -148,6 +150,7 @@ fun MapPane(
             override fun zoomIn() { follow = false; mapView?.controller?.zoomIn() }
             override fun zoomOut() { follow = false; mapView?.controller?.zoomOut() }
             override fun voiceSearch() = g.assistant.askForDestination()
+            override fun openGoogleMaps() { g.gmaps.openGoogleMaps() }
         }
     }
 

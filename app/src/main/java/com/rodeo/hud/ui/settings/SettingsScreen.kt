@@ -224,8 +224,10 @@ fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onSimulateCrash
                 ToggleRow("Avoid highways", profile.avoidHighways, sub = "Prefer city and state roads") { v -> g.profile.update { it.copy(avoidHighways = v) } }
                 ToggleRow("Spoken turn-by-turn", navState.voiceOn, sub = "Turn prompts lower the music for a moment instead of stopping it") { v -> if (v != navState.voiceOn) g.nav.toggleVoice() }
             }
+            GoogleMapsCard(onShowHud = onBack)
             GlassCard(Modifier.fillMaxWidth()) {
                 SectionLabel("Services")
+                Text("Google Maps turns: read on the phone from Google Maps' own notification · free, no account or key", color = c.text, style = LocalType.current.body)
                 Text("Map and turn-by-turn: OpenStreetMap data, free routing servers (Valhalla, OSRM) · no keys, no fees", color = c.text, style = LocalType.current.body)
                 Text("Voice assistant: on the phone, works offline · speech model Kroko ASR by Banafo (CC BY-SA 4.0) on sherpa-onnx (Apache 2.0)", color = c.text, style = LocalType.current.body)
                 Text("SOS: SMS from the default SIM" + if (g.sos.canSendSms) "" else " · SMS permission off", color = c.text, style = LocalType.current.body)

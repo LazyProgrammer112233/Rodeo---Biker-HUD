@@ -2,7 +2,14 @@ package com.rodeo.hud
 
 import android.Manifest
 import android.content.Context
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
 import android.location.Location
 import android.media.AudioManager
 import android.media.MediaMetadata
@@ -28,6 +35,8 @@ import androidx.test.rule.GrantPermissionRule
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.Tasks
 import com.rodeo.hud.data.ThemeMode
+import com.rodeo.hud.media.MediaListenerService
+import com.rodeo.hud.nav.gmaps.GmapsBridge
 import com.rodeo.hud.nav.LatLng
 import com.rodeo.hud.nav.Navigator
 import com.rodeo.hud.nav.MapTiles
@@ -226,6 +235,96 @@ class DeviceTest {
         }
     }
 
+    @Test fun e_googleMapsTurnsOnTheHud() {
+        note("\n== Google Maps turns on the HUD (from a navigation notification)")
+        val nm = ctx.getSystemService(NotificationManager::class.java)
+        nm.createNotificationChannel(NotificationChannel("e2e-nav", "E2E navigation", NotificationManager.IMPORTANCE_LOW))
+        // Google Maps' own notification can't be posted from a test, so Rodeo listens to itself here.
+        MediaListenerService.sources = setOf(GmapsBridge.GOOGLE_MAPS, ctx.packageName)
+        g.profile.update { it.copy(gmapsVoice = true, gmapsBigPanel = true) }
+        fun post(title: String, text: String?, sub: String?, arrow: Bitmap?) {
+            val n = Notification.Builder(ctx, "e2e-nav")
+                .setSmallIcon(android.R.drawable.ic_dialog_map)
+                .setContentTitle(title)
+                .apply { if (text != null) setContentText(text); if (sub != null) setSubText(sub); if (arrow != null) setLargeIcon(arrow) }
+                .setCategory(Notification.CATEGORY_NAVIGATION)
+                .setOngoing(true)
+                .build()
+            nm.notify(NAV_ID, n)
+        }
+        try {
+            launch {
+                note("access=${g.music.hasAccess()}")
+                post("450 m", "MG Road", "15 min · 6.8 km · 1:35 PM ETA", arrowPicture(left = true))
+                compose.waitUntil(15_000) { g.gmaps.state.value.guidance?.distanceText == "450 m" }
+                sleep(1_500)
+                val s1 = g.gmaps.state.value
+                note("read: ${s1.guidance?.maneuver} trusted=${s1.guidance?.arrowTrusted} arrow=${s1.lastArrow?.maneuver}/${s1.lastArrow?.confident} street=${s1.guidance?.street} eta=${s1.guidance?.eta}")
+                assertTrue("panel not shown", compose.onAllNodes(hasTestTag("gmaps-panel")).fetchSemanticsNodes().isNotEmpty())
+                assertTrue("left turn not read from the picture", s1.guidance?.maneuver == com.rodeo.hud.nav.Maneuver.LEFT)
+                shot("20-gmaps-left")
+                compose.waitUntil(10_000) { synchronized(spoken) { spoken.any { it.contains("turn left", ignoreCase = true) } } }
+
+                post("Rerouting…", null, null, null)
+                compose.waitUntil(10_000) { g.gmaps.state.value.guidance?.status == com.rodeo.hud.nav.gmaps.NavStatus.REROUTING }
+                sleep(800)
+                shot("21-gmaps-rerouting")
+
+                post("2 km", "At the roundabout, take the 2nd exit onto 100 Feet Rd", "13 min · 5.9 km · 1:35 PM ETA", null)
+                compose.waitUntil(10_000) { g.gmaps.state.value.guidance?.roundaboutExit == 2 }
+                sleep(800)
+                shot("22-gmaps-roundabout")
+
+                post("120 m", "Make a U-turn", "8 min · 3.7 km · 1:35 PM ETA", arrowPicture(left = false))
+                compose.waitUntil(10_000) { g.gmaps.state.value.guidance?.maneuver?.name?.startsWith("UTURN") == true }
+                sleep(800)
+                shot("23-gmaps-uturn")
+
+                compose.onNode(hasContentDescription("Show map")).performClick()
+                compose.waitUntil(5_000) { compose.onAllNodes(hasTestTag("gmaps-card")).fetchSemanticsNodes().isNotEmpty() }
+                sleep(800)
+                shot("24-gmaps-card-over-map")
+                compose.onNode(hasContentDescription("Big turn view")).performClick()
+                compose.waitUntil(5_000) { compose.onAllNodes(hasTestTag("gmaps-panel")).fetchSemanticsNodes().isNotEmpty() }
+
+                nm.cancel(NAV_ID)
+                compose.waitUntil(10_000) { g.gmaps.state.value.ended }
+                sleep(800)
+                shot("25-gmaps-ended")
+                compose.waitUntil(15_000) { !g.gmaps.state.value.active }
+                sleep(500)
+                assertTrue("panel still up after Google Maps stopped", compose.onAllNodes(hasTestTag("gmaps-panel")).fetchSemanticsNodes().isEmpty())
+                note("spoken: " + synchronized(spoken) { spoken.takeLast(8).joinToString(" | ") })
+
+                // The preview trip from Settings.
+                inst.runOnMainSync { g.gmaps.startDemo(stepMs = 1_200) }
+                sleep(2_600)
+                shot("26-gmaps-preview")
+                inst.runOnMainSync { g.gmaps.stopDemo() }
+            }
+        } finally {
+            nm.cancel(NAV_ID)
+            MediaListenerService.sources = setOf(GmapsBridge.GOOGLE_MAPS)
+        }
+    }
+
+    /** A white turn arrow on a clear background, like the one Google Maps puts in its notification. */
+    private fun arrowPicture(left: Boolean): Bitmap {
+        val b = Bitmap.createBitmap(128, 128, Bitmap.Config.ARGB_8888)
+        val c = Canvas(b)
+        val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE; strokeWidth = 16f; style = Paint.Style.STROKE; strokeJoin = Paint.Join.ROUND }
+        if (left) {
+            c.drawPath(Path().apply { moveTo(80f, 116f); lineTo(80f, 56f); lineTo(44f, 56f) }, p)
+            p.style = Paint.Style.FILL
+            c.drawPath(Path().apply { moveTo(14f, 56f); lineTo(46f, 30f); lineTo(46f, 82f); close() }, p)
+        } else {
+            c.drawPath(Path().apply { moveTo(40f, 116f); lineTo(40f, 50f); arcTo(40f, 22f, 92f, 74f, 180f, 180f, false); lineTo(92f, 76f) }, p)
+            p.style = Paint.Style.FILL
+            c.drawPath(Path().apply { moveTo(92f, 108f); lineTo(68f, 76f); lineTo(116f, 76f); close() }, p)
+        }
+        return b
+    }
+
     // --- helpers ---
 
     private fun playing(on: Boolean, pos: Long) = PlaybackState.Builder()
@@ -358,5 +457,6 @@ class DeviceTest {
 
     private companion object {
         const val TAG = "RodeoE2E"
+        const val NAV_ID = 4242
     }
 }

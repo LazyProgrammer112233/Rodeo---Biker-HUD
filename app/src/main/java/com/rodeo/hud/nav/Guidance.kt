@@ -8,7 +8,12 @@ enum class Maneuver {
     KEEP_LEFT, KEEP_RIGHT,
     UTURN_LEFT, UTURN_RIGHT,
     ROUNDABOUT_LEFT, ROUNDABOUT_RIGHT,
+    /** Roundabout exits straight ahead / all the way back round. */
+    ROUNDABOUT_STRAIGHT, ROUNDABOUT_UTURN,
+    MERGE,
     ARRIVE,
+    /** Google Maps showed a turn Rodeo could not read; the card shows Google's own picture. */
+    UNKNOWN,
 }
 
 /** What the turn card shows. Plain strings so the card can be previewed and tested. */
@@ -28,4 +33,6 @@ data class GuidanceUi(
     val status: String? = null,
     /** A route shown before the ride starts: Start begins guidance. */
     val preview: Boolean = false,
+    /** Roundabout exit number, when known ("2nd exit"). */
+    val roundaboutExit: Int? = null,
 )

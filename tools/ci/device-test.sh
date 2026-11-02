@@ -12,6 +12,8 @@ adb shell cmd notification allow_listener com.rodeo.hud/com.rodeo.hud.media.Medi
 adb shell settings put secure location_mode 3
 # Skip the one-time "Viewing full screen" tip that would cover the screenshots.
 adb shell settings put secure immersive_mode_confirmations confirmed
+# A slow emulator launcher can raise "isn't responding" dialogs over the screenshots.
+adb shell settings put global hide_error_dialogs 1
 adb shell media volume --stream 3 --set 7 > /dev/null 2>&1 || true
 adb logcat -c
 adb logcat -v time > $OUT/logcat.txt 2>&1 &
