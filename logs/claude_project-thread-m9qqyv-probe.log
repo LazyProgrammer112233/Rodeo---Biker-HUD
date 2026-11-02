@@ -5,10 +5,10 @@
 == valhalla walk-to-bike: {"trip":{"locations":[{"type":"break","lat":12.9716,"lon":77.5946,"original_index":0},{"type":"break","lat":12.9731,"lon":77.5961,"side_of_street":"left","original_index":1}],"legs":[{"maneuvers":[{"type":1,"instruction":"Walk east.","verbal_succinct_transition_instruction":"Walk east. Then Turn lef
 == osrm: {"code":"Ok","routes":[{"legs":[{"steps":[{"intersections":[{"out":0,"entry":[true],"bearings":[53],"location":[76.78316,30.73984]},{"out":0,"in":2,"entry":[true,true,false],"bearings":[60,150,240],"location":[76.783285,30.73992]}],"driving_side":"right","geometry":"_wesy@obnmqC_DyFiQq[","maneuver":
 == photon: {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"osm_type":"W","osm_id":1227950655,"osm_key":"highway","osm_value":"primary","type":"street","name":"Nandi Hills Road","city":"Devanahalli","county":"Devanahalli taluku","state":"Karnataka","country":"India","postcode":"562110",
-== nominatim: [{"place_id":250839107,"licence":"Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright","osm_type":"node","osm_id":4827607329,"lat":"13.3688849","lon":"77.6842015","category":"amenity","type":"police","place_rank":30,"importance":3.750133516437045e-05,"addresstype":"amenity","name"
+== nominatim: [{"place_id":253629100,"licence":"Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright","osm_type":"node","osm_id":4827607329,"lat":"13.3688849","lon":"77.6842015","category":"amenity","type":"police","place_rank":30,"importance":3.750133516437045e-05,"addresstype":"amenity","name"
 == tile osm blr 00 200 image/png 37766
 == tile hot blr 00 200 image/png 35779
-== tile osm blr 01 200 image/png 39078
+== tile osm blr 01 200 image/png 39066
 == tile hot blr 01 200 image/png 38769
 == tile osm blr 10 200 image/png 42456
 == tile hot blr 10 200 image/png 39783
@@ -22,31 +22,31 @@
 == tile hot del 10 200 image/png 39193
 == tile osm del 11 200 image/png 29203
 == tile hot del 11 200 image/png 28542
-== tile osm bom 00 200 image/png 39352
+== tile osm bom 00 200 image/png 39360
 == tile hot bom 00 200 image/png 37241
-== tile osm bom 01 200 image/png 18035
+== tile osm bom 01 200 image/png 18027
 == tile hot bom 01 200 image/png 17456
 == tile osm bom 10 200 image/png 33943
 == tile hot bom 10 200 image/png 32379
-== tile osm bom 11 200 image/png 29397
+== tile osm bom 11 200 image/png 29084
 == tile hot bom 11 200 image/png 28849
 total 116
-drwxr-xr-x 2 runner runner  4096 Nov  2 17:32 .
-drwxr-xr-x 4 runner runner  4096 Nov  2 17:32 ..
--rw-r--r-- 1 runner runner  9141 Nov  2 17:32 osrm-chandigarh-sukhna.json
--rw-r--r-- 1 runner runner  1252 Nov  2 17:32 photon-nandi.json
--rw-r--r-- 1 runner runner  4531 Nov  2 17:32 search-nominatim-hp-petrol-pump.json
--rw-r--r-- 1 runner runner  3702 Nov  2 17:32 search-nominatim-indiranagar.json
--rw-r--r-- 1 runner runner   546 Nov  2 17:32 search-nominatim-kempegowda-airport.json
--rw-r--r-- 1 runner runner  4467 Nov  2 17:32 search-nominatim-lalbagh.json
--rw-r--r-- 1 runner runner  4201 Nov  2 17:32 search-nominatim-nandi-hills.json
--rw-r--r-- 1 runner runner  3666 Nov  2 17:32 search-photon-hp-petrol-pump.json
--rw-r--r-- 1 runner runner  3239 Nov  2 17:32 search-photon-indiranagar.json
--rw-r--r-- 1 runner runner  3395 Nov  2 17:32 search-photon-kempegowda-airport.json
--rw-r--r-- 1 runner runner  3462 Nov  2 17:32 search-photon-lalbagh.json
--rw-r--r-- 1 runner runner  1636 Nov  2 17:32 search-photon-nandi-hills.json
--rw-r--r-- 1 runner runner 12425 Nov  2 17:32 valhalla-bengaluru-nandi.json
--rw-r--r-- 1 runner runner  7076 Nov  2 17:32 valhalla-chandigarh-sukhna.json
--rw-r--r-- 1 runner runner  7289 Nov  2 17:32 valhalla-delhi-cp-indiagate.json
--rw-r--r-- 1 runner runner  3884 Nov  2 17:32 valhalla-mumbai-bandra-juhu.json
--rw-r--r-- 1 runner runner  3860 Nov  2 17:32 valhalla-walk-to-bike.json
+drwxr-xr-x 2 runner runner  4096 Nov  2 17:47 .
+drwxr-xr-x 4 runner runner  4096 Nov  2 17:46 ..
+-rw-r--r-- 1 runner runner  9141 Nov  2 17:47 osrm-chandigarh-sukhna.json
+-rw-r--r-- 1 runner runner  1252 Nov  2 17:47 photon-nandi.json
+-rw-r--r-- 1 runner runner  4522 Nov  2 17:47 search-nominatim-hp-petrol-pump.json
+-rw-r--r-- 1 runner runner  3701 Nov  2 17:47 search-nominatim-indiranagar.json
+-rw-r--r-- 1 runner runner   544 Nov  2 17:47 search-nominatim-kempegowda-airport.json
+-rw-r--r-- 1 runner runner  4440 Nov  2 17:47 search-nominatim-lalbagh.json
+-rw-r--r-- 1 runner runner  4201 Nov  2 17:47 search-nominatim-nandi-hills.json
+-rw-r--r-- 1 runner runner  3666 Nov  2 17:47 search-photon-hp-petrol-pump.json
+-rw-r--r-- 1 runner runner  3239 Nov  2 17:47 search-photon-indiranagar.json
+-rw-r--r-- 1 runner runner  3395 Nov  2 17:47 search-photon-kempegowda-airport.json
+-rw-r--r-- 1 runner runner  3462 Nov  2 17:47 search-photon-lalbagh.json
+-rw-r--r-- 1 runner runner  1636 Nov  2 17:47 search-photon-nandi-hills.json
+-rw-r--r-- 1 runner runner 12425 Nov  2 17:46 valhalla-bengaluru-nandi.json
+-rw-r--r-- 1 runner runner  7076 Nov  2 17:46 valhalla-chandigarh-sukhna.json
+-rw-r--r-- 1 runner runner  7289 Nov  2 17:47 valhalla-delhi-cp-indiagate.json
+-rw-r--r-- 1 runner runner  3884 Nov  2 17:47 valhalla-mumbai-bandra-juhu.json
+-rw-r--r-- 1 runner runner  3860 Nov  2 17:47 valhalla-walk-to-bike.json
