@@ -165,12 +165,15 @@ fun SignInScreen() {
                         val creating = mode == Mode.CREATE
                         Text(if (creating) "Create your account" else "Sign in", color = c.text, style = LocalType.current.headlineMd)
                         Spacer(Modifier.size(8.dp))
-                        PrimaryButton("Continue with Google", Modifier.fillMaxWidth().testTag("signin-google"), enabled = !busy, icon = Icons.Filled.AccountCircle) {
-                            val activity = ctx as? Activity
-                            if (activity != null) act { g.accounts.google(activity) }
+                        // Google needs the web client id that a fresh google-services.json carries.
+                        if (g.accounts.googleEnabled) {
+                            PrimaryButton("Continue with Google", Modifier.fillMaxWidth().testTag("signin-google"), enabled = !busy, icon = Icons.Filled.AccountCircle) {
+                                val activity = ctx as? Activity
+                                if (activity != null) act { g.accounts.google(activity) }
+                            }
+                            Spacer(Modifier.size(4.dp))
+                            SectionLabel("Or with email")
                         }
-                        Spacer(Modifier.size(4.dp))
-                        SectionLabel("Or with email")
                         if (creating) InputField(name, { name = it.take(24) }, "Your name (shown to your pack)", KeyboardType.Text, Icons.Filled.AccountCircle)
                         InputField(email, { email = it.trim() }, "Email", KeyboardType.Email, Icons.Filled.Email)
                         PasswordField(password, { password = it }, if (creating) "Password (6+ characters)" else "Password")
