@@ -83,7 +83,7 @@ class PackService(
     init {
         cloud.warmUp()
         scope.launch { cloud.status.collect { s -> _state.update { it.copy(cloud = s) } } }
-        scope.launch { cloud.error.collect { e -> _state.update { it.copy(error = e) } } }
+        scope.launch { cloud.error.collect { e -> _state.update { if (it.demo) it else it.copy(error = e) } } }
         scope.launch { cloud.voiceRoster.collect { voice.onRoster(it) } }
         scope.launch { voice.ui.collect { v -> _state.update { it.copy(voice = v) } } }
         scope.launch { nearby.status.collect { s -> _state.update { it.copy(nearby = s) } } }

@@ -115,8 +115,11 @@ fun PackHud(s: PackHudState, actions: PackHudActions, modifier: Modifier = Modif
         val small = maxHeight < 300.dp || maxWidth < 330.dp || s.compact
         val chipH = if (small) 44.dp else 54.dp
         val gap = 6.dp
-        val top = maxHeight * 0.22f
+        // Bands, top to bottom: search bar, alert banner, chips. The left edge stops above the zoom buttons.
+        val toastTop = 54.dp
+        val top = maxOf(maxHeight * 0.22f, toastTop + 42.dp)
         val bottom = maxHeight * 0.80f
+        val leftBottom = maxHeight * 0.72f
         val close = me != null && others.any { !it.stale(s.now) && PackLogic.distanceM(me.lat, me.lng, it.lat, it.lng) <= MINI_RANGE_M }
         val showMini = close && !s.compact && maxHeight >= 260.dp
         val miniSize = if (maxHeight < 380.dp) 112.dp else 148.dp
@@ -135,12 +138,12 @@ fun PackHud(s: PackHudState, actions: PackHudActions, modifier: Modifier = Modif
         // The nearest riders win the space when an edge is full.
         val byDistance = others.sortedBy { dist[it.id] ?: Double.MAX_VALUE }
         fun capacity(from: Dp, to: Dp) = maxOf(1, floor(((to - from + gap) / (chipH + gap))).toInt())
-        val leftCap = capacity(leftTop, bottom)
+        val leftCap = capacity(leftTop, leftBottom)
         val rightCap = capacity(top, rightBottom)
         val leftIds = byDistance.filter { (rel[it.id] ?: 180.0) < 0 }.take(leftCap).map { it.id }
         val rightIds = byDistance.filter { (rel[it.id] ?: 180.0) >= 0 }.take(rightCap).map { it.id }
         val slots = with(density) {
-            PackLogic.layoutChips(leftIds.map { it to rel[it] }, leftTop.toPx(), bottom.toPx(), chipH.toPx(), gap.toPx()) +
+            PackLogic.layoutChips(leftIds.map { it to rel[it] }, leftTop.toPx(), leftBottom.toPx(), chipH.toPx(), gap.toPx()) +
                 PackLogic.layoutChips(rightIds.map { it to (rel[it] ?: 180.0) }, top.toPx(), rightBottom.toPx(), chipH.toPx(), gap.toPx())
         }.filter { (it.right && it.id in rightIds) || (!it.right && it.id in leftIds) }
 
@@ -172,7 +175,7 @@ fun PackHud(s: PackHudState, actions: PackHudActions, modifier: Modifier = Modif
             )
         }
 
-        PackToast(s.event, s.now, Modifier.align(Alignment.TopCenter).offset(y = bottom - 50.dp).padding(horizontal = 70.dp))
+        PackToast(s.event, s.now, Modifier.align(Alignment.TopCenter).offset(y = toastTop).padding(horizontal = 8.dp))
     }
 }
 

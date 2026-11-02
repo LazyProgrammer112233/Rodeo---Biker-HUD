@@ -261,7 +261,7 @@ private fun LinksCard(pack: PackState, onFixNearby: () -> Unit) {
     val c = LocalHud.current
     GlassCard(Modifier.fillMaxWidth(), padding = PaddingValues(12.dp)) {
         SectionLabel("Connection")
-        val (cloudText, cloudOk) = when (pack.cloud) {
+        val (cloudText, cloudOk) = if (pack.demo) "Mobile data · off in the demo" to false else when (pack.cloud) {
             CloudStatus.ONLINE -> "Mobile data · live" to true
             CloudStatus.OFFLINE -> "Mobile data · no signal right now" to false
             CloudStatus.SIGNING_IN -> "Mobile data · connecting…" to false
