@@ -243,3 +243,19 @@ class VoiceLogicTest {
         assertEquals(listOf("wake", "NEXT"), r.events)
     }
 }
+
+class PackCommandTest {
+    private fun cmd(t: String) = Commands.parse(t).command
+
+    @Test fun packCommands() {
+        assertEquals(VoiceCommand.PACK_STATUS, cmd("where is the pack"))
+        assertEquals(VoiceCommand.PACK_STATUS, cmd("where are my friends"))
+        assertEquals(VoiceCommand.PACK_STATUS, cmd("pack status"))
+        assertEquals(VoiceCommand.PACK_TALK, cmd("pack voice on"))
+        assertEquals(VoiceCommand.PACK_TALK, cmd("talk to the pack"))
+        assertEquals(VoiceCommand.PACK_QUIET, cmd("pack voice off"))
+        // The guidance voice commands still mean guidance.
+        assertEquals(VoiceCommand.MUTE_GUIDANCE, cmd("voice off"))
+        assertEquals(VoiceCommand.UNMUTE_GUIDANCE, cmd("voice on"))
+    }
+}

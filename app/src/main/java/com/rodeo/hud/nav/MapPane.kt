@@ -392,7 +392,9 @@ private fun OsmMap(
         }
         parked?.let { view.overlays += pin(view, it, "Parked bike", dot(ctx, 0xFF2D7FF9.toInt(), letter = "P")) }
         members.filter { !it.isMe }.forEach { r ->
-            view.overlays += pin(view, GeoPoint(r.lat, r.lng), r.name, dot(ctx, if (r.isLead) accent else 0xFF19A7CE.toInt(), letter = r.name.take(1).uppercase()))
+            // Each rider in their pack colour (the same colour as their chip on the HUD edge).
+            val col = if (r.sos) 0xFFE53935.toInt() else com.rodeo.hud.pack.PackLogic.PALETTE[r.colorIndex.mod(com.rodeo.hud.pack.PackLogic.PALETTE.size)].toInt()
+            view.overlays += pin(view, GeoPoint(r.lat, r.lng), r.name, dot(ctx, col, letter = r.name.take(1).uppercase()))
         }
         // When the rider pans away, show their position as a dot instead of the centre arrow.
         if (!follow && here != null) view.overlays += pin(view, here, "You", dot(ctx, accent, ring = true))

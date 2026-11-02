@@ -156,7 +156,10 @@ fun HudScreen(actions: HudActions, showEndSlider: Boolean, dark: Boolean) {
     CockpitLayout(
         state, controls, profile.mapOnRight,
         map = { m ->
-            MapPane(m, dark = dark, lowPower = health.lowPower, lockInput = state.lockInput, members = pack.members, hazards = localHazards + remoteHazards)
+            androidx.compose.foundation.layout.Box(m) {
+                MapPane(Modifier.fillMaxSize(), dark = dark, lowPower = health.lowPower, lockInput = state.lockInput, members = pack.members, hazards = localHazards + remoteHazards)
+                if (pack.active) PackLayer(compact = false)
+            }
         },
         backdrop = { ParticleField(Modifier.fillMaxSize(), speed, lowPower = health.lowPower) },
         overlay = { GestureFlash(Modifier.align(Alignment.TopCenter).padding(top = 18.dp)) },
@@ -252,4 +255,30 @@ private fun openBluetooth(ctx: Context, on: Boolean) {
     val intent = if (!on) Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE) else Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
     runCatching { ctx.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
         .onFailure { runCatching { ctx.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } }
+}
+
+/** Pack riders over the map: edge chips, the close-range mini-map, pop-ups and the voice button. */
+@Composable
+private fun PackLayer(compact: Boolean) {
+    val ctx = LocalContext.current
+    val g = ctx.graph
+    val pack by g.pack.state.collectAsState()
+    val loc by g.location.location.collectAsState()
+    var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(1_000)
+            now = System.currentTimeMillis()
+        }
+    }
+    // Same rule as the map: heading-up once moving with a bearing, north-up when parked.
+    val heading = loc?.takeIf { it.hasSpeed() && it.speed * 3.6f > 8f && it.hasBearing() }?.bearing?.toDouble()
+    val actions = remember {
+        object : PackHudActions {
+            override fun toggleMute() = g.pack.voice.setMuted(!g.pack.voice.ui.value.muted)
+            override fun talk(down: Boolean) = g.pack.voice.setTalking(down)
+            override fun openPack() = Unit
+        }
+    }
+    PackHud(PackHudState(pack.members, heading, pack.voice, pack.lastEvent, now, compact), actions, Modifier.fillMaxSize())
 }

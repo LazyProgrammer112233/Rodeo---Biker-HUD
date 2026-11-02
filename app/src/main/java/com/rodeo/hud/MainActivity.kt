@@ -131,6 +131,13 @@ class MainActivity : ComponentActivity(), HudActions, AssistantHost {
 
     private fun handleIntent(intent: Intent?) {
         if (intent?.getStringExtra("open") == "garage") screen = Screen.GARAGE
+        // A pack QR code scanned with the phone's camera: rodeo://pack/ABC123.
+        if (intent?.action == Intent.ACTION_VIEW && intent.data?.scheme == com.rodeo.hud.pack.PackLogic.LINK_SCHEME) {
+            com.rodeo.hud.pack.PackLogic.codeFrom(intent.data?.toString())?.let { code ->
+                if (g.pack.state.value.code != code) g.pack.join(code)
+                screen = Screen.PACK
+            }
+        }
         // The helmet intercom's assistant button (or a long press on a wired headset button).
         if (intent?.action == Intent.ACTION_VOICE_COMMAND || intent?.action == ACTION_VOICE_HANDS_FREE || intent?.action == Intent.ACTION_ASSIST) {
             screen = Screen.HUD
@@ -153,6 +160,8 @@ class MainActivity : ComponentActivity(), HudActions, AssistantHost {
         g.assistant.setVisible(true)
         syncGestures()
         askMic()
+        // Keep the pack alive in the background (only startable while the app is in front).
+        if (g.pack.state.value.active && !g.pack.state.value.demo) com.rodeo.hud.pack.PackLinkService.start(this)
     }
 
     override fun onResume() {

@@ -7,6 +7,7 @@ enum class VoiceCommand {
     START_RIDE, END_RIDE, DISMISS, MUSIC_PAD_ON, MUSIC_PAD_OFF,
     VOLUME_UP, VOLUME_DOWN,
     SPEED, TIME, BATTERY, ETA,
+    PACK_STATUS, PACK_TALK, PACK_QUIET,
     UNKNOWN,
 }
 
@@ -36,6 +37,7 @@ object Commands {
         "start ride", "start the ride", "end ride", "end the ride", "stop ride", "finish ride",
         "dismiss", "clear", "volume up", "louder", "volume down", "quieter",
         "what is my speed", "speed", "what time is it", "time", "battery", "how far", "how long", "how much longer",
+        "where is the pack", "pack status", "where are my friends", "where is everyone", "pack voice on", "pack voice off", "talk to pack",
     )
 
     /**
@@ -68,6 +70,10 @@ object Commands {
         destination(words)?.let { return it }
 
         val parsed = when {
+            has("pack voice off", "stop pack voice", "leave pack voice", "close pack voice", "mute pack", "pack off") -> Parsed(VoiceCommand.PACK_QUIET)
+            has("pack voice on", "talk to pack", "talk to the pack", "open pack voice", "join pack voice", "pack voice", "pack talk") -> Parsed(VoiceCommand.PACK_TALK)
+            has("where is the pack", "where is my pack", "pack status", "where are my friends", "where is everyone", "where are the others", "where is my group", "pack kahan hai") ->
+                Parsed(VoiceCommand.PACK_STATUS)
             has("music pad off", "unlock screen", "unlock the screen", "pad off", "turn off music pad", "screen unlock") -> Parsed(VoiceCommand.MUSIC_PAD_OFF)
             has("music pad on", "music pad", "lock screen", "lock the screen", "pad on", "turn on music pad", "screen lock") -> Parsed(VoiceCommand.MUSIC_PAD_ON)
             has("stop navigation", "end navigation", "cancel navigation", "stop navigating", "exit navigation", "stop route",

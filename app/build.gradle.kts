@@ -11,7 +11,31 @@ val secrets = Properties().apply {
     val f = rootProject.file("secrets.properties")
     if (f.exists()) f.inputStream().use { load(it) }
 }
-fun secret(name: String): String = System.getenv(name) ?: secrets.getProperty(name) ?: ""
+// Firebase settings can also come from the google-services.json Firebase gives you (app/google-services.json).
+// They are not secret: they ship inside every APK. The database rules and sign-in keep the data safe.
+@Suppress("UNCHECKED_CAST")
+val googleServices: Map<String, String> = rootProject.file("app/google-services.json").takeIf { it.exists() }?.let { f ->
+    runCatching {
+        val json = groovy.json.JsonSlurper().parse(f) as Map<String, Any?>
+        val project = json["project_info"] as Map<String, Any?>
+        val clients = json["client"] as List<Map<String, Any?>>
+        val client = clients.firstOrNull {
+            ((it["client_info"] as Map<String, Any?>)["android_client_info"] as Map<String, Any?>)["package_name"] == "com.rodeo.hud"
+        } ?: clients.first()
+        mapOf(
+            "FIREBASE_PROJECT_ID" to (project["project_id"] as? String).orEmpty(),
+            "FIREBASE_DB_URL" to (project["firebase_url"] as? String).orEmpty(),
+            "FIREBASE_APP_ID" to ((client["client_info"] as Map<String, Any?>)["mobilesdk_app_id"] as? String).orEmpty(),
+            "FIREBASE_API_KEY" to (((client["api_key"] as List<Map<String, Any?>>).firstOrNull())?.get("current_key") as? String).orEmpty(),
+        )
+    }.getOrDefault(emptyMap())
+} ?: emptyMap()
+
+// An unset CI secret arrives as an empty variable, so blank counts as missing.
+fun secret(name: String): String = System.getenv(name)?.takeIf { it.isNotBlank() }
+    ?: secrets.getProperty(name)?.takeIf { it.isNotBlank() }
+    ?: googleServices[name]?.takeIf { it.isNotBlank() }
+    ?: ""
 
 // -Prodeo.e2e builds for the x86_64 emulator used by the on-device tests on CI, with a
 // mock-location permission so the tests can drive GPS. Phone builds are unaffected.
@@ -36,6 +60,10 @@ android {
         buildConfigField("String", "FIREBASE_APP_ID", "\"${secret("FIREBASE_APP_ID")}\"")
         buildConfigField("String", "FIREBASE_PROJECT_ID", "\"${secret("FIREBASE_PROJECT_ID")}\"")
         buildConfigField("String", "FIREBASE_DB_URL", "\"${secret("FIREBASE_DB_URL")}\"")
+        // Optional TURN relay for the pack voice channel (comma-separated turn: / turns: URLs).
+        buildConfigField("String", "TURN_URLS", "\"${secret("TURN_URLS")}\"")
+        buildConfigField("String", "TURN_USERNAME", "\"${secret("TURN_USERNAME")}\"")
+        buildConfigField("String", "TURN_PASSWORD", "\"${secret("TURN_PASSWORD")}\"")
     }
 
     // Optional fixed signing key (CI secrets SIGNING_KEYSTORE_B64 / SIGNING_PASSWORD).
@@ -118,6 +146,16 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-database")
+    // Anonymous sign-in, so the database rules let a rider write only their own position.
+    implementation("com.google.firebase:firebase-auth")
+
+    // Pack mode without mobile signal: phone-to-phone over Bluetooth / Wi-Fi.
+    implementation("com.google.android.gms:play-services-nearby:19.3.0")
+    // Pack QR codes: drawn with ZXing (Apache 2.0), scanned with Google's code scanner (no camera permission).
+    implementation("com.google.zxing:core:3.5.3")
+    implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
+    // Pack voice channel: WebRTC (BSD), peer to peer.
+    implementation("io.getstream:stream-webrtc-android:1.3.8")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs_nio:2.1.3")
 

@@ -57,7 +57,7 @@ class AppGraph(app: Application) {
     val audioRoutes = AudioRoutes(app)
     val speaker = Speaker(app)
     val waves = WaveSensor(app)
-    val pack = PackService(app, scope, warnings) { profile.profile.value.riderName }
+    val pack = PackService(app, scope, warnings, speaker) { profile.profile.value.riderName }
     val hazardSync = HazardSync(app, hazards)
     val nav = NavController(app, scope, speaker, { location.location.value }) {
         profile.profile.value.let { RouteOptions(avoidTolls = it.avoidTolls, avoidHighways = it.avoidHighways) }
@@ -87,6 +87,7 @@ class AppGraph(app: Application) {
             ambient.setLocation(loc.latitude, loc.longitude)
         }
         scope.launch { rides.refresh() }
+        wirePack()
         // The music pad follows the ride: on when it starts, off when it ends (if the rider wants that).
         scope.launch {
             ride.live.map { it.active }.distinctUntilChanged().drop(1).collect { active ->
@@ -94,6 +95,31 @@ class AppGraph(app: Application) {
             }
         }
     }
+}
+
+/**
+ * Pack mode and the rest of the app: the pack hears about this rider's SOS, and the voice channel
+ * hands the microphone to the assistant or an SOS countdown when they need it.
+ */
+private fun AppGraph.wirePack() {
+    scope.launch {
+        sos.state.collect { s ->
+            val real = when (s) {
+                is com.rodeo.hud.sos.SosState.Countdown -> !s.dryRun
+                is com.rodeo.hud.sos.SosState.Active -> !s.dryRun
+                else -> false
+            }
+            pack.setSos(real)
+            pack.voice.hold("sos", s is com.rodeo.hud.sos.SosState.Countdown)
+        }
+    }
+    scope.launch {
+        assistant.ui.map { it.awake || it.training?.done == false }.distinctUntilChanged().collect { busy ->
+            pack.voice.hold("assistant", busy)
+        }
+    }
+    // While the voice channel has the microphone, the wake phrase rests.
+    scope.launch { pack.voice.ui.map { it.live }.distinctUntilChanged().collect { assistant.sync() } }
 }
 
 class RodeoApp : Application() {
@@ -141,11 +167,13 @@ class RodeoApp : Application() {
         val nm = getSystemService(NotificationManager::class.java)
         nm.createNotificationChannel(NotificationChannel(CH_RIDE, "Ride tracking", NotificationManager.IMPORTANCE_LOW))
         nm.createNotificationChannel(NotificationChannel(CH_REMINDERS, "Garage reminders", NotificationManager.IMPORTANCE_DEFAULT))
+        nm.createNotificationChannel(NotificationChannel(CH_PACK, "Pack mode", NotificationManager.IMPORTANCE_LOW))
     }
 
     companion object {
         const val CH_RIDE = "ride"
         const val CH_REMINDERS = "reminders"
+        const val CH_PACK = "pack"
     }
 }
 

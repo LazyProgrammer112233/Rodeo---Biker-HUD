@@ -112,10 +112,12 @@ class Assistant(private val context: Context, private val g: AppGraph) : VoiceBr
         val countdown = g.sos.state.value is SosState.Countdown
         val training = _ui.value.training?.done == false
         val awake = brain.mode == VoiceBrain.Mode.AWAKE
+        // The pack voice channel holds the microphone: the wake phrase rests until it closes.
+        val packTalking = g.pack.voice.ui.value.live
         val wanted = micAllowed && engine.ready && (
             countdown || training || awake || expectDestination ||
-                (visible && p.listenMode != ListenMode.OFF) ||
-                (p.listenMode == ListenMode.ALWAYS && g.ride.live.value.active)
+                (!packTalking && visible && p.listenMode != ListenMode.OFF) ||
+                (!packTalking && p.listenMode == ListenMode.ALWAYS && g.ride.live.value.active)
             )
         if (wanted) {
             engine.start()
@@ -352,6 +354,12 @@ class Assistant(private val context: Context, private val g: AppGraph) : VoiceBr
                     done("${Navigator.spokenDistance(pr.remainingM)} to go, about ${Navigator.spokenDuration(pr.remainingS)}", speak = true)
                 } else done("No route is set", speak = true)
             }
+            VoiceCommand.PACK_STATUS -> done(g.pack.spokenSummary(), speak = true)
+            VoiceCommand.PACK_TALK -> {
+                if (!g.pack.state.value.active) done("You're not in a pack", speak = true)
+                else { g.pack.voiceOn(); done("Pack voice on", speak = true) }
+            }
+            VoiceCommand.PACK_QUIET -> { g.pack.voiceOff(); done("Pack voice off", speak = true) }
             VoiceCommand.UNKNOWN -> done("Sorry, I didn't get that", speak = true)
         }
     }
