@@ -70,8 +70,8 @@ class CloudLink(context: Context, private val scope: CoroutineScope) : VoiceSign
 
     /** Signed-in id, or "" before sign-in. */
     override val myId: String get() = uid ?: ""
-    var uid: String? = runCatching { auth?.currentUser?.uid }.getOrNull()
-        private set
+    /** The signed-in rider (anonymous until they make an account). */
+    val uid: String? get() = runCatching { auth?.currentUser?.uid }.getOrNull()
 
     /** Server clock minus this phone's clock. */
     @Volatile private var serverOffset = 0L
@@ -85,7 +85,7 @@ class CloudLink(context: Context, private val scope: CoroutineScope) : VoiceSign
     /** Anonymous sign-in, once per install (Firebase keeps it). Returns the rider's id or null. */
     suspend fun signIn(): String? {
         val a = auth ?: return null
-        a.currentUser?.uid?.let { uid = it; return it }
+        a.currentUser?.uid?.let { return it }
         _status.value = CloudStatus.SIGNING_IN
         val id = runCatching { withTimeoutOrNull(15_000) { a.signInAnonymously().await().user?.uid } }
             .onFailure {
@@ -95,7 +95,6 @@ class CloudLink(context: Context, private val scope: CoroutineScope) : VoiceSign
                     "Pack server: turn on Anonymous sign-in in Firebase"
                 } else "Couldn't reach the pack server"
             }.getOrNull()
-        uid = id
         _status.value = if (id != null) CloudStatus.OFFLINE else CloudStatus.ERROR
         return id
     }

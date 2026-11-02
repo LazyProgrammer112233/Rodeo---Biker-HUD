@@ -83,6 +83,7 @@ fun SettingsScreen(onBack: () -> Unit, onChangeBike: () -> Unit, onSimulateCrash
                 }
                 Text("Settings", color = c.text, style = LocalType.current.headlineXl)
             }
+            AccountCard()
             GlassCard(Modifier.fillMaxWidth()) {
                 SectionLabel("Bike and look")
                 Text(profile.bikeLabel + (profile.paintName?.let { " · $it" } ?: ""), color = c.text, modifier = Modifier.padding(vertical = 6.dp))

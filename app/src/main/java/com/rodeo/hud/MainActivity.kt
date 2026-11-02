@@ -98,7 +98,15 @@ class MainActivity : ComponentActivity(), HudActions, AssistantHost {
 
             RodeoTheme(profile, dark) {
                 Box(Modifier.fillMaxSize()) {
-                    if (!profile.onboarded) {
+                    val account by g.accounts.account.collectAsState()
+                    // A new Google account names the rider, if they haven't named themselves.
+                    LaunchedEffect(account?.name) {
+                        val n = account?.name?.takeIf { it.isNotBlank() } ?: return@LaunchedEffect
+                        if (profile.riderName == "Rider") g.profile.update { it.copy(riderName = n.take(24)) }
+                    }
+                    if (g.accounts.enabled && !BuildConfig.E2E && account?.ready != true) {
+                        com.rodeo.hud.ui.setup.SignInScreen()
+                    } else if (!profile.onboarded) {
                         Onboarding(onDone = { ensureLocation() })
                     } else {
                         BackHandler(enabled = screen != Screen.HUD && screen != Screen.BIKE) { screen = Screen.HUD }

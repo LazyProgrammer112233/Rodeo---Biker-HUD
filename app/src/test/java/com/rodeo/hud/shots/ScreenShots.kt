@@ -77,5 +77,7 @@ class ScreenShots {
         }
     }
 
+    @Test fun signIn() = shoot("screen-sign-in") { com.rodeo.hud.ui.setup.SignInScreen() }
+
     @Test fun onboarding() = shoot("screen-onboarding") { Onboarding(onDone = {}) }
 }

@@ -57,6 +57,7 @@ class AppGraph(app: Application) {
     val audioRoutes = AudioRoutes(app)
     val speaker = Speaker(app)
     val waves = WaveSensor(app)
+    val accounts = com.rodeo.hud.core.Accounts(app)
     val pack = PackService(app, scope, warnings, speaker) { profile.profile.value.riderName }
     val hazardSync = HazardSync(app, hazards)
     val nav = NavController(app, scope, speaker, { location.location.value }) {

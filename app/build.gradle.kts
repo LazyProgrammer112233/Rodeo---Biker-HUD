@@ -27,6 +27,9 @@ val googleServices: Map<String, String> = rootProject.file("app/google-services.
             "FIREBASE_DB_URL" to (project["firebase_url"] as? String).orEmpty(),
             "FIREBASE_APP_ID" to ((client["client_info"] as Map<String, Any?>)["mobilesdk_app_id"] as? String).orEmpty(),
             "FIREBASE_API_KEY" to (((client["api_key"] as List<Map<String, Any?>>).firstOrNull())?.get("current_key") as? String).orEmpty(),
+            // The "web" OAuth client (type 3) appears once Google sign-in is on and the SHA-1 is registered.
+            "GOOGLE_WEB_CLIENT_ID" to ((client["oauth_client"] as? List<Map<String, Any?>>).orEmpty()
+                .firstOrNull { (it["client_type"] as? Number)?.toInt() == 3 }?.get("client_id") as? String).orEmpty(),
         )
     }.getOrDefault(emptyMap())
 } ?: emptyMap()
@@ -61,6 +64,9 @@ android {
         buildConfigField("String", "FIREBASE_PROJECT_ID", "\"${secret("FIREBASE_PROJECT_ID")}\"")
         buildConfigField("String", "FIREBASE_DB_URL", "\"${secret("FIREBASE_DB_URL")}\"")
         // Optional TURN relay for the pack voice channel (comma-separated turn: / turns: URLs).
+        // Emulator test builds skip the sign-in screen (they can't receive the verification email).
+        buildConfigField("boolean", "E2E", e2e.toString())
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${secret("GOOGLE_WEB_CLIENT_ID")}\"")
         buildConfigField("String", "TURN_URLS", "\"${secret("TURN_URLS")}\"")
         buildConfigField("String", "TURN_USERNAME", "\"${secret("TURN_USERNAME")}\"")
         buildConfigField("String", "TURN_PASSWORD", "\"${secret("TURN_PASSWORD")}\"")
@@ -148,6 +154,10 @@ dependencies {
     implementation("com.google.firebase:firebase-database")
     // Anonymous sign-in, so the database rules let a rider write only their own position.
     implementation("com.google.firebase:firebase-auth")
+    // Continue with Google, through Android's Credential Manager.
+    implementation("androidx.credentials:credentials:1.3.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 
     // Pack mode without mobile signal: phone-to-phone over Bluetooth / Wi-Fi.
     implementation("com.google.android.gms:play-services-nearby:19.3.0")
