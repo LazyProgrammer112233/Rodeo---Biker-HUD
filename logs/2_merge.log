@@ -16,63 +16,25 @@ Daemon will be stopped at the end of the build
 > Task :app:mergeDebugResources
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
+> Task :app:processDebugManifestForPackage
 > Task :app:javaPreCompileDebug
 > Task :app:mergeDebugShaders
 > Task :app:compileDebugShaders NO-SOURCE
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:mergeDebugAssets
+> Task :app:processDebugResources
 > Task :app:compressDebugAssets
-> Task :app:processDebugManifestForPackage
 > Task :app:checkDebugDuplicateClasses
 > Task :app:mergeLibDexDebug
 > Task :app:mergeDebugJniLibFolders
 > Task :app:mergeDebugNativeLibs
-> Task :app:processDebugResources
 
 > Task :app:stripDebugDebugSymbols
 Unable to strip the following libraries, packaging them as they are: libandroidx.graphics.path.so, libonnxruntime.so, libsherpa-onnx-jni.so.
 
 > Task :app:l8DexDesugarLibDebug
-> Task :app:desugarDebugFileDependencies
 > Task :app:validateSigningDebug
 > Task :app:writeDebugAppMetadata
 > Task :app:writeDebugSigningConfigVersions
-> Task :app:mergeExtDexDebug
+> Task :app:desugarDebugFileDependencies
 > Task :app:compileDebugKotlin
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/MainActivity.kt:251:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Please add the '@Deprecated' annotation or suppress the diagnostic.
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/MainActivity.kt:252:15 'fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray): Unit' is deprecated. This method has been deprecated in favor of using the Activity Result API
-      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt
-      contracts for common intents available in
-      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for
-      testing, and allow receiving results in separate, testable classes independent from your
-      activity. Use
-      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)} passing
-      in a {@link RequestMultiplePermissions} object for the {@link ActivityResultContract} and
-      handling the result in the {@link ActivityResultCallback#onActivityResult(Object) callback}.
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/nav/gmaps/MapsNoticeReader.kt:81:27 'fun get(p0: String!): Any?' is deprecated. Deprecated in Java.
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/nav/gmaps/MapsNoticeReader.kt:81:44 'static field EXTRA_LARGE_ICON: String' is deprecated. Deprecated in Java.
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/hud/GmapsPanel.kt:110:53 'val Icons.Filled.VolumeUp: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.VolumeUp.
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/hud/GmapsPanel.kt:110:80 'val Icons.Filled.VolumeOff: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.VolumeOff.
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/hud/GmapsPanel.kt:147:57 'val Icons.Filled.VolumeUp: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.VolumeUp.
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/hud/GmapsPanel.kt:147:84 'val Icons.Filled.VolumeOff: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.VolumeOff.
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/hud/MapChrome.kt:302:53 'val Icons.Filled.VolumeUp: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.VolumeUp.
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/hud/MapChrome.kt:302:80 'val Icons.Filled.VolumeOff: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.VolumeOff.
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/hud/Overlays.kt:315:27 'val Icons.Filled.VolumeUp: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.VolumeUp.
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/settings/GoogleMapsSettings.kt:49:21 'val LocalLifecycleOwner: ProvidableCompositionLocal<LifecycleOwner>' is deprecated. Moved to lifecycle-runtime-compose library in androidx.lifecycle.compose package.
-w: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/main/java/com/rodeo/hud/ui/setup/SetupParts.kt:100:21 'val LocalLifecycleOwner: ProvidableCompositionLocal<LifecycleOwner>' is deprecated. Moved to lifecycle-runtime-compose library in androidx.lifecycle.compose package.
-
-> Task :app:compileDebugJavaWithJavac
-> Task :app:dexBuilderDebug
-> Task :app:mergeDebugGlobalSynthetics
-> Task :app:processDebugJavaRes
-> Task :app:mergeProjectDexDebug
-> Task :app:mergeDebugJavaResource
-> Task :app:packageDebug
-> Task :app:createDebugApkListingFileRedirect
-> Task :app:assembleDebug
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_5-1793640647650.json
-
-BUILD SUCCESSFUL in 1m 35s
-38 actionable tasks: 38 executed
-SIGNING Signer #1 certificate SHA-256 digest: a620dd857f178c947e46160d939f98b7cb3f7230c1a6412952df293ee517a0d6
-SIGNING Signer #1 certificate SHA-1 digest: e95c4ee9ace01664f5a21f4686a93c883fa97587
