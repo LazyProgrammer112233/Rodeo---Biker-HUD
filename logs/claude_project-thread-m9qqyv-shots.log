@@ -31,18 +31,28 @@ Daemon will be stopped at the end of the build
 > Task :app:packageDebugUnitTestForUnitTest
 > Task :app:generateDebugUnitTestConfig
 > Task :app:processDebugJavaRes UP-TO-DATE
-> Task :app:compileDebugUnitTestKotlin
-> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
-> Task :app:processDebugUnitTestJavaRes
-> Task :app:testDebugUnitTest
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_7-1793637955492.json
 
-BUILD SUCCESSFUL in 1m 41s
-28 actionable tasks: 8 executed, 20 up-to-date
-testsuite name="com.rodeo.hud.logic.GestureLogicTest" tests="6" skipped="0" failures="0"
-testsuite name="com.rodeo.hud.logic.NavLogicTest" tests="9" skipped="0" failures="0"
-testsuite name="com.rodeo.hud.logic.NavReplayTest" tests="1" skipped="0" failures="0"
-testsuite name="com.rodeo.hud.logic.PlacesTest" tests="6" skipped="0" failures="0"
-testsuite name="com.rodeo.hud.logic.VoiceLogicTest" tests="21" skipped="0" failures="0"
-testsuite name="com.rodeo.hud.shots.HudShots" tests="13" skipped="0" failures="0"
-testsuite name="com.rodeo.hud.shots.ScreenShots" tests="6" skipped="0" failures="0"
+> Task :app:compileDebugUnitTestKotlin
+e: The daemon has terminated unexpectedly on startup attempt #1 with error code: 0. The daemon process output:
+    1. Kotlin compile daemon is ready
+e: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/test/java/com/rodeo/hud/gmaps/ArrowReaderTest.kt:10:14 Unresolved reference 'imageio'.
+e: file:///home/runner/work/Rodeo---Biker-HUD/Rodeo---Biker-HUD/app/src/test/java/com/rodeo/hud/gmaps/ArrowReaderTest.kt:25:27 Unresolved reference 'ImageIO'.
+
+> Task :app:compileDebugUnitTestKotlin FAILED
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_7-1793640781608.json
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileDebugUnitTestKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 31s
+26 actionable tasks: 6 executed, 20 up-to-date
