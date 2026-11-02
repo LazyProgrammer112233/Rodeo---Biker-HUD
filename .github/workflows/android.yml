@@ -133,6 +133,12 @@ jobs:
           } > probe.log 2>&1
           ls -la $F >> probe.log; cat probe.log | head -60
 
+      # Pack mode's server (Firebase): sign-in and the database rules, against the real project.
+      - name: Probe pack server
+        if: github.event_name == 'push'
+        continue-on-error: true
+        run: bash tools/ci/pack-server.sh 2>&1 | tee -a probe.log
+
       # Unit tests (routing, voice, gestures) and screenshots of every screen at phone and tablet
       # sizes, day and night. Images and logs go to the ci-logs branch.
       - name: Tests and screenshots

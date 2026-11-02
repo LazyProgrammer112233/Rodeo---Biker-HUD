@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "260528860110",
+    "firebase_url": "https://rodeo---the-rider-hud-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "rodeo---the-rider-hud",
+    "storage_bucket": "rodeo---the-rider-hud.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:260528860110:android:158be3d351e98081b5999f",
+        "android_client_info": {
+          "package_name": "com.rodeo.hud"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3yOrl9m4VlcsZiUmyCduceWwuy8bfxNk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

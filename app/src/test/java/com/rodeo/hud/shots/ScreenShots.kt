@@ -66,5 +66,16 @@ class ScreenShots {
 
     @Test fun pack() = shoot("screen-pack") { PackScreen(onBack = {}) }
 
+    /** A pack in progress (the demo pack: code, riders, connection and voice cards). */
+    @Test fun packActive() {
+        val app = org.robolectric.RuntimeEnvironment.getApplication() as com.rodeo.hud.RodeoApp
+        app.graph.pack.demo()
+        try {
+            shoot("screen-pack-active") { PackScreen(onBack = {}) }
+        } finally {
+            app.graph.pack.leave()
+        }
+    }
+
     @Test fun onboarding() = shoot("screen-onboarding") { Onboarding(onDone = {}) }
 }
