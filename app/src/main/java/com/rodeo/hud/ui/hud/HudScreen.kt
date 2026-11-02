@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.wifi.WifiManager
 import android.provider.Settings
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -35,6 +36,7 @@ import com.rodeo.hud.nav.MapPane
 import com.rodeo.hud.ride.formatDuration
 import com.rodeo.hud.ui.components.ParticleField
 import com.rodeo.hud.ui.theme.LocalHud
+import com.rodeo.hud.ui.theme.sdp
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -61,6 +63,7 @@ fun HudScreen(actions: HudActions, showEndSlider: Boolean, dark: Boolean) {
     val voice by g.assistant.ui.collectAsState()
     val route by g.audioRoutes.route.collectAsState()
     val lastFix by g.location.lastFixAt.collectAsState()
+    val gmaps by g.gmaps.state.collectAsState()
 
     var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var wifi by remember { mutableStateOf(false) }
@@ -153,10 +156,27 @@ fun HudScreen(actions: HudActions, showEndSlider: Boolean, dark: Boolean) {
         }
     }
 
+    val gmapsActions = remember {
+        object : GmapsActions {
+            override fun toggleVoice() = g.gmaps.toggleVoice()
+            override fun toggleMap() = g.gmaps.toggleMap()
+            override fun stopDemo() = g.gmaps.stopDemo()
+        }
+    }
+
     CockpitLayout(
         state, controls, profile.mapOnRight,
         map = { m ->
-            MapPane(m, dark = dark, lowPower = health.lowPower, lockInput = state.lockInput, members = pack.members, hazards = localHazards + remoteHazards)
+            Box(m) {
+                // The map stays alive underneath so "show map" is instant.
+                MapPane(Modifier.fillMaxSize(), dark = dark, lowPower = health.lowPower, lockInput = state.lockInput, members = pack.members, hazards = localHazards + remoteHazards)
+                if (gmaps.active) {
+                    // Google Maps is navigating: its next turn takes the pane, or sits big over the map.
+                    val big = profile.gmapsBigPanel != gmaps.showMap
+                    if (big) GmapsPanel(gmaps, gmapsActions, Modifier.fillMaxSize())
+                    else GmapsCard(gmaps, gmapsActions, Modifier.align(Alignment.TopCenter).padding(10.sdp()))
+                }
+            }
         },
         backdrop = { ParticleField(Modifier.fillMaxSize(), speed, lowPower = health.lowPower) },
         overlay = { GestureFlash(Modifier.align(Alignment.TopCenter).padding(top = 18.dp)) },

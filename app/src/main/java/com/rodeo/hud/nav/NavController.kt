@@ -48,6 +48,9 @@ class NavController(
     val state: StateFlow<NavState> = _state.asStateFlow()
 
     private var navigator: Navigator? = null
+
+    /** True while Google Maps is guiding the rider: Rodeo's own route then stays silent. */
+    var quiet: () -> Boolean = { false }
     private var job: Job? = null
     private var lastRouteAt = 0L
     private var arrivedAt = 0L
@@ -80,7 +83,7 @@ class NavController(
             requestRoute(announce = true)
             return
         }
-        val nav = Navigator(route) { text -> speaker.say(text, Speaker.Channel.NAV) }
+        val nav = Navigator(route) { text -> if (!quiet()) speaker.say(text, Speaker.Channel.NAV) }
         navigator = nav
         val p = nav.update(from.latitude, from.longitude, from.speed, from.takeIf { it.hasBearing() }?.bearing, from.accuracy, System.currentTimeMillis())
         _state.update { it.copy(progress = p) }
@@ -160,7 +163,7 @@ class NavController(
                     _state.update { it.copy(route = route, progress = null, routing = false, error = null) }
                     return@onSuccess
                 }
-                val nav = Navigator(route) { text -> speaker.say(text, Speaker.Channel.NAV) }
+                val nav = Navigator(route) { text -> if (!quiet()) speaker.say(text, Speaker.Channel.NAV) }
                 navigator = nav
                 val p = nav.update(from.latitude, from.longitude, from.speed, from.takeIf { it.hasBearing() }?.bearing, from.accuracy, System.currentTimeMillis())
                 _state.update { it.copy(route = route, progress = p, routing = false, error = null) }

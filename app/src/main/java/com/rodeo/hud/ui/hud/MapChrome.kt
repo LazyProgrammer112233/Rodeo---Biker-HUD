@@ -28,6 +28,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Directions
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Mic
@@ -95,6 +96,8 @@ data class MapChromeState(
     val bearingDeg: Float? = null,
     val speedKmh: Float = 0f,
     val attribution: String = "© OpenStreetMap contributors",
+    /** Google Maps is installed: offer it beside Home and Bike (its turns then show on the HUD). */
+    val googleMaps: Boolean = false,
 )
 
 interface MapChromeActions {
@@ -108,6 +111,7 @@ interface MapChromeActions {
     fun zoomIn()
     fun zoomOut()
     fun voiceSearch()
+    fun openGoogleMaps() {}
 }
 
 /** Search, quick places, turn card, map buttons, bearing and the OSM credit, laid over the map. */
@@ -177,6 +181,7 @@ private fun SearchRow(s: MapChromeState, actions: MapChromeActions, narrow: Bool
             }
             s.home?.let { h -> PlaceChip(Icons.Filled.Home, "Home", s.homeSub, narrow) { actions.pick(h, false) } }
             s.parked?.let { p -> PlaceChip(Icons.Filled.TwoWheeler, "Bike", s.parkedSub, narrow) { actions.pick(p, true) } }
+            if (s.googleMaps) PlaceChip(Icons.Filled.Directions, "Maps", "Google", narrow || s.home != null && s.parked != null, actions::openGoogleMaps)
         }
         if (s.results.isNotEmpty() || s.searching || s.searchNote != null) {
             val shape = panelShape()
@@ -399,22 +404,53 @@ fun ManeuverGlyph(m: Maneuver, color: Color, modifier: Modifier = Modifier) {
                 drawPath(path, color, style = stroke)
                 head(color, p(0.3f, 0.66f, mir), Offset(0f, 1f), sw, s)
             }
-            Maneuver.ROUNDABOUT_LEFT, Maneuver.ROUNDABOUT_RIGHT -> {
-                // Ring with the approach from below and the exit leaving at the top corner.
-                val mir = m == Maneuver.ROUNDABOUT_LEFT
+            Maneuver.ROUNDABOUT_LEFT, Maneuver.ROUNDABOUT_RIGHT, Maneuver.ROUNDABOUT_STRAIGHT, Maneuver.ROUNDABOUT_UTURN -> {
+                // Ring with the approach from below and the exit leaving where the rider turns off.
                 val ring = p(0.5f, 0.5f, false)
                 drawCircle(color, s * 0.2f, ring, style = Stroke(sw * 0.75f))
                 drawLine(color, p(0.5f, 0.95f, false), p(0.5f, 0.71f, false), sw, StrokeCap.Round)
-                arrow(color, stroke, listOf(p(0.63f, 0.36f, mir), p(0.9f, 0.08f, mir)), sw)
+                when (m) {
+                    Maneuver.ROUNDABOUT_STRAIGHT -> arrow(color, stroke, listOf(p(0.5f, 0.3f, false), p(0.5f, 0.04f, false)), sw)
+                    // All the way round and back the way the rider came, on the left of the approach.
+                    Maneuver.ROUNDABOUT_UTURN -> arrow(color, stroke, listOf(p(0.32f, 0.62f, false), p(0.24f, 0.95f, false)), sw)
+                    else -> {
+                        val mir = m == Maneuver.ROUNDABOUT_LEFT
+                        arrow(color, stroke, listOf(p(0.63f, 0.36f, mir), p(0.9f, 0.08f, mir)), sw)
+                    }
+                }
+            }
+            Maneuver.KEEP_LEFT, Maneuver.KEEP_RIGHT -> {
+                // A fork: the road the rider leaves is drawn faint, the one to take bold.
+                val mir = m == Maneuver.KEEP_LEFT
+                drawPath(Path().apply {
+                    val a = p(0.5f, 0.58f, mir); moveTo(a.x, a.y)
+                    val b = p(0.26f, 0.3f, mir); lineTo(b.x, b.y)
+                    val e = p(0.26f, 0.1f, mir); lineTo(e.x, e.y)
+                }, color.copy(alpha = color.alpha * 0.35f), style = stroke)
+                arrow(color, stroke, listOf(p(0.5f, 0.94f, mir), p(0.5f, 0.58f, mir), p(0.74f, 0.3f, mir), p(0.74f, 0.06f, mir)), sw)
+            }
+            Maneuver.MERGE -> {
+                // The rider's road joins the main road from the side.
+                drawLine(color.copy(alpha = color.alpha * 0.35f), p(0.62f, 0.94f, false), p(0.62f, 0.1f, false), sw, StrokeCap.Round)
+                arrow(color, stroke, listOf(p(0.24f, 0.94f, false), p(0.24f, 0.72f, false), p(0.5f, 0.42f, false), p(0.5f, 0.08f, false)), sw)
+            }
+            Maneuver.UNKNOWN -> {
+                // A road sign: Google Maps has a turn that Rodeo could not draw.
+                val d = Path().apply {
+                    moveTo(0.5f * s, 0.04f * s); lineTo(0.96f * s, 0.5f * s); lineTo(0.5f * s, 0.96f * s); lineTo(0.04f * s, 0.5f * s); close()
+                }
+                drawPath(d, color, style = Stroke(sw * 0.7f, join = StrokeJoin.Round))
+                arrow(color, Stroke(sw * 0.8f, cap = StrokeCap.Round, join = StrokeJoin.Round), listOf(p(0.5f, 0.74f, false), p(0.5f, 0.26f, false)), sw * 0.8f, headScale = 0.7f)
             }
             else -> {
                 val (deg, mir) = when (m) {
-                    Maneuver.SLIGHT_RIGHT, Maneuver.KEEP_RIGHT -> 40f to false
+                    Maneuver.SLIGHT_RIGHT -> 40f to false
                     Maneuver.RIGHT -> 90f to false
                     Maneuver.SHARP_RIGHT -> 135f to false
-                    Maneuver.SLIGHT_LEFT, Maneuver.KEEP_LEFT -> 40f to true
+                    Maneuver.SLIGHT_LEFT -> 40f to true
                     Maneuver.LEFT -> 90f to true
-                    else -> 135f to true
+                    Maneuver.SHARP_LEFT -> 135f to true
+                    else -> 0f to false
                 }
                 val rad = Math.toRadians(deg.toDouble())
                 val dx = sin(rad).toFloat()

@@ -7,6 +7,7 @@ import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.rodeo.hud.core.AmbientController
+import com.rodeo.hud.nav.gmaps.GmapsBridge
 import com.rodeo.hud.core.AudioRoutes
 import com.rodeo.hud.core.CrashDetector
 import com.rodeo.hud.core.DeviceGuardian
@@ -63,6 +64,13 @@ class AppGraph(app: Application) {
         profile.profile.value.let { RouteOptions(avoidTolls = it.avoidTolls, avoidHighways = it.avoidHighways) }
     }
 
+    /** Google Maps' own turn-by-turn, read from its notification, on the HUD and in the helmet. */
+    val gmaps = GmapsBridge(
+        app, scope, speaker,
+        voicePref = { profile.profile.value.gmapsVoice },
+        saveVoicePref = { on -> profile.update { it.copy(gmapsVoice = on) } },
+    )
+
     val sos: SosManager = SosManager(app, scope, { profile.profile.value }) {
         val loc = location.location.value
         SosSnapshot(loc?.latitude, loc?.longitude, ride.speedKmh.value, loc?.takeIf { it.hasBearing() }?.bearing)
@@ -82,11 +90,16 @@ class AppGraph(app: Application) {
     init {
         location.addListener { loc ->
             nav.onLocation(loc)
+            gmaps.onLocation(loc)
             pack.onLocation(loc)
             hazardSync.onLocation(loc.latitude, loc.longitude)
             ambient.setLocation(loc.latitude, loc.longitude)
         }
         scope.launch { rides.refresh() }
+        nav.quiet = { gmaps.state.value.active && !gmaps.state.value.ended }
+        scope.launch {
+            profile.profile.map { it.gmapsVoice }.distinctUntilChanged().drop(1).collect { gmaps.setVoice(it) }
+        }
         // The music pad follows the ride: on when it starts, off when it ends (if the rider wants that).
         scope.launch {
             ride.live.map { it.active }.distinctUntilChanged().drop(1).collect { active ->

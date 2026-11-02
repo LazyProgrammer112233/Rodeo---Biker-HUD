@@ -54,6 +54,10 @@ data class Profile(
     val sosWithoutWake: Boolean = true,
     /** Wave a hand over the top of the phone to play / pause. */
     val waveControl: Boolean = false,
+    /** Rodeo speaks Google Maps' turns (read from its notification) in its own voice. */
+    val gmapsVoice: Boolean = true,
+    /** While Google Maps navigates, its next turn fills the map pane (else a big card over the map). */
+    val gmapsBigPanel: Boolean = true,
     val avoidTolls: Boolean = false,
     val avoidHighways: Boolean = false,
 ) {
@@ -108,6 +112,8 @@ class ProfileStore(context: Context) {
         put("helmetMic", p.helmetMic)
         put("sosWithoutWake", p.sosWithoutWake)
         put("waveControl2", p.waveControl)
+        put("gmapsVoice", p.gmapsVoice)
+        put("gmapsBigPanel", p.gmapsBigPanel)
         put("avoidTolls", p.avoidTolls)
         put("avoidHighways", p.avoidHighways)
     }
@@ -149,6 +155,8 @@ class ProfileStore(context: Context) {
             helmetMic = o.optBoolean("helmetMic", false),
             sosWithoutWake = o.optBoolean("sosWithoutWake", true),
             waveControl = o.optBoolean("waveControl2", false),
+            gmapsVoice = o.optBoolean("gmapsVoice", true),
+            gmapsBigPanel = o.optBoolean("gmapsBigPanel", true),
             avoidTolls = o.optBoolean("avoidTolls", false),
             avoidHighways = o.optBoolean("avoidHighways", false),
         )
