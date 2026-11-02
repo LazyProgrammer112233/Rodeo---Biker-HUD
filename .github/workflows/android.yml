@@ -85,6 +85,9 @@ jobs:
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
           FIREBASE_DB_URL: ${{ secrets.FIREBASE_DB_URL }}
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+          TURN_URLS: ${{ secrets.TURN_URLS }}
+          TURN_USERNAME: ${{ secrets.TURN_USERNAME }}
+          TURN_PASSWORD: ${{ secrets.TURN_PASSWORD }}
         run: |
           chmod +x gradlew
           set -o pipefail
