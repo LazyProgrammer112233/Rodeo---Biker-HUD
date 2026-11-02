@@ -80,12 +80,14 @@ fun GmapsPanel(s: GmapsState, actions: GmapsActions, modifier: Modifier = Modifi
             // Touches stop here instead of panning the hidden map underneath.
             .pointerInput(Unit) { awaitPointerEventScope { while (true) awaitPointerEvent() } },
     ) {
-        val pad = (maxHeight.value * 0.045f).dp
-        val stripH = maxHeight * 0.17f
+        val paneW = maxWidth
+        val paneH = maxHeight
+        val pad = (paneH.value * 0.045f).dp
+        val stripH = paneH * 0.17f
         Column(Modifier.fillMaxSize()) {
             Row(Modifier.weight(1f).fillMaxWidth().padding(start = pad, top = pad, end = pad), verticalAlignment = Alignment.CenterVertically) {
                 // The arrow: a square of about 40% of the width, as tall as the row allows.
-                val side = minOf(maxWidth * 0.4f, (maxHeight - stripH - pad) * 0.94f)
+                val side = minOf(paneW * 0.4f, (paneH - stripH - pad) * 0.94f)
                 ArrowTile(s, Modifier.size(side))
                 Spacer(Modifier.width(pad))
                 Column(Modifier.weight(1f).fillMaxHeight().padding(top = 54.sdp()), verticalArrangement = Arrangement.Center) {
@@ -93,7 +95,7 @@ fun GmapsPanel(s: GmapsState, actions: GmapsActions, modifier: Modifier = Modifi
                         FitText("GOOGLE MAPS", t.headlineXl.copy(fontWeight = FontWeight.Black), c.text)
                         return@Column
                     }
-                    Distance(g, maxHeight)
+                    Distance(g, paneH)
                     FitText(GmapsText.action(g), t.headlineXl.copy(fontWeight = FontWeight.Black, fontSize = t.headlineXl.fontSize * 1.25f), c.text, Modifier.testTag("gmaps-action"))
                     GmapsText.road(g)?.let { road ->
                         FitText(road.uppercase(), t.headlineLg.copy(fontWeight = FontWeight.Bold), c.textMuted, maxLines = 2, modifier = Modifier.testTag("gmaps-road"))
