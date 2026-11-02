@@ -56,6 +56,7 @@ import com.rodeo.hud.nav.gmaps.VoicePlanner
 import com.rodeo.hud.ui.components.FitText
 import com.rodeo.hud.ui.components.panelShape
 import com.rodeo.hud.ui.theme.LocalHud
+import com.rodeo.hud.ui.theme.LocalScale
 import com.rodeo.hud.ui.theme.LocalType
 import com.rodeo.hud.ui.theme.sdp
 
@@ -201,8 +202,10 @@ private fun Distance(g: MapsGuidance, paneHeight: Dp) {
     val c = LocalHud.current
     val t = LocalType.current
     val parts = GmapsText.distanceParts(g) ?: return
-    // As big as the pane allows: roughly a third of its height.
-    val big = t.speed.copy(fontSize = t.speed.fontSize * (paneHeight.value / 300f).coerceIn(0.7f, 1.6f))
+    // As big as the pane allows once the action and road lines fit under it (short panes shrink it).
+    val k = LocalScale.current
+    val free = paneHeight.value * 0.83f - paneHeight.value * 0.045f - 54f * k - 80f * k
+    val big = t.speed.copy(fontSize = t.speed.fontSize * (free / (92f * k)).coerceIn(0.4f, 1.4f))
     Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.testTag("gmaps-distance")) {
         FitText(parts.first, big, c.accent, Modifier.weight(1f, fill = false), minScale = 0.35f)
         if (parts.second.isNotEmpty()) {

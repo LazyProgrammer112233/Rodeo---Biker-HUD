@@ -91,6 +91,7 @@ class NoticeParserTest {
         val a = NoticeParser.parse(MapsNotice("You have arrived", "Lalbagh Botanical Garden", null))!!
         assertEquals(NavStatus.ARRIVED, a.status)
         assertEquals(Maneuver.ARRIVE, a.maneuver)
+        assertEquals("Lalbagh Botanical Garden", a.street)
         val ahead = NoticeParser.parse(MapsNotice("150 m", "Destination will be on the right", "1 min · 150 m · 6:02 PM ETA"))!!
         assertEquals(Maneuver.ARRIVE, ahead.maneuver)
         assertEquals(NavStatus.NAVIGATING, ahead.status)

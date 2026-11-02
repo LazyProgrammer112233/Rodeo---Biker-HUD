@@ -148,7 +148,12 @@ object NoticeParser {
             maneuver = roundaboutFor(maneuver)
         }
 
-        val (street, towards) = streetOf(instruction, textTurn != null)
+        var (street, towards) = streetOf(instruction, textTurn != null)
+        if (status == NavStatus.ARRIVED) {
+            // "You have arrived" + the place: the place is what the rider wants to see.
+            street = rest.firstOrNull { line -> val l = line.lowercase(Locale.ROOT); ARRIVED.none { it in l } && STATUS_WORDS.none { it in l } }
+            towards = false
+        }
         val s = summary
         return MapsGuidance(
             maneuver = maneuver,

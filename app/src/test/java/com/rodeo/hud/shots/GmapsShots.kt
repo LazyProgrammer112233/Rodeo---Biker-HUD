@@ -112,14 +112,14 @@ class GmapsShots {
         CockpitLayout(riding, NoCockpit, mapOnRight = false, map = { GmapsPanel(s, NoGmaps, it) })
     }
 
-    @Test fun everyTurn() = shoot("gmaps-turns", listOf(Frame("1500x1100", 1500, 1100)), listOf(looks[0], looks[1])) {
+    @Test fun everyTurn() = shoot("gmaps-turns", listOf(Frame("1400x900", 1400, 900)), listOf(looks[0], looks[1])) {
         val list = Maneuver.entries.filter { it != Maneuver.UNKNOWN }
         Column(Modifier.fillMaxSize().background(LocalHud.current.background)) {
-            list.chunked(4).forEach { row ->
+            list.chunked(5).forEach { row ->
                 Row {
                     row.forEach { m ->
                         val exit = if (m.name.startsWith("ROUNDABOUT")) "At the roundabout, take the 3rd exit" else "Brigade Rd"
-                        Box(Modifier.requiredSize(375.dp, 180.dp).padding(4.dp)) {
+                        Box(Modifier.requiredSize(280.dp, 225.dp).padding(4.dp)) {
                             GmapsPanel(state("300 m", exit, "8 min · 3.7 km · 18:42 ETA", m), NoGmaps, Modifier.fillMaxSize())
                         }
                     }
