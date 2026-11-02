@@ -2,7 +2,7 @@ name: Android APK
 
 on:
   push:
-    branches: [ main, "p1-*" ]
+    branches: [ main, "p1-*", "claude/**" ]
   pull_request:
   workflow_dispatch:
 
@@ -230,13 +230,18 @@ jobs:
           done || true
 
       # Pull request runs have ref_name "1/merge", so name the APK after the source branch.
+      # Branch names may contain "/", which cannot go in a file name or a release tag.
       - name: Rename APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk "Rodeo-${{ github.head_ref || github.ref_name }}.apk"
+        run: |
+          SAFE_REF="${{ github.head_ref || github.ref_name }}"
+          SAFE_REF="${SAFE_REF//\//-}"
+          echo "SAFE_REF=$SAFE_REF" >> $GITHUB_ENV
+          cp app/build/outputs/apk/debug/app-debug.apk "Rodeo-$SAFE_REF.apk"
 
       - uses: actions/upload-artifact@v4
         with:
           name: Rodeo-apk
-          path: Rodeo-${{ github.head_ref || github.ref_name }}.apk
+          path: Rodeo-${{ env.SAFE_REF }}.apk
 
       # Only the newest commit on the branch may replace the rolling APK.
       - name: Still the newest commit?
@@ -251,10 +256,10 @@ jobs:
         if: github.event_name == 'push' && steps.newest.outputs.ok == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: latest-${{ github.ref_name }}
+          tag_name: latest-${{ env.SAFE_REF }}
           name: Rodeo ${{ github.ref_name }} (build ${{ github.run_number }}, ${{ github.sha }})
           prerelease: true
-          files: Rodeo-${{ github.ref_name }}.apk
+          files: Rodeo-${{ env.SAFE_REF }}.apk
           overwrite_files: true
 
   # The real app on an Android emulator: search, route, ride to arrival, reroute, music card.
