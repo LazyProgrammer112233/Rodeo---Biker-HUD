@@ -7,7 +7,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
-import javax.imageio.ImageIO
+import java.io.ByteArrayOutputStream
+import java.io.DataInputStream
+import java.util.zip.Inflater
 
 /**
  * Reads several hundred turn-arrow pictures (two open icon sets, each at three sizes and styles)
@@ -22,13 +24,70 @@ class ArrowReaderTest {
         listOf("material", "mapbox").flatMap { fam ->
             File(root, fam).listFiles()!!.sortedBy { it.name }.mapNotNull { f ->
                 val exp = expected(fam, f.name.substringBefore("@")) ?: return@mapNotNull null
-                val img = ImageIO.read(f)
-                val px = IntArray(img.width * img.height)
-                img.getRGB(0, 0, img.width, img.height, px, 0, img.width)
-                val r = ArrowReader.read(img.width, img.height, px)
+                val (w, h, px) = readPng(f)
+                val r = ArrowReader.read(w, h, px)
                 Case("$fam/${f.name}", exp, r.maneuver, r.confident)
             }
         }
+    }
+
+    /**
+     * Minimal PNG reader for the fixtures (8-bit RGB / RGBA, not interlaced): javax.imageio is
+     * not on the Android unit-test classpath.
+     */
+    private fun readPng(f: File): Triple<Int, Int, IntArray> {
+        val inp = DataInputStream(f.inputStream().buffered())
+        inp.skipBytes(8)
+        var w = 0; var h = 0; var type = 0
+        val idat = ByteArrayOutputStream()
+        while (true) {
+            val len = inp.readInt()
+            val tag = String(ByteArray(4).also { inp.readFully(it) }, Charsets.US_ASCII)
+            val data = ByteArray(len).also { inp.readFully(it) }
+            inp.readInt()
+            when (tag) {
+                "IHDR" -> {
+                    w = java.nio.ByteBuffer.wrap(data, 0, 4).int; h = java.nio.ByteBuffer.wrap(data, 4, 4).int
+                    check(data[8].toInt() == 8 && data[12].toInt() == 0) { "${f.name}: unsupported PNG" }
+                    type = data[9].toInt()
+                }
+                "IDAT" -> idat.write(data)
+                "IEND" -> break
+            }
+        }
+        val bpp = when (type) { 6 -> 4; 2 -> 3; else -> error("${f.name}: colour type $type") }
+        val stride = w * bpp
+        val raw = ByteArray(h * (stride + 1))
+        Inflater().apply { setInput(idat.toByteArray()); var o = 0; while (o < raw.size && !finished()) o += inflate(raw, o, raw.size - o); end() }
+        val cur = ByteArray(stride); val prev = ByteArray(stride)
+        val px = IntArray(w * h)
+        for (y in 0 until h) {
+            val filter = raw[y * (stride + 1)].toInt()
+            for (i in 0 until stride) {
+                val x = raw[y * (stride + 1) + 1 + i].toInt() and 0xFF
+                val a = if (i >= bpp) cur[i - bpp].toInt() and 0xFF else 0
+                val b = prev[i].toInt() and 0xFF
+                val c = if (i >= bpp) prev[i - bpp].toInt() and 0xFF else 0
+                val v = when (filter) {
+                    0 -> x
+                    1 -> x + a
+                    2 -> x + b
+                    3 -> x + (a + b) / 2
+                    4 -> { val p = a + b - c; val pa = kotlin.math.abs(p - a); val pb = kotlin.math.abs(p - b); val pc = kotlin.math.abs(p - c)
+                        x + if (pa <= pb && pa <= pc) a else if (pb <= pc) b else c }
+                    else -> error("filter $filter")
+                }
+                cur[i] = v.toByte()
+            }
+            for (xx in 0 until w) {
+                val o = xx * bpp
+                val r = cur[o].toInt() and 0xFF; val g = cur[o + 1].toInt() and 0xFF; val bl = cur[o + 2].toInt() and 0xFF
+                val al = if (bpp == 4) cur[o + 3].toInt() and 0xFF else 255
+                px[y * w + xx] = (al shl 24) or (r shl 16) or (g shl 8) or bl
+            }
+            cur.copyInto(prev)
+        }
+        return Triple(w, h, px)
     }
 
     @Test fun enoughPictures() = assertTrue("only ${cases.size} pictures", cases.size > 300)
